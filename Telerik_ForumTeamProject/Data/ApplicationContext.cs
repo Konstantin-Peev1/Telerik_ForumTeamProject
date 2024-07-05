@@ -70,6 +70,7 @@ namespace Telerik_ForumTeamProject.Data
                     LastName = "Peev",
                     Email = "konstantin.i.peev@gmail.com",
                     IsBlocked = false,
+                    IsAdmin = true
                 }
             };
             List<Admin> admins = new List<Admin>()

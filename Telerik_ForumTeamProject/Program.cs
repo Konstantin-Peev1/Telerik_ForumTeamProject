@@ -1,5 +1,10 @@
 using Microsoft.EntityFrameworkCore;
 using Telerik_ForumTeamProject.Data;
+using Telerik_ForumTeamProject.Helpers;
+using Telerik_ForumTeamProject.Repositories;
+using Telerik_ForumTeamProject.Repositories.Contracts;
+using Telerik_ForumTeamProject.Services;
+using Telerik_ForumTeamProject.Services.Contracts;
 
 namespace Telerik_ForumTeamProject
 {
@@ -28,6 +33,15 @@ namespace Telerik_ForumTeamProject
                 options.EnableSensitiveDataLogging();
             });
 
+            //Repositories
+            builder.Services.AddScoped<IUserRepository, UserRepository>();
+
+            //Services
+            builder.Services.AddScoped<IUserService, UserService>();
+
+            // Helpers
+            builder.Services.AddScoped<ModelMapper>();
+            builder.Services.AddScoped<AuthManager>();
 
             var app = builder.Build();
 

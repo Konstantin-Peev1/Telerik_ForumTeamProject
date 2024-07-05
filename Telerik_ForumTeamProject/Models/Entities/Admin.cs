@@ -17,6 +17,8 @@ namespace Telerik_ForumTeamProject.Models.Entities
         [MinLength(4, ErrorMessage = "The {0} field must be at least {1} character.")]
         public string LastName { get; set; }
         public string Email { get; set; }
+
+      
         
         public string? PhoneNumber { get; set; }
     }

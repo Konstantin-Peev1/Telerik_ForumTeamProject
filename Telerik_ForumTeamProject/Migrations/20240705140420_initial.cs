@@ -48,6 +48,7 @@ namespace Telerik_ForumTeamProject.Migrations
                     LastName = table.Column<string>(type: "nvarchar(32)", maxLength: 32, nullable: false),
                     Email = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Password = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    IsAdmin = table.Column<bool>(type: "bit", nullable: false),
                     IsBlocked = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
@@ -172,8 +173,8 @@ namespace Telerik_ForumTeamProject.Migrations
 
             migrationBuilder.InsertData(
                 table: "Users",
-                columns: new[] { "ID", "Email", "FirstName", "IsBlocked", "LastName", "Password", "UserName" },
-                values: new object[] { 1, "konstantin.i.peev@gmail.com", "Konstantin", false, "Peev", "123456778", "Kosio_Peev" });
+                columns: new[] { "ID", "Email", "FirstName", "IsAdmin", "IsBlocked", "LastName", "Password", "UserName" },
+                values: new object[] { 1, "konstantin.i.peev@gmail.com", "Konstantin", true, false, "Peev", "123456778", "Kosio_Peev" });
 
             migrationBuilder.InsertData(
                 table: "Posts",

@@ -234,6 +234,9 @@ namespace Telerik_ForumTeamProject.Migrations
                         .HasMaxLength(32)
                         .HasColumnType("nvarchar(32)");
 
+                    b.Property<bool>("IsAdmin")
+                        .HasColumnType("bit");
+
                     b.Property<bool>("IsBlocked")
                         .HasColumnType("bit");
 
@@ -260,6 +263,7 @@ namespace Telerik_ForumTeamProject.Migrations
                             ID = 1,
                             Email = "konstantin.i.peev@gmail.com",
                             FirstName = "Konstantin",
+                            IsAdmin = true,
                             IsBlocked = false,
                             LastName = "Peev",
                             Password = "123456778",

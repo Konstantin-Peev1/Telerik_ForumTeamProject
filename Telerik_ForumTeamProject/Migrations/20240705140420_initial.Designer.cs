@@ -12,7 +12,7 @@ using Telerik_ForumTeamProject.Data;
 namespace Telerik_ForumTeamProject.Migrations
 {
     [DbContext(typeof(ApplicationContext))]
-    [Migration("20240704114208_initial")]
+    [Migration("20240705140420_initial")]
     partial class initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -236,6 +236,9 @@ namespace Telerik_ForumTeamProject.Migrations
                         .HasMaxLength(32)
                         .HasColumnType("nvarchar(32)");
 
+                    b.Property<bool>("IsAdmin")
+                        .HasColumnType("bit");
+
                     b.Property<bool>("IsBlocked")
                         .HasColumnType("bit");
 
@@ -262,6 +265,7 @@ namespace Telerik_ForumTeamProject.Migrations
                             ID = 1,
                             Email = "konstantin.i.peev@gmail.com",
                             FirstName = "Konstantin",
+                            IsAdmin = true,
                             IsBlocked = false,
                             LastName = "Peev",
                             Password = "123456778",
