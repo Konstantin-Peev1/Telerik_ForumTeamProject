@@ -10,7 +10,6 @@ namespace Telerik_ForumTeamProject.Repositories
     public class PostRepository : IPostRepository
     {
         private readonly ApplicationContext applicationContext;
-
         public PostRepository(ApplicationContext applicationContext)
         {
             this.applicationContext = applicationContext;
@@ -61,16 +60,33 @@ namespace Telerik_ForumTeamProject.Repositories
 
         public Post UpdatePost(Post post, Post updatedPost)
         {
-            throw new NotImplementedException();
-            //implement tags first
+            post.Title = updatedPost.Title;
+            post.Content = updatedPost.Content;
+            post.Created = DateTime.Now;
+            this.applicationContext.SaveChanges();
+            return post;
         }
 
-        public Post DeletePost(Post post)
+        public Post UpdateTags(Post post, Tag tag)
         {
-            throw new NotImplementedException();
+            post.Tags.Add(tag);
+            this.applicationContext.SaveChanges();
+            return post;
+        }
+        public Post RemoveTags(Post post, Tag tag)
+        {
+            post.Tags.Remove(tag);
+            this.applicationContext.SaveChanges();
+            return post;
         }
 
-        private IQueryable<Post> FilterByTitle(IQueryable<Post> posts, string title)
+        public bool DeletePost(Post post)
+        {
+            this.applicationContext.Posts.Remove(post);
+            return this.applicationContext.SaveChanges() > 0;
+        }
+
+        private static IQueryable<Post> FilterByTitle(IQueryable<Post> posts, string title)
         {
             if(!string.IsNullOrEmpty(title))
             {
@@ -79,15 +95,15 @@ namespace Telerik_ForumTeamProject.Repositories
             return posts;
         }
 
-        private IQueryable<Post> FilterByMinLikes(IQueryable<Post> posts, int minLikes)
+        private static IQueryable<Post> FilterByMinLikes(IQueryable<Post> posts, int minLikes)
         {
             return posts.Where(posts => posts.Likes.Count >= minLikes);
         }
-        private IQueryable<Post> FilterByMaxLikes(IQueryable<Post> posts, int maxLikes)
+        private static IQueryable<Post> FilterByMaxLikes(IQueryable<Post> posts, int maxLikes)
         {
             return posts.Where(posts => posts.Likes.Count <= maxLikes);
         }
-        private IQueryable<Post> FilterByUser(IQueryable<Post> posts, string username)
+        private static IQueryable<Post> FilterByUser(IQueryable<Post> posts, string username)
         {
             if(!string.IsNullOrEmpty(username))
             {
@@ -96,7 +112,7 @@ namespace Telerik_ForumTeamProject.Repositories
             return posts;
         }
 
-        private IQueryable<Post> FilterByTag(IQueryable<Post> posts, string tagdesc)
+        private static IQueryable<Post> FilterByTag(IQueryable<Post> posts, string tagdesc)
         {
             if (!string.IsNullOrEmpty(tagdesc))
             {
