@@ -26,7 +26,7 @@ namespace Telerik_ForumTeamProject.Repositories
 
         public Reply GetReplyById(int id)
         {
-            Reply reply = GetReplies().FirstOrDefault(x => x.ID == id);
+            Reply reply = GetReplies().FirstOrDefault(x => x.Id == id);
 
             return reply ?? throw new EntityNotFoundException("Reply not found.");
         }
@@ -42,7 +42,7 @@ namespace Telerik_ForumTeamProject.Repositories
         {
             Reply replyToUpdate = this.GetReplyById(id);
 
-            replyToUpdate.Description = reply.Description;
+            replyToUpdate.Content = reply.Content;
             this.applicationContext.SaveChanges();
             return replyToUpdate;
         }

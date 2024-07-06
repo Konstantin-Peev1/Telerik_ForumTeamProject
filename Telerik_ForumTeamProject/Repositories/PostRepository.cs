@@ -63,22 +63,12 @@ namespace Telerik_ForumTeamProject.Repositories
             post.Title = updatedPost.Title;
             post.Content = updatedPost.Content;
             post.Created = DateTime.Now;
+            post.Tags = updatedPost.Tags;
             this.applicationContext.SaveChanges();
             return post;
         }
 
-        public Post UpdateTags(Post post, Tag tag)
-        {
-            post.Tags.Add(tag);
-            this.applicationContext.SaveChanges();
-            return post;
-        }
-        public Post RemoveTags(Post post, Tag tag)
-        {
-            post.Tags.Remove(tag);
-            this.applicationContext.SaveChanges();
-            return post;
-        }
+
 
         public bool DeletePost(Post post)
         {

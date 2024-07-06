@@ -19,5 +19,22 @@ namespace Telerik_ForumTeamProject.Repositories
             this.applicationContext.SaveChanges();
             return tag; 
         }
+
+        public bool TagExists(string description)
+        {
+            return this.applicationContext.Tags.Any(tag => tag.Description == description);
+        }
+        public Post UpdateTags(Post post, Tag tag)
+        {
+            post.Tags.Add(tag);
+            this.applicationContext.SaveChanges();
+            return post;
+        }
+        public bool RemoveTags(Post post, Tag tag)
+        {
+            post.Tags.Remove(tag);
+            
+            return this.applicationContext.SaveChanges() > 0;
+        }
     }
 }
