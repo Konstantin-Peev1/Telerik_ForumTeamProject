@@ -9,8 +9,8 @@ namespace Telerik_ForumTeamProject.Repositories.Contracts
         User UpdateInformation(User user, User userToUpdate);
         User CreateUser (User user);
         bool UserExists(string username);
-        public bool UserExistsEmail(string email);
-        public User GetUserByID(int id);
+        bool UserExistsEmail(string email);
+        User GetUserByID(int id);
 
 
     }
