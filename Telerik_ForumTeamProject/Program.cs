@@ -35,6 +35,8 @@ namespace Telerik_ForumTeamProject
 
             //Repositories
             builder.Services.AddScoped<IUserRepository, UserRepository>();
+            builder.Services.AddScoped<ICommentRepository, CommentRepository>();
+            builder.Services.AddScoped<IReplyRepository, ReplyRepository>();
 
             //Services
             builder.Services.AddScoped<IUserService, UserService>();
