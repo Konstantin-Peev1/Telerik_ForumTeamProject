@@ -62,8 +62,7 @@ namespace Telerik_ForumTeamProject.Repositories
         {
             post.Title = updatedPost.Title;
             post.Content = updatedPost.Content;
-            post.Created = DateTime.Now;
-            post.Tags = updatedPost.Tags;
+           // post.Tags = updatedPost.Tags;
             this.applicationContext.SaveChanges();
             return post;
         }
@@ -142,7 +141,7 @@ namespace Telerik_ForumTeamProject.Repositories
                     .ThenInclude(reply => reply.User)
                 .Include(post => post.Comments)
                     .ThenInclude(comment => comment.User)
-                .Include(post => post.Created);
+                .Include(post => post.Likes);
                   
         }
     }

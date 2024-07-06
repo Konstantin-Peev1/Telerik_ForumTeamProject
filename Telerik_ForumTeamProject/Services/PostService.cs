@@ -26,7 +26,7 @@ namespace Telerik_ForumTeamProject.Services
         public bool DeletePost(int id, User user)
         {
             Post post = this.postRepository.GetPost(id);
-            if(post.UserID != user.ID) 
+            if(post.UserID != user.ID && !user.IsAdmin) 
             {
                 throw new AuthorisationExcpetion("You can't delete other people's posts!");
             }
@@ -66,7 +66,7 @@ namespace Telerik_ForumTeamProject.Services
         }
 
 
-        // I do not like the tag implementation it has to be optimized a little
+        
 
      
     }

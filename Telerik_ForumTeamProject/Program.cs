@@ -17,6 +17,8 @@ namespace Telerik_ForumTeamProject
             // Add services to the container.
 
             builder.Services.AddControllers();
+           
+             
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
@@ -37,13 +39,19 @@ namespace Telerik_ForumTeamProject
             builder.Services.AddScoped<IUserRepository, UserRepository>();
             builder.Services.AddScoped<ICommentRepository, CommentRepository>();
             builder.Services.AddScoped<IReplyRepository, ReplyRepository>();
+            builder.Services.AddScoped<IPostRepository, PostRepository>();
+            builder.Services.AddScoped<ITagRepository, TagRepository>();    
 
             //Services
             builder.Services.AddScoped<IUserService, UserService>();
+            builder.Services.AddScoped<IPostService, PostService>();
+            builder.Services.AddScoped<ITagService,  TagService>();
 
             // Helpers
             builder.Services.AddScoped<ModelMapper>();
             builder.Services.AddScoped<AuthManager>();
+            builder.Services.AddControllers().AddNewtonsoftJson(options => options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore);
+
 
             var app = builder.Build();
 

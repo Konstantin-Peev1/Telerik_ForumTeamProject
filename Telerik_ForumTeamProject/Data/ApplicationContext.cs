@@ -91,6 +91,7 @@ namespace Telerik_ForumTeamProject.Data
                     Title = "This is my first post!!",
                     Content = "Wow this is the first post I have written",
                     UserID = users[0].ID,
+                    Created = DateTime.Now,
                     
                 }
             };
@@ -110,9 +111,9 @@ namespace Telerik_ForumTeamProject.Data
             {
                 new Reply
                 {
-                    ID = 1,
+                    Id = 1,
                     PostID = posts[0].Id,
-                    Description = "I am just commenting because why not",
+                    Content = "I am just commenting because why not",
                     UserID = users[0].ID,
                    
                 }

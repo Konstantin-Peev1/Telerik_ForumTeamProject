@@ -1,4 +1,6 @@
-﻿using Telerik_ForumTeamProject.Models.Entities;
+﻿using Microsoft.Extensions.Hosting;
+using System.Xml.Linq;
+using Telerik_ForumTeamProject.Models.Entities;
 using Telerik_ForumTeamProject.Models.RequestDTO;
 using Telerik_ForumTeamProject.Models.ResponseDTO;
 
@@ -26,6 +28,46 @@ namespace Telerik_ForumTeamProject.Helpers
                 Password = userRequest.Password,
                 UserName = userRequest.UserName,
             };
+        }
+
+        public Post Map(PostRequestDTO postRequestDTO)
+        {
+            return new Post()
+            {
+                Title = postRequestDTO.Title,
+                Content = postRequestDTO.Content,
+                Created = DateTime.Now,
+            };
+        }
+
+        public PostUploadResponseDTO Map(Post post)
+        {
+         
+            return new PostUploadResponseDTO()
+            {
+                Title = post.Title,
+                PostDate = post.Created,
+                Content = post.Content,
+                UserName = post.User.UserName,
+                Likes = post.Likes?.Count() ?? 0,
+                Comments = Map(post.Comments) ?? new List<CommentReplyResponseDTO>(),
+                Replies = Map(post.Replies) ?? new List<CommentReplyResponseDTO>(),
+
+            };
+        }
+
+        public List<CommentReplyResponseDTO> Map<T>(List<T> items) where T : PostAddition
+        {
+            if (items != null)
+            {
+                return items.Select(item => new CommentReplyResponseDTO
+                {
+                    Content = item.Content,
+                    UserName = item.User.UserName,
+                    Created = item.Created
+                }).ToList();
+            }
+            return new List<CommentReplyResponseDTO>();
         }
         public List<PostResponseDTO> Map(List<Post> posts)
         {
