@@ -10,6 +10,7 @@ namespace Telerik_ForumTeamProject.Repositories.Contracts
         User CreateUser (User user);
         bool UserExists(string username);
         public bool UserExistsEmail(string email);
+        public User GetUserByID(int id);
 
 
     }

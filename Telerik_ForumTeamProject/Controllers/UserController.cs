@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Telerik_ForumTeamProject.Helpers;
 using Telerik_ForumTeamProject.Models.Entities;
+using Telerik_ForumTeamProject.Models.RequestDTO;
 using Telerik_ForumTeamProject.Services.Contracts;
 
 namespace Telerik_ForumTeamProject.Controllers
@@ -28,12 +29,31 @@ namespace Telerik_ForumTeamProject.Controllers
             User user = this.authManager.TryGetUser(credentials);
 
 
-            var userToDisplay = this.userService.GetByInformation(information, user);
-
+            var userInfo = this.userService.GetByInformation(information, user);
+            var userToDisplay = modelMapper.Map(userInfo);
             return this.Ok(userToDisplay);
              //trycatch later -> think of where to put them 
         }
 
-        
+        [HttpPost("")]
+        public IActionResult Create([FromBody] UserRequestDTO user)
+        {
+            var createdUser = this.userService.CreateUser(this.modelMapper.Map(user));
+            var createdUserResponse = this.modelMapper.Map(createdUser);
+
+            return this.StatusCode(StatusCodes.Status201Created, createdUserResponse);
+        }
+
+        [HttpPut("{id}")]
+        public IActionResult Update(int id, [FromHeader] string credentials, [FromBody] UserRequestDTO userRequest)
+        {
+            User user = this.authManager.TryGetUser(credentials);
+            User userUpdateInfo = this.modelMapper.Map(userRequest);
+            var updatedUser = this.userService.UpdateUser(user, userUpdateInfo, id);
+            var userToReturn = this.modelMapper.Map(updatedUser);
+            return this.Ok(userToReturn);
+        }
+
+
     }
 }

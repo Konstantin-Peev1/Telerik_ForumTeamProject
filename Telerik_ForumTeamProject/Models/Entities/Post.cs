@@ -16,10 +16,15 @@ namespace Telerik_ForumTeamProject.Models.Entities
         [MaxLength(8192, ErrorMessage = "The {0} field must be less than {1} characters.")]
         [MinLength(32, ErrorMessage = "The {0} field must be at least {1} character.")]
         public string Content { get; set; }
+          
         public int UserID {  get; set; }
         public User User { get; set; }
+
+        public DateTime Created { get; set; }
         public List<Comment> Comments { get; set; }
         public List<Tag> Tags { get; set; }
         public List<Reply> Replies { get;set; }
+        public List<Like> Likes { get; set; }
+        
     }
 }

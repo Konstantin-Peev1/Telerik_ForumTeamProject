@@ -33,12 +33,12 @@ namespace Telerik_ForumTeamProject.Repositories
         }
         public User UpdateInformation(User user, User userToUpdate)
         {
-            userToUpdate.FirstName = user.FirstName;
-            userToUpdate.LastName = user.LastName;
-            userToUpdate.Password = user.Password;
-            userToUpdate.UserName = user.UserName;
+            user.FirstName = userToUpdate.FirstName;
+            user.LastName = userToUpdate.LastName;
+            user.Password = userToUpdate.Password;
+            user.UserName = userToUpdate.UserName;
             this.applicationConetxt.SaveChanges();
-            return userToUpdate;
+            return user;
         }
 
         public bool UserExists(string username)
@@ -49,6 +49,11 @@ namespace Telerik_ForumTeamProject.Repositories
         {
             return this.applicationConetxt.Users.Any(user => user.Email == email);
 
+        }
+
+        public User GetUserByID(int id)
+        {
+            return this.applicationConetxt.Users.FirstOrDefault(u => u.ID == id) ?? throw new EntityNotFoundException("No such user");
         }
 
         private IQueryable<User> GetUser()

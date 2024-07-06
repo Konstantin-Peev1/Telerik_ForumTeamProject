@@ -33,13 +33,14 @@ namespace Telerik_ForumTeamProject.Services
             User createdUser = this.userRepository.CreateUser(user);
             return createdUser;
         }
-        public User UpdateUser(User user, User userToUpdate)
+        public User UpdateUser(User user, User userToUpdate, int id)
         {
-            if(user.ID != userToUpdate.ID)
+            var validateUser = this.userRepository.GetUserByID(id);
+            if(user.ID != validateUser.ID)
             {
                 throw new AuthorisationExcpetion("You can't edit other users!");
             }
-            if(user.UserName != userToUpdate.UserName && this.userRepository.UserExists(user.UserName))
+            if(user.UserName != userToUpdate.UserName && this.userRepository.UserExists(userToUpdate.UserName))
             {
                 throw new DuplicateEntityException("User with such username exists");
             }
