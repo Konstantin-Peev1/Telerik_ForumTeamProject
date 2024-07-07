@@ -51,8 +51,18 @@ namespace Telerik_ForumTeamProject.Helpers
 
         public PostUploadResponseDTO Map(Post post)
         {
-         
-            return new PostUploadResponseDTO()
+            PostUploadResponseDTO postResponse = new PostUploadResponseDTO();
+
+            postResponse.Title = post.Title;
+            postResponse.PostDate = post.Created;
+            postResponse.Content = post.Content;
+            postResponse.UserName = post.User.UserName;
+            postResponse.Likes = post.Likes?.Count() ?? 0;
+            postResponse.Comments = Map(post.Comments) ?? new List<CommentReplyResponseDTO>();
+            postResponse.Replies = Map(post.Replies) ?? new List<CommentReplyResponseDTO>();
+            postResponse.Tags = post.Tags?.Select(tag => tag.Description).ToList() ?? new List<string>();
+            return postResponse;
+            /*return new PostUploadResponseDTO()
             {
                 Title = post.Title,
                 PostDate = post.Created,
@@ -62,7 +72,7 @@ namespace Telerik_ForumTeamProject.Helpers
                 Comments = Map(post.Comments) ?? new List<CommentReplyResponseDTO>(),
                 Replies = Map(post.Replies) ?? new List<CommentReplyResponseDTO>(),
                 Tags = post.Tags.Select(tag => tag.Description).ToList() ?? new List<string>(),
-            };
+            };*/
         }
 
         public List<CommentReplyResponseDTO> Map<T>(List<T> items) where T : PostAddition
