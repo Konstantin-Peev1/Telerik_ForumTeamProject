@@ -15,20 +15,31 @@ namespace Telerik_ForumTeamProject.Services
             this.tagRepository = tagRepository;
         }
 
-        public Tag Create(Tag tag)
+        public Tag Create(string desc)
         {
-            return tagRepository.Create(tag);
+            Tag tag = new Tag()
+            {
+                Description = desc,
+            };
+            Tag createdTag = tagRepository.Create(tag);
+            return createdTag;
         }
 
-        public bool RemoveTags(User user, Post post, Tag tag)
+        public List<Tag> GetTagsByDesc(string desc)
+        {
+            return this.tagRepository.GetTagByDesc(desc);
+        }
+
+        public bool RemoveTags(User user, Post post, string desc)
         {
             if(user.ID != post.UserID && !user.IsAdmin)
             {
                 throw new AuthorisationExcpetion("You can't edit tags of other users");
             }
 
-            if(post.Tags.Any(tagPost => tagPost.Description == tag.Description))
+            if(post.Tags.Any(tagPost => desc == tagPost.Description))
             {
+                Tag tag = tagRepository.GetTagByDesc(desc).FirstOrDefault(t => t.Description == desc);
                 post.Tags.Remove(tag);
                 tag.Posts.Remove(post);
                 return true;
@@ -36,25 +47,24 @@ namespace Telerik_ForumTeamProject.Services
             return false;
         }
 
-        public Tag UpdateTags(User user, Post post, Tag tag)
+        public Tag UpdateTags(User user, Post post, string desc)
         {
             if (user.ID != post.UserID && !user.IsAdmin)
             {
                 throw new AuthorisationExcpetion("You can't edit tags of other users");
             }
-            if(tagRepository.TagExists(tag.Description) 
-                && !post.Tags.Any(tagToChecl => tagToChecl.Description == tag.Description))
+            if(tagRepository.TagExists(desc) 
+                && !post.Tags.Any(tagToChecl => tagToChecl.Description == desc))
             {
-                post.Tags.Add(tag);
-                tag.Posts.Add(post);
-                return tag;
+                
+                return this.tagRepository.UpdateTags(post, desc);
             }
-            else if (!tagRepository.TagExists(tag.Description))
+            else if (!tagRepository.TagExists(desc))
             {
-                tagRepository.Create(tag);
-                post.Tags.Add(tag);
-                tag.Posts.Add(post);
-                return tag;
+                Tag tag = Create(desc);
+                this.tagRepository.UpdateTags(post, desc);
+                return this.tagRepository.UpdateTags(post, desc);
+                
             }
             else
             {

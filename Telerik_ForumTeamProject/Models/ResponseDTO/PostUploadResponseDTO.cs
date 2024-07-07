@@ -12,6 +12,8 @@ namespace Telerik_ForumTeamProject.Models.ResponseDTO
         public List<CommentReplyResponseDTO> Replies { get; set; }
         public string UserName { get; set; }
 
+        public List<string> Tags { get; set; }
+
         //maybe tags
 
     }

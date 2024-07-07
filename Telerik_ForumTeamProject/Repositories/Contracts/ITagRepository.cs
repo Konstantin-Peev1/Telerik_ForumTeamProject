@@ -7,6 +7,8 @@ namespace Telerik_ForumTeamProject.Repositories.Contracts
         Tag Create(Tag tag);
         bool TagExists(string description);
         bool RemoveTags(Post post, Tag tag);
-        Post UpdateTags(Post post, Tag tag);
+        Tag UpdateTags(Post post, string desc);
+
+        List<Tag> GetTagByDesc(string description);
     }
 }

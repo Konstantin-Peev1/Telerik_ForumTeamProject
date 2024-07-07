@@ -18,6 +18,10 @@ namespace Telerik_ForumTeamProject.Services
 
         public Post CreatePost(Post post, User user)
         {
+            if(user.IsBlocked)
+            {
+                throw new AuthorisationExcpetion("Blocked users can't upload posts");
+            }
             post.UserID = user.ID;
             Post postCreated = this.postRepository.CreatePost(post);
             return postCreated;
@@ -65,7 +69,7 @@ namespace Telerik_ForumTeamProject.Services
             return postUpdate;
         }
 
-
+        //Have to create a block user command.
         
 
      

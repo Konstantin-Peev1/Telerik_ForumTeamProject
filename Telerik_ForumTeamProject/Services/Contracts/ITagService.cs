@@ -4,9 +4,11 @@ namespace Telerik_ForumTeamProject.Services.Contracts
 {
     public interface ITagService
     {
-        Tag Create(Tag tag);
-        bool RemoveTags(User user, Post post, Tag tag);
-        Tag UpdateTags(User user, Post post, Tag tag);
+        bool RemoveTags(User user, Post post, string desc);
+        Tag UpdateTags(User user, Post post, string desc);
+        Tag Create(string desc);
+
+        List<Tag> GetTagsByDesc(string desc);   
 
     }
 }

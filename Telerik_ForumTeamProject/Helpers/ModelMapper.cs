@@ -40,6 +40,15 @@ namespace Telerik_ForumTeamProject.Helpers
             };
         }
 
+        public TagResponseDTO Map(Tag tag)
+        {
+            return new TagResponseDTO()
+            {
+                Description = tag.Description,
+                Posts = tag.Posts.Select(post => Map(post)).ToList(),
+            };
+        }
+
         public PostUploadResponseDTO Map(Post post)
         {
          
@@ -52,7 +61,7 @@ namespace Telerik_ForumTeamProject.Helpers
                 Likes = post.Likes?.Count() ?? 0,
                 Comments = Map(post.Comments) ?? new List<CommentReplyResponseDTO>(),
                 Replies = Map(post.Replies) ?? new List<CommentReplyResponseDTO>(),
-
+                Tags = post.Tags.Select(tag => tag.Description).ToList() ?? new List<string>(),
             };
         }
 

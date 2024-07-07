@@ -1,4 +1,6 @@
-﻿using Telerik_ForumTeamProject.Data;
+﻿using Microsoft.EntityFrameworkCore;
+using Telerik_ForumTeamProject.Data;
+using Telerik_ForumTeamProject.Exceptions;
 using Telerik_ForumTeamProject.Models.Entities;
 using Telerik_ForumTeamProject.Repositories.Contracts;
 
@@ -24,17 +26,28 @@ namespace Telerik_ForumTeamProject.Repositories
         {
             return this.applicationContext.Tags.Any(tag => tag.Description == description);
         }
-        public Post UpdateTags(Post post, Tag tag)
+
+        public Tag TagExistsFullDesc(string description)
         {
-            post.Tags.Add(tag);
+            return this.applicationContext.Tags.Include(tag => tag.Posts).FirstOrDefault(tag => tag.Description == description) ?? throw new EntityNotFoundException("No such tag");
+        }
+        public Tag UpdateTags(Post post,string desc)
+        {
+            post.Tags.Add(TagExistsFullDesc(desc));
+            TagExistsFullDesc(desc).Posts.Add(post);
             this.applicationContext.SaveChanges();
-            return post;
+            return TagExistsFullDesc(desc);
         }
         public bool RemoveTags(Post post, Tag tag)
         {
             post.Tags.Remove(tag);
             
             return this.applicationContext.SaveChanges() > 0;
+        }
+
+        public List<Tag> GetTagByDesc(string description)
+        {
+            return this.applicationContext.Tags.Where(tag => tag.Description.Contains(description)).Include(tag => tag.Posts).ToList();
         }
     }
 }
