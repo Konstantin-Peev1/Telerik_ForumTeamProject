@@ -48,6 +48,8 @@ namespace Telerik_ForumTeamProject.Helpers
                 Posts = tag.Posts.Select(post => Map(post)).ToList(),
             };
         }
+    
+
 
         public PostUploadResponseDTO Map(Post post)
         {

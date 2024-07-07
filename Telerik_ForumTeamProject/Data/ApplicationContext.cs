@@ -58,14 +58,15 @@ namespace Telerik_ForumTeamProject.Data
                 .WithMany(u => u.Replies)
                 .HasForeignKey(r => r.UserID)
                 .OnDelete(DeleteBehavior.Cascade);
-
+            string plainPassword = "123456778";
+            string hashedPassword = BCrypt.Net.BCrypt.HashPassword(plainPassword);
             List<User> users = new List<User>()
             {
                 new User
                 {
                     ID = 1,
                     UserName = "Kosio_Peev",
-                    Password = "123456778",
+                    Password = hashedPassword,
                     FirstName = "Konstantin",
                     LastName = "Peev",
                     Email = "konstantin.i.peev@gmail.com",
@@ -134,6 +135,9 @@ namespace Telerik_ForumTeamProject.Data
             modelBuilder.Entity<Comment>().HasData(comments);
             modelBuilder.Entity<Reply>().HasData(replies);
             modelBuilder.Entity<Tag>().HasData(tags);
+
+            modelBuilder.Entity<User>().HasDiscriminator<string>("Discriminator").HasValue<User>("User");
+         
         }
     }
 }

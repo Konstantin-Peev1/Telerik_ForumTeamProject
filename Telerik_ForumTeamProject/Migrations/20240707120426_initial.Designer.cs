@@ -12,7 +12,7 @@ using Telerik_ForumTeamProject.Data;
 namespace Telerik_ForumTeamProject.Migrations
 {
     [DbContext(typeof(ApplicationContext))]
-    [Migration("20240705140420_initial")]
+    [Migration("20240707120426_initial")]
     partial class initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -61,9 +61,6 @@ namespace Telerik_ForumTeamProject.Migrations
                         .HasMaxLength(32)
                         .HasColumnType("nvarchar(32)");
 
-                    b.Property<string>("PhoneNumber")
-                        .HasColumnType("nvarchar(max)");
-
                     b.HasKey("ID");
 
                     b.ToTable("Admins");
@@ -91,6 +88,9 @@ namespace Telerik_ForumTeamProject.Migrations
                         .HasMaxLength(8192)
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<DateTime>("Created")
+                        .HasColumnType("datetime2");
+
                     b.Property<int>("PostID")
                         .HasColumnType("int");
 
@@ -115,9 +115,31 @@ namespace Telerik_ForumTeamProject.Migrations
                         {
                             Id = 1,
                             Content = "I am just commenting because why not",
+                            Created = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             PostID = 1,
                             UserID = 1
                         });
+                });
+
+            modelBuilder.Entity("Telerik_ForumTeamProject.Models.Entities.Like", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<int>("PostID")
+                        .HasColumnType("int");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PostID");
+
+                    b.ToTable("Like");
                 });
 
             modelBuilder.Entity("Telerik_ForumTeamProject.Models.Entities.Post", b =>
@@ -130,13 +152,14 @@ namespace Telerik_ForumTeamProject.Migrations
 
                     b.Property<string>("Content")
                         .IsRequired()
-                        .HasMaxLength(8192)
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("Created")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("Title")
                         .IsRequired()
-                        .HasMaxLength(64)
-                        .HasColumnType("nvarchar(64)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("UserID")
                         .HasColumnType("int");
@@ -152,6 +175,7 @@ namespace Telerik_ForumTeamProject.Migrations
                         {
                             Id = 1,
                             Content = "Wow this is the first post I have written",
+                            Created = new DateTime(2024, 7, 7, 15, 4, 26, 649, DateTimeKind.Local).AddTicks(7390),
                             Title = "This is my first post!!",
                             UserID = 1
                         });
@@ -159,16 +183,19 @@ namespace Telerik_ForumTeamProject.Migrations
 
             modelBuilder.Entity("Telerik_ForumTeamProject.Models.Entities.Reply", b =>
                 {
-                    b.Property<int>("ID")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ID"), 1L, 1);
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
-                    b.Property<string>("Description")
+                    b.Property<string>("Content")
                         .IsRequired()
                         .HasMaxLength(8192)
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("Created")
+                        .HasColumnType("datetime2");
 
                     b.Property<int>("PostID")
                         .HasColumnType("int");
@@ -176,7 +203,7 @@ namespace Telerik_ForumTeamProject.Migrations
                     b.Property<int>("UserID")
                         .HasColumnType("int");
 
-                    b.HasKey("ID");
+                    b.HasKey("Id");
 
                     b.HasIndex("PostID");
 
@@ -187,8 +214,9 @@ namespace Telerik_ForumTeamProject.Migrations
                     b.HasData(
                         new
                         {
-                            ID = 1,
-                            Description = "I am just commenting because why not",
+                            Id = 1,
+                            Content = "I am just commenting because why not",
+                            Created = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             PostID = 1,
                             UserID = 1
                         });
@@ -227,14 +255,17 @@ namespace Telerik_ForumTeamProject.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ID"), 1L, 1);
 
+                    b.Property<string>("Discriminator")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("Email")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("FirstName")
                         .IsRequired()
-                        .HasMaxLength(32)
-                        .HasColumnType("nvarchar(32)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("IsAdmin")
                         .HasColumnType("bit");
@@ -244,8 +275,7 @@ namespace Telerik_ForumTeamProject.Migrations
 
                     b.Property<string>("LastName")
                         .IsRequired()
-                        .HasMaxLength(32)
-                        .HasColumnType("nvarchar(32)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Password")
                         .IsRequired()
@@ -259,6 +289,8 @@ namespace Telerik_ForumTeamProject.Migrations
 
                     b.ToTable("Users");
 
+                    b.HasDiscriminator<string>("Discriminator").HasValue("User");
+
                     b.HasData(
                         new
                         {
@@ -268,7 +300,7 @@ namespace Telerik_ForumTeamProject.Migrations
                             IsAdmin = true,
                             IsBlocked = false,
                             LastName = "Peev",
-                            Password = "123456778",
+                            Password = "$2b$10$y8o4nD.3CrGkDuJk4MQM1eRYuibi9AkVSWtVPdCtjMO2neikXTECS",
                             UserName = "Kosio_Peev"
                         });
                 });
@@ -313,6 +345,15 @@ namespace Telerik_ForumTeamProject.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("Telerik_ForumTeamProject.Models.Entities.Like", b =>
+                {
+                    b.HasOne("Telerik_ForumTeamProject.Models.Entities.Post", null)
+                        .WithMany("Likes")
+                        .HasForeignKey("PostID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("Telerik_ForumTeamProject.Models.Entities.Post", b =>
                 {
                     b.HasOne("Telerik_ForumTeamProject.Models.Entities.User", "User")
@@ -346,6 +387,8 @@ namespace Telerik_ForumTeamProject.Migrations
             modelBuilder.Entity("Telerik_ForumTeamProject.Models.Entities.Post", b =>
                 {
                     b.Navigation("Comments");
+
+                    b.Navigation("Likes");
 
                     b.Navigation("Replies");
                 });
