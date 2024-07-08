@@ -91,13 +91,27 @@ namespace Telerik_ForumTeamProject.Helpers
             return new List<CommentReplyResponseDTO>();
         }
 
-        public Comment Map(CommentRequestDTO comment)
+        public Comment Map(CommentRequestDTO comment, int postId)
         {
             return new Comment()
             {
+                PostID = postId,
                 Content = comment.Content,
+                Created = DateTime.Now
             };
         }
+
+        public Comment MapUpdateComment(CommentRequestDTO comment, int commentId)
+        {
+            return new Comment()
+            {
+                Id = commentId,
+                Content = comment.Content,
+                Created = DateTime.Now
+            };
+        }
+
+
 
         public CommentReplyResponseDTO Map(Comment comment)
         {
