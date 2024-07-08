@@ -47,6 +47,13 @@ namespace Telerik_ForumTeamProject.Repositories
             return replyToUpdate;
         }
 
+        public bool DeleteReply(int id) 
+        {
+            Reply replyToDelete = this.GetReplyById(id);
+            applicationContext.Remove(replyToDelete);
+            return applicationContext.SaveChanges() > 0;
+        }
+
         private IQueryable<Reply> GetReplies()
         {
             return this.applicationContext.Replies;

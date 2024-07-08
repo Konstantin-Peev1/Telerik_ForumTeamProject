@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+﻿using System;
+using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
@@ -8,22 +9,6 @@ namespace Telerik_ForumTeamProject.Migrations
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.CreateTable(
-                name: "Admins",
-                columns: table => new
-                {
-                    ID = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    FirstName = table.Column<string>(type: "nvarchar(32)", maxLength: 32, nullable: false),
-                    LastName = table.Column<string>(type: "nvarchar(32)", maxLength: 32, nullable: false),
-                    Email = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    PhoneNumber = table.Column<string>(type: "nvarchar(max)", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Admins", x => x.ID);
-                });
-
             migrationBuilder.CreateTable(
                 name: "Tags",
                 columns: table => new
@@ -44,12 +29,14 @@ namespace Telerik_ForumTeamProject.Migrations
                     ID = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     UserName = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    FirstName = table.Column<string>(type: "nvarchar(32)", maxLength: 32, nullable: false),
-                    LastName = table.Column<string>(type: "nvarchar(32)", maxLength: 32, nullable: false),
+                    FirstName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    LastName = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Email = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Password = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     IsAdmin = table.Column<bool>(type: "bit", nullable: false),
-                    IsBlocked = table.Column<bool>(type: "bit", nullable: false)
+                    IsBlocked = table.Column<bool>(type: "bit", nullable: false),
+                    Discriminator = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    PhoneNumber = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -62,9 +49,10 @@ namespace Telerik_ForumTeamProject.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Title = table.Column<string>(type: "nvarchar(64)", maxLength: 64, nullable: false),
-                    Content = table.Column<string>(type: "nvarchar(max)", maxLength: 8192, nullable: false),
-                    UserID = table.Column<int>(type: "int", nullable: false)
+                    Title = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Content = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    UserID = table.Column<int>(type: "int", nullable: false),
+                    Created = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -75,6 +63,26 @@ namespace Telerik_ForumTeamProject.Migrations
                         principalTable: "Users",
                         principalColumn: "ID",
                         onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Like",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    UserId = table.Column<int>(type: "int", nullable: false),
+                    PostID = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Like", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Like_Posts_PostID",
+                        column: x => x.PostID,
+                        principalTable: "Posts",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -105,15 +113,16 @@ namespace Telerik_ForumTeamProject.Migrations
                 name: "Replies",
                 columns: table => new
                 {
-                    ID = table.Column<int>(type: "int", nullable: false)
+                    Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Description = table.Column<string>(type: "nvarchar(max)", maxLength: 8192, nullable: false),
+                    Created = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Content = table.Column<string>(type: "nvarchar(max)", maxLength: 8192, nullable: false),
                     UserID = table.Column<int>(type: "int", nullable: false),
                     PostID = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Replies", x => x.ID);
+                    table.PrimaryKey("PK_Replies", x => x.Id);
                     table.ForeignKey(
                         name: "FK_Replies_Posts_PostID",
                         column: x => x.PostID,
@@ -134,10 +143,11 @@ namespace Telerik_ForumTeamProject.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
+                    ReplyID = table.Column<int>(type: "int", nullable: true),
                     Content = table.Column<string>(type: "nvarchar(max)", maxLength: 8192, nullable: false),
                     UserID = table.Column<int>(type: "int", nullable: false),
                     PostID = table.Column<int>(type: "int", nullable: false),
-                    ReplyID = table.Column<int>(type: "int", nullable: true)
+                    Created = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -152,7 +162,7 @@ namespace Telerik_ForumTeamProject.Migrations
                         name: "FK_Comments_Replies_ReplyID",
                         column: x => x.ReplyID,
                         principalTable: "Replies",
-                        principalColumn: "ID");
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_Comments_Users_UserID",
                         column: x => x.UserID,
@@ -162,34 +172,29 @@ namespace Telerik_ForumTeamProject.Migrations
                 });
 
             migrationBuilder.InsertData(
-                table: "Admins",
-                columns: new[] { "ID", "Email", "FirstName", "LastName", "PhoneNumber" },
-                values: new object[] { 1, "adminAdminov@gmail.com", "Admin", "Adminov", null });
-
-            migrationBuilder.InsertData(
                 table: "Tags",
                 columns: new[] { "ID", "Description" },
                 values: new object[] { 1, "TestTag" });
 
             migrationBuilder.InsertData(
                 table: "Users",
-                columns: new[] { "ID", "Email", "FirstName", "IsAdmin", "IsBlocked", "LastName", "Password", "UserName" },
-                values: new object[] { 1, "konstantin.i.peev@gmail.com", "Konstantin", true, false, "Peev", "123456778", "Kosio_Peev" });
+                columns: new[] { "ID", "Discriminator", "Email", "FirstName", "IsAdmin", "IsBlocked", "LastName", "Password", "UserName" },
+                values: new object[] { 1, "User", "konstantin.i.peev@gmail.com", "Konstantin", true, false, "Peev", "123456778", "Kosio_Peev" });
 
             migrationBuilder.InsertData(
                 table: "Posts",
-                columns: new[] { "Id", "Content", "Title", "UserID" },
-                values: new object[] { 1, "Wow this is the first post I have written", "This is my first post!!", 1 });
+                columns: new[] { "Id", "Content", "Created", "Title", "UserID" },
+                values: new object[] { 1, "Wow this is the first post I have written", new DateTime(2024, 7, 7, 22, 11, 27, 632, DateTimeKind.Local).AddTicks(5368), "This is my first post!!", 1 });
 
             migrationBuilder.InsertData(
                 table: "Comments",
-                columns: new[] { "Id", "Content", "PostID", "ReplyID", "UserID" },
-                values: new object[] { 1, "I am just commenting because why not", 1, null, 1 });
+                columns: new[] { "Id", "Content", "Created", "PostID", "ReplyID", "UserID" },
+                values: new object[] { 1, "I am just commenting because why not", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 1, null, 1 });
 
             migrationBuilder.InsertData(
                 table: "Replies",
-                columns: new[] { "ID", "Description", "PostID", "UserID" },
-                values: new object[] { 1, "I am just commenting because why not", 1, 1 });
+                columns: new[] { "Id", "Content", "Created", "PostID", "UserID" },
+                values: new object[] { 1, "I am just commenting because why not", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 1, 1 });
 
             migrationBuilder.CreateIndex(
                 name: "IX_Comments_PostID",
@@ -205,6 +210,11 @@ namespace Telerik_ForumTeamProject.Migrations
                 name: "IX_Comments_UserID",
                 table: "Comments",
                 column: "UserID");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Like_PostID",
+                table: "Like",
+                column: "PostID");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Posts_UserID",
@@ -230,10 +240,10 @@ namespace Telerik_ForumTeamProject.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "Admins");
+                name: "Comments");
 
             migrationBuilder.DropTable(
-                name: "Comments");
+                name: "Like");
 
             migrationBuilder.DropTable(
                 name: "PostTag");

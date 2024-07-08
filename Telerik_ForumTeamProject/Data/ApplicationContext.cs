@@ -73,7 +73,7 @@ namespace Telerik_ForumTeamProject.Data
                     IsAdmin = true
                 }
             };
-            List<Admin> admins = new List<Admin>()
+/*            List<Admin> admins = new List<Admin>()
             {
                 new Admin
                 {
@@ -82,7 +82,7 @@ namespace Telerik_ForumTeamProject.Data
                     LastName = "Adminov",
                     Email = "adminAdminov@gmail.com"
                 }
-            };
+            };*/
             List<Post> posts = new List<Post>()
             {
                 new Post
@@ -128,7 +128,7 @@ namespace Telerik_ForumTeamProject.Data
                 }
             };
 
-            modelBuilder.Entity<Admin>().HasData(admins);
+            //modelBuilder.Entity<Admin>().HasData(admins);
             modelBuilder.Entity<User>().HasData(users);
             modelBuilder.Entity<Post>().HasData(posts);
             modelBuilder.Entity<Comment>().HasData(comments);

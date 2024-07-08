@@ -43,6 +43,14 @@ namespace Telerik_ForumTeamProject.Repositories
             return commentToUpdate;
         }
 
+        public bool DeleteComment(int id, Comment comment) 
+        {
+            comment = this.GetCommentById(id);
+            this.applicationContext.Comments.Remove(comment);
+            return this.applicationContext.SaveChanges() > 0;
+            
+        }
+
         private IQueryable<Comment> GetComments()
         {
             return this.applicationContext.Comments;

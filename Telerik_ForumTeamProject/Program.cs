@@ -44,6 +44,7 @@ namespace Telerik_ForumTeamProject
 
             //Services
             builder.Services.AddScoped<IUserService, UserService>();
+            builder.Services.AddScoped<ICommentService, CommentService>();
             builder.Services.AddScoped<IPostService, PostService>();
             builder.Services.AddScoped<ITagService,  TagService>();
 
