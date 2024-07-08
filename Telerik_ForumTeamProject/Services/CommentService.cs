@@ -33,12 +33,11 @@ namespace Telerik_ForumTeamProject.Services
 
         public Comment UpdateComment(int id, Comment comment, User user)
         {
-            Comment commentToUpdate = this.commentRepository.GetCommentById(id);
             if (comment.UserID != user.ID && !user.IsAdmin)
             {
                 throw new AuthorisationExcpetion("You do not have permission to edit this comment!");
             }
-            return this.commentRepository.UpdateComment(id, commentToUpdate);
+            return this.commentRepository.UpdateComment(id, comment);
         }
 
         public bool DeleteComment(int id, User user)

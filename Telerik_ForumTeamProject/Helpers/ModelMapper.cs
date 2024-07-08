@@ -8,13 +8,14 @@ namespace Telerik_ForumTeamProject.Helpers
 {
     public class ModelMapper
     {
+
         public UserResponseDTO Map(User user)
         {
             UserResponseDTO response = new UserResponseDTO();
             response.FirstName = user.FirstName;
             response.LastName = user.LastName;
-            response.Email = user.Email;     
-            if(user.Posts!= null) { response.Posts = Map(user.Posts); }
+            response.Email = user.Email;
+            if (user.Posts != null) { response.Posts = Map(user.Posts); }
             return response;
         }
 
@@ -48,7 +49,7 @@ namespace Telerik_ForumTeamProject.Helpers
                 Posts = tag.Posts.Select(post => Map(post)).ToList(),
             };
         }
-    
+
 
 
         public PostUploadResponseDTO Map(Post post)
@@ -91,13 +92,26 @@ namespace Telerik_ForumTeamProject.Helpers
             return new List<CommentReplyResponseDTO>();
         }
 
-        public Comment Map(CommentRequestDTO comment)
+        public Comment Map(CommentRequestDTO comment, int postId)
         {
             return new Comment()
             {
+                PostID = postId,
                 Content = comment.Content,
+                Created = DateTime.Now
             };
         }
+
+        public Comment MapUpdateComment(CommentRequestDTO comment, int commentId)
+        {
+            return new Comment()
+            {
+                Id = commentId,
+                Content = comment.Content,
+                Created = DateTime.Now
+            };
+        }
+
 
         public CommentReplyResponseDTO Map(Comment comment)
         {
@@ -111,7 +125,7 @@ namespace Telerik_ForumTeamProject.Helpers
 
         public List<PostResponseDTO> Map(List<Post> posts)
         {
-            if(posts.Count !=  0) 
+            if (posts.Count != 0)
             {
                 return posts.Select(post => new PostResponseDTO
                 {
@@ -119,12 +133,6 @@ namespace Telerik_ForumTeamProject.Helpers
                 }).ToList();
             }
             return new List<PostResponseDTO>();
-
-          
         }
-
-    }
-
-   
-    
+    }   
 }
