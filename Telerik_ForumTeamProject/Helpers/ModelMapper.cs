@@ -90,6 +90,25 @@ namespace Telerik_ForumTeamProject.Helpers
             }
             return new List<CommentReplyResponseDTO>();
         }
+
+        public Comment Map(CommentRequestDTO comment)
+        {
+            return new Comment()
+            {
+                Content = comment.Content,
+            };
+        }
+
+        public CommentReplyResponseDTO Map(Comment comment)
+        {
+            return new CommentReplyResponseDTO
+            {
+                Content = comment.Content,
+                Created = comment.Created,
+                UserName = comment.User.UserName
+            };
+        }
+
         public List<PostResponseDTO> Map(List<Post> posts)
         {
             if(posts.Count !=  0) 
@@ -103,6 +122,7 @@ namespace Telerik_ForumTeamProject.Helpers
 
           
         }
+
     }
 
    
