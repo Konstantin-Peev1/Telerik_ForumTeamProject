@@ -12,7 +12,6 @@ namespace Telerik_ForumTeamProject.Data
         }
 
         public DbSet<User> Users { get; set; }
-        public DbSet<Admin> Admins { get; set; }
         public DbSet<Comment> Comments { get; set; }
         public DbSet<Post> Posts { get;set; }
         public DbSet<Tag> Tags { get; set; }
@@ -74,16 +73,7 @@ namespace Telerik_ForumTeamProject.Data
                     IsAdmin = true
                 }
             };
-/*            List<Admin> admins = new List<Admin>()
-            {
-                new Admin
-                {
-                    ID = 1,
-                    FirstName = "Admin",
-                    LastName = "Adminov",
-                    Email = "adminAdminov@gmail.com"
-                }
-            };*/
+
             List<Post> posts = new List<Post>()
             {
                 new Post
@@ -129,7 +119,7 @@ namespace Telerik_ForumTeamProject.Data
                 }
             };
 
-            //modelBuilder.Entity<Admin>().HasData(admins);
+           
             modelBuilder.Entity<User>().HasData(users);
             modelBuilder.Entity<Post>().HasData(posts);
             modelBuilder.Entity<Comment>().HasData(comments);

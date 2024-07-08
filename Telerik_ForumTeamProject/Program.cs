@@ -41,12 +41,14 @@ namespace Telerik_ForumTeamProject
             builder.Services.AddScoped<IReplyRepository, ReplyRepository>();
             builder.Services.AddScoped<IPostRepository, PostRepository>();
             builder.Services.AddScoped<ITagRepository, TagRepository>();    
+            builder.Services.AddScoped<ILikeRepository, LikeRepository>();
 
             //Services
             builder.Services.AddScoped<IUserService, UserService>();
             builder.Services.AddScoped<ICommentService, CommentService>();
             builder.Services.AddScoped<IPostService, PostService>();
             builder.Services.AddScoped<ITagService,  TagService>();
+            builder.Services.AddScoped<ILikeService, LikeService>();
 
             // Helpers
             builder.Services.AddScoped<ModelMapper>();

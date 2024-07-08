@@ -141,7 +141,8 @@ namespace Telerik_ForumTeamProject.Repositories
                     .ThenInclude(reply => reply.User)
                 .Include(post => post.Comments)
                     .ThenInclude(comment => comment.User)
-                .Include(post => post.Likes);
+                .Include(post => post.Likes)
+                    .ThenInclude(likes => likes.User);
                   
         }
     }

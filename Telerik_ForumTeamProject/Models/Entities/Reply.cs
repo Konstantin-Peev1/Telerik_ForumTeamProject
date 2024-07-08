@@ -6,6 +6,6 @@ namespace Telerik_ForumTeamProject.Models.Entities
     {    
 
         public List<Comment> Comments { get; set; }
-        public DateTime Created { get; set; }
+       
     }
 }

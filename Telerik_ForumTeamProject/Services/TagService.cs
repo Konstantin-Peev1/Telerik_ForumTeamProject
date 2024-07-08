@@ -36,15 +36,14 @@ namespace Telerik_ForumTeamProject.Services
             {
                 throw new AuthorisationExcpetion("You can't edit tags of other users");
             }
+            Tag tag = tagRepository.GetTagByDesc(desc).FirstOrDefault(t => t.Description == desc);
 
-            if(post.Tags.Any(tagPost => desc == tagPost.Description))
+            if (post.Tags.Any(tagPost => desc == tagPost.Description))
             {
-                Tag tag = tagRepository.GetTagByDesc(desc).FirstOrDefault(t => t.Description == desc);
                 post.Tags.Remove(tag);
                 tag.Posts.Remove(post);
-                return true;
             }
-            return false;
+            return this.tagRepository.RemoveTags(post, tag);
         }
 
         public Tag UpdateTags(User user, Post post, string desc)
