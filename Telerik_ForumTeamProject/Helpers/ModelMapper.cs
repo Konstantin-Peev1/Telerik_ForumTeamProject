@@ -3,6 +3,7 @@ using System.Xml.Linq;
 using Telerik_ForumTeamProject.Models.Entities;
 using Telerik_ForumTeamProject.Models.RequestDTO;
 using Telerik_ForumTeamProject.Models.ResponseDTO;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace Telerik_ForumTeamProject.Helpers
 {
@@ -65,7 +66,7 @@ namespace Telerik_ForumTeamProject.Helpers
             PostUploadResponseDTO postResponse = new PostUploadResponseDTO();
 
             postResponse.Title = post.Title;
-            postResponse.PostDate = post.Created;
+            postResponse.PostDate = DateTimeFormatter.FormatToStandard(post.Created);
             postResponse.Content = post.Content;
             postResponse.UserName = post.User.UserName;
             postResponse.Likes = post.Likes?.Count() ?? 0;
@@ -94,26 +95,40 @@ namespace Telerik_ForumTeamProject.Helpers
                 {
                     Content = item.Content,
                     UserName = item.User.UserName,
-                    Created = item.Created
+                    Created = DateTimeFormatter.FormatToStandard(item.Created)
                 }).ToList();
             }
             return new List<CommentReplyResponseDTO>();
         }
 
-        public Comment Map(CommentRequestDTO comment)
+        public Comment Map(CommentRequestDTO comment, int postId)
         {
             return new Comment()
             {
+                PostID = postId,
                 Content = comment.Content,
+                Created = DateTime.Now
             };
         }
+
+        public Comment MapUpdateComment(CommentRequestDTO comment, int commentId)
+        {
+            return new Comment()
+            {
+                Id = commentId,
+                Content = comment.Content,
+                Created = DateTime.Now
+            };
+        }
+
+
 
         public CommentReplyResponseDTO Map(Comment comment)
         {
             return new CommentReplyResponseDTO
             {
                 Content = comment.Content,
-                Created = comment.Created,
+                Created = DateTimeFormatter.FormatToStandard(comment.Created),
                 UserName = comment.User.UserName
             };
         }
