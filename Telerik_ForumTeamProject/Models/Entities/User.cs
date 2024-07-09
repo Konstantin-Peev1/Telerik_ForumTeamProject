@@ -20,6 +20,8 @@ namespace Telerik_ForumTeamProject.Models.Entities
         public string Password { get; set; }
       
         public bool IsAdmin { get; set; } 
+
+        public string Role { get; set; }
         public bool IsBlocked { get; set; }
 
         public List<Post> Posts { get; set; }

@@ -34,6 +34,7 @@ namespace Telerik_ForumTeamProject.Migrations
                     Email = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Password = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     IsAdmin = table.Column<bool>(type: "bit", nullable: false),
+                    Role = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     IsBlocked = table.Column<bool>(type: "bit", nullable: false),
                     Discriminator = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
@@ -183,13 +184,13 @@ namespace Telerik_ForumTeamProject.Migrations
 
             migrationBuilder.InsertData(
                 table: "Users",
-                columns: new[] { "ID", "Discriminator", "Email", "FirstName", "IsAdmin", "IsBlocked", "LastName", "Password", "UserName" },
-                values: new object[] { 1, "User", "konstantin.i.peev@gmail.com", "Konstantin", true, false, "Peev", "$2b$10$zSHva9Muug/Br.hKmAByFeVUTTQ7.pJPmrzHWkP7DNCN.eRvNqQem", "Kosio_Peev" });
+                columns: new[] { "ID", "Discriminator", "Email", "FirstName", "IsAdmin", "IsBlocked", "LastName", "Password", "Role", "UserName" },
+                values: new object[] { 1, "User", "konstantin.i.peev@gmail.com", "Konstantin", true, false, "Peev", "$2b$10$4P3xMfnfWXucglQ1.uHixuOQ/8bz1jbgnqyogJbAqHC2nY2/qAT62", "Admin", "Kosio_Peev" });
 
             migrationBuilder.InsertData(
                 table: "Posts",
                 columns: new[] { "Id", "Content", "Created", "Title", "UserID" },
-                values: new object[] { 1, "Wow this is the first post I have written", new DateTime(2024, 7, 8, 13, 13, 35, 129, DateTimeKind.Local).AddTicks(3364), "This is my first post!!", 1 });
+                values: new object[] { 1, "Wow this is the first post I have written", new DateTime(2024, 7, 9, 1, 22, 49, 521, DateTimeKind.Local).AddTicks(7966), "This is my first post!!", 1 });
 
             migrationBuilder.InsertData(
                 table: "Comments",

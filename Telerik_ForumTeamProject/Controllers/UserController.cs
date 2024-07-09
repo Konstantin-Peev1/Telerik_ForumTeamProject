@@ -1,5 +1,7 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 using Telerik_ForumTeamProject.Exceptions;
 using Telerik_ForumTeamProject.Helpers;
 using Telerik_ForumTeamProject.Models.Entities;
@@ -10,66 +12,59 @@ namespace Telerik_ForumTeamProject.Controllers
 {
     [Route("api/user")]
     [ApiController]
-    public class UserController : ControllerBase
+    public class UserController : BaseController
     {
         private readonly IUserService userService;
         private readonly ModelMapper modelMapper;
-        private readonly AuthManager authManager;
+      //  private readonly AuthManager authManager;
 
-        public UserController(IUserService userService, ModelMapper modelMapper, AuthManager authManager)
+        public UserController(IUserService userService, ModelMapper modelMapper, AuthManager authManager) :base(authManager)
         {
             this.userService = userService;
             this.modelMapper = modelMapper;
-            this.authManager = authManager;
         }
 
+
         [HttpGet("")]
-
-        public IActionResult Get([FromHeader] string credentials, [FromQuery] string information)
+        [Authorize(Policy = "AdminPolicy")]
+        public IActionResult Get([FromQuery] string information)
         {
-            User user = this.authManager.TryGetUser(credentials);
-
-
+            User user = GetCurrentUser();
             var userInfo = this.userService.GetByInformation(information, user);
             var userToDisplay = modelMapper.Map(userInfo);
             return this.Ok(userToDisplay);
              //trycatch later -> think of where to put them 
         }
 
-        //[HttpPost("")]
-        //public IActionResult Create([FromBody] UserRequestDTO user)
-        //{
-        //    var createdUser = this.userService.CreateUser(this.modelMapper.Map(user));
-        //    var createdUserResponse = this.modelMapper.Map(createdUser);
 
-        //    return this.StatusCode(StatusCodes.Status201Created, createdUserResponse);
-        //}
 
         [HttpPut("{id}")]
-        public IActionResult Update(int id, [FromHeader] string credentials, [FromBody] UserRequestDTO userRequest)
+        [Authorize()]
+        public IActionResult Update(int id, [FromBody] UserRequestDTO userRequest)
         {
-            User user = this.authManager.TryGetUser(credentials);
+            User user = GetCurrentUser();
             User userUpdateInfo = this.modelMapper.Map(userRequest);
             var updatedUser = this.userService.UpdateUser(user, userUpdateInfo, id);
             var userToReturn = this.modelMapper.Map(updatedUser);
             return this.Ok(userToReturn);
         }
 
+        [AllowAnonymous]
         [HttpPost("login")]
         public IActionResult Login(LogInRequestDTO loginRequest)
         {
             try
             {
                 var user = authManager.Authenticate(loginRequest.UserName, loginRequest.Password);
-                var userToDisplay = modelMapper.Map(user);
-                return Ok(userToDisplay);
+                var token = authManager.Generate(user);
+                return Ok(token);
             }
             catch (AuthorisationExcpetion ex)
             {
                 return Unauthorized(ex.Message);
             }
         }
-
+        [AllowAnonymous]
         [HttpPost("register")]
         public IActionResult Register(UserRequestDTO registerRequest)
         {
@@ -87,6 +82,8 @@ namespace Telerik_ForumTeamProject.Controllers
                 return Conflict(ex.Message);
             }
         }
+
+
 
 
     }

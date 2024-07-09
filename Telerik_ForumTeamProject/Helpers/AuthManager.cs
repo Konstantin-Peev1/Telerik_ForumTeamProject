@@ -1,7 +1,12 @@
 ﻿using BCrypt.Net;
+using Microsoft.IdentityModel.Tokens;
 using System;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
 using Telerik_ForumTeamProject.Exceptions;
 using Telerik_ForumTeamProject.Models.Entities;
+using Telerik_ForumTeamProject.Models.RequestDTO;
 using Telerik_ForumTeamProject.Repositories.Contracts;
 
 namespace Telerik_ForumTeamProject.Helpers
@@ -10,9 +15,10 @@ namespace Telerik_ForumTeamProject.Helpers
     {
         private const string InvalidCredentialsErrorMessage = "Invalid credentials!";
         private readonly IUserRepository userRepository;
-
-        public AuthManager(IUserRepository userRepository)
+        private readonly IConfiguration configuration;
+        public AuthManager(IUserRepository userRepository, IConfiguration configuration)
         {
+            this.configuration = configuration;
             this.userRepository = userRepository;
         }
 
@@ -40,7 +46,7 @@ namespace Telerik_ForumTeamProject.Helpers
                 var user = userRepository.GetByInformation(username);
 
                 // Check if user exists and verify password
-                if (user == null || !VerifyPassword(password, user.Password))
+                if (user == null || password != user.Password)
                 {
                     throw new AuthorisationExcpetion(InvalidCredentialsErrorMessage);
                 }
@@ -62,5 +68,33 @@ namespace Telerik_ForumTeamProject.Helpers
         {
             return BCrypt.Net.BCrypt.HashPassword(password);
         }
+
+        public string Generate(User user)
+        {
+            var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["Jwt:Key"]));
+            var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
+
+            var claims = new[]
+            {
+                new Claim(ClaimTypes.NameIdentifier, user.UserName),
+                new Claim(ClaimTypes.Email, user.Email),
+                new Claim(ClaimTypes.GivenName, user.FirstName),
+                new Claim(ClaimTypes.Surname, user.LastName),
+                new Claim(ClaimTypes.Hash, user.Password),
+                new Claim("isAdmin", user.IsAdmin.ToString())
+            };
+
+            var token = new JwtSecurityToken(
+                configuration["Jwt:Issuer"], configuration["Jwt:Audience"],
+                claims, 
+                expires: DateTime.Now.AddMinutes(1),
+                signingCredentials: credentials);
+
+            return new JwtSecurityTokenHandler().WriteToken(token);
+        }
+
+
+
+   
     }
 }

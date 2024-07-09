@@ -27,6 +27,15 @@ namespace Telerik_ForumTeamProject.Helpers
                 Email = userRequest.Email,
                 Password = userRequest.Password,
                 UserName = userRequest.UserName,
+                Role = "User",
+            };
+        }
+
+        public LikeResponseDTO Map(Like like)
+        {
+            return new LikeResponseDTO()
+            {
+                UserName = like.User.UserName,
             };
         }
 

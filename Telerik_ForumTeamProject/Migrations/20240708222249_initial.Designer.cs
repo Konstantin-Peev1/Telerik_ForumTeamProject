@@ -12,7 +12,7 @@ using Telerik_ForumTeamProject.Data;
 namespace Telerik_ForumTeamProject.Migrations
 {
     [DbContext(typeof(ApplicationContext))]
-    [Migration("20240708101335_initial")]
+    [Migration("20240708222249_initial")]
     partial class initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -141,7 +141,7 @@ namespace Telerik_ForumTeamProject.Migrations
                         {
                             Id = 1,
                             Content = "Wow this is the first post I have written",
-                            Created = new DateTime(2024, 7, 8, 13, 13, 35, 129, DateTimeKind.Local).AddTicks(3364),
+                            Created = new DateTime(2024, 7, 9, 1, 22, 49, 521, DateTimeKind.Local).AddTicks(7966),
                             Title = "This is my first post!!",
                             UserID = 1
                         });
@@ -247,6 +247,10 @@ namespace Telerik_ForumTeamProject.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("Role")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("UserName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -266,7 +270,8 @@ namespace Telerik_ForumTeamProject.Migrations
                             IsAdmin = true,
                             IsBlocked = false,
                             LastName = "Peev",
-                            Password = "$2b$10$zSHva9Muug/Br.hKmAByFeVUTTQ7.pJPmrzHWkP7DNCN.eRvNqQem",
+                            Password = "$2b$10$4P3xMfnfWXucglQ1.uHixuOQ/8bz1jbgnqyogJbAqHC2nY2/qAT62",
+                            Role = "Admin",
                             UserName = "Kosio_Peev"
                         });
                 });

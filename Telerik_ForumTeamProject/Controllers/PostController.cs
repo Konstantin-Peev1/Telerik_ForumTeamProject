@@ -1,6 +1,9 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
+using System.Security.Claims;
+using Telerik_ForumTeamProject.Exceptions;
 using Telerik_ForumTeamProject.Helpers;
 using Telerik_ForumTeamProject.Models.Entities;
 using Telerik_ForumTeamProject.Models.RequestDTO;
@@ -11,20 +14,20 @@ namespace Telerik_ForumTeamProject.Controllers
 {
     [Route("api/post")]
     [ApiController]
-    public class PostController : ControllerBase
+    public class PostController : BaseController
     {
         private readonly IPostService postService;
         private readonly ModelMapper modelMapper;
-        private readonly AuthManager authManager;
+      //  private readonly AuthManager authManager;
 
-        public PostController(IPostService postService, ModelMapper modelMapper, AuthManager authManager)
+        public PostController(IPostService postService, ModelMapper modelMapper, AuthManager authManager) :base(authManager)
         {
             this.postService = postService;
             this.modelMapper = modelMapper;
-            this.authManager = authManager;
+           // this.authManager = authManager;
         }
 
-
+        [AllowAnonymous]
         [HttpGet("latest")]
 
         public IActionResult GetLatest10()
@@ -34,6 +37,7 @@ namespace Telerik_ForumTeamProject.Controllers
             return Ok(postsToShow);
         }
 
+        [AllowAnonymous]
         [HttpGet("most-commented")]
 
         public IActionResult GetMostCommented10()
@@ -44,17 +48,19 @@ namespace Telerik_ForumTeamProject.Controllers
         }
 
         [HttpGet("filtered-posts")]
-        public IActionResult Get([FromHeader] string credentials, [FromQuery] PostQueryParamteres paramteres)
+        [Authorize]
+        public IActionResult Get([FromQuery] PostQueryParamteres paramteres)
         {
-            User user = this.authManager.TryGetUser(credentials);
+            User user = GetCurrentUser();
             var postsToUpload = this.postService.FilterBy(paramteres).Select(post => this.modelMapper.Map(post)).ToList();
             return Ok(postsToUpload);
         }
 
         [HttpGet("{id}")]
+        [Authorize(Roles = "Admin")]
         public IActionResult GetById([FromHeader] string credentials, int id)
         {
-            User user = this.authManager.TryGetUser(credentials);
+            User user = GetCurrentUser();
             Post post = this.postService.GetPost(id);
             var postToShow = this.modelMapper.Map(post);
 
@@ -62,9 +68,10 @@ namespace Telerik_ForumTeamProject.Controllers
         }
 
         [HttpPost("")]
-        public IActionResult CreatePost([FromHeader] string credentials, [FromBody] PostRequestDTO postRequestDTO)
+        [Authorize]
+        public IActionResult CreatePost([FromBody] PostRequestDTO postRequestDTO)
         {
-            User user = this.authManager.TryGetUser(credentials);
+            User user = GetCurrentUser();
             Post post = this.modelMapper.Map(postRequestDTO);
             Post createdPost = this.postService.CreatePost(post, user);
             var showPost = this.modelMapper.Map(createdPost);
@@ -72,10 +79,10 @@ namespace Telerik_ForumTeamProject.Controllers
         }
 
         [HttpPut("id")]
-
-        public IActionResult UpdatePost([FromHeader] string credentials, [FromBody] PostRequestDTO postRequestDTO, int id)
+        [Authorize]
+        public IActionResult UpdatePost([FromBody] PostRequestDTO postRequestDTO, int id)
         {
-            User user = this.authManager.TryGetUser(credentials);
+            User user = GetCurrentUser();
             Post post = this.modelMapper.Map(postRequestDTO);
             Post updatedPost = this.postService.UpdatePost(id, post, user);
             var showPost = this.modelMapper.Map(updatedPost);
@@ -84,13 +91,13 @@ namespace Telerik_ForumTeamProject.Controllers
         }
 
         [HttpDelete("id")]
-
-        public IActionResult DeletePost([FromHeader] string credentials, int id)
+        [Authorize]
+        public IActionResult DeletePost(int id)
         {
-            User user = this.authManager.TryGetUser(credentials);
+            User user = GetCurrentUser();
             bool postDeleted = this.postService.DeletePost(id, user);
             return this.Ok(postDeleted);
         }
-
+       
     }
 }

@@ -1,4 +1,9 @@
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
+using System.Text;
 using Telerik_ForumTeamProject.Data;
 using Telerik_ForumTeamProject.Helpers;
 using Telerik_ForumTeamProject.Repositories;
@@ -15,46 +20,90 @@ namespace Telerik_ForumTeamProject
             var builder = WebApplication.CreateBuilder(args);
 
             // Add services to the container.
-
             builder.Services.AddControllers();
-           
-             
+            builder.Services.AddMvc();
+            builder.Services.AddRazorPages();
+
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
-            builder.Services.AddSwaggerGen();
+            builder.Services.AddSwaggerGen(c =>
+            {
+                c.SwaggerDoc("v1", new OpenApiInfo { Title = "My API", Version = "v1" });
+                c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+                {
+                    Name = "Authorization",
+                    Type = SecuritySchemeType.ApiKey,
+                    Scheme = "Bearer",
+                    BearerFormat = "JWT",
+                    In = ParameterLocation.Header,
+                    Description = "JWT Authorization header using the Bearer scheme. Example: \"Authorization: Bearer {token}\""
+                });
+                c.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                }
+            },
+            new string[] {}
+        }
+    });
+            });
+
+            builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+                .AddJwtBearer(options =>
+                {
+                    options.TokenValidationParameters = new TokenValidationParameters()
+                    {
+                        ValidateIssuer = true,
+                        ValidateAudience = true,
+                        ValidateLifetime = true,
+                        ValidateIssuerSigningKey = true,
+                        ValidIssuer = builder.Configuration["Jwt:Issuer"],
+                        ValidAudience = builder.Configuration["Jwt:Audience"],
+                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
+                    };
+                });
+
             builder.Services.AddDbContext<ApplicationContext>(options =>
             {
-                // The connection string can be found in the appsettings.json file. 
-                // It's a good practice to keep the connection string in a separate file,
-                //  because it's easier to change the connection string without recompiling the entire application.
-                // Also, the connection string is a sensitive information and should not be exposed in the code.
                 string connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
                 options.UseSqlServer(connectionString);
-
-                // The following helps with debugging the trobled relationship between EF and SQL ¯\_(-_-)_/¯ 
                 options.EnableSensitiveDataLogging();
             });
 
-            //Repositories
+            builder.Services.AddAuthorization(options =>
+            {
+                options.AddPolicy("AdminPolicy", policy =>
+                    policy.Requirements.Add(new AdminRequirement()));
+            });
+
+            builder.Services.AddSingleton<IAuthorizationHandler, AdminHandler>();
+
+            // Repositories
             builder.Services.AddScoped<IUserRepository, UserRepository>();
             builder.Services.AddScoped<ICommentRepository, CommentRepository>();
             builder.Services.AddScoped<IReplyRepository, ReplyRepository>();
             builder.Services.AddScoped<IPostRepository, PostRepository>();
-            builder.Services.AddScoped<ITagRepository, TagRepository>();    
+            builder.Services.AddScoped<ITagRepository, TagRepository>();
             builder.Services.AddScoped<ILikeRepository, LikeRepository>();
 
-            //Services
+            // Services
             builder.Services.AddScoped<IUserService, UserService>();
             builder.Services.AddScoped<ICommentService, CommentService>();
             builder.Services.AddScoped<IPostService, PostService>();
-            builder.Services.AddScoped<ITagService,  TagService>();
+            builder.Services.AddScoped<ITagService, TagService>();
             builder.Services.AddScoped<ILikeService, LikeService>();
 
             // Helpers
             builder.Services.AddScoped<ModelMapper>();
             builder.Services.AddScoped<AuthManager>();
-            builder.Services.AddControllers().AddNewtonsoftJson(options => options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore);
-
+            builder.Services.AddControllers().AddNewtonsoftJson(options =>
+                options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore);
 
             var app = builder.Build();
 
@@ -66,11 +115,16 @@ namespace Telerik_ForumTeamProject
             }
 
             app.UseHttpsRedirection();
-
+            app.UseRouting();
+            app.UseAuthentication(); // Ensure UseAuthentication is called before UseAuthorization
             app.UseAuthorization();
 
-
             app.MapControllers();
+            app.UseEndpoints(endpoints =>
+            {
+                endpoints.MapControllers();
+                endpoints.MapRazorPages();
+            });
 
             app.Run();
         }
