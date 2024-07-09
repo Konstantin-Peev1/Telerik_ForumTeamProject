@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Razor.TagHelpers;
 using Telerik_ForumTeamProject.Helpers;
@@ -11,17 +12,17 @@ namespace Telerik_ForumTeamProject.Controllers
 {
     [Route("api/comment")]
     [ApiController]
-    public class CommentController : ControllerBase
+    public class CommentController : BaseController
     {
         private readonly ICommentService commentService;
         private readonly IPostService postService;
         private readonly ModelMapper modelMapper;
-        private readonly AuthManager authManager;
+      //  private readonly AuthManager authManager;
 
-        public CommentController(ICommentService commentService, IPostService postService, AuthManager authManager, ModelMapper modelMapper)
+        public CommentController(ICommentService commentService, IPostService postService, AuthManager authManager, ModelMapper modelMapper) :base(authManager)
         {
             this.commentService = commentService;
-            this.authManager = authManager;
+           // this.authManager = authManager;
             this.modelMapper = modelMapper;
             this.postService = postService;
         }
@@ -33,10 +34,11 @@ namespace Telerik_ForumTeamProject.Controllers
                     return this.Ok(comment);
                 }*/
 
-        [HttpGet]
-        public IActionResult GetAllPostComments([FromHeader] string credentials, int postId)
+        [HttpGet("")]
+        [Authorize()]
+        public IActionResult GetAllPostComments(int postId)
         {
-            User user = this.authManager.TryGetUser(credentials);
+            User user = GetCurrentUser();
             Post post = postService.GetPost(postId);
             List<CommentReplyResponseDTO> response = this.modelMapper.Map(post.Comments);
 
@@ -44,10 +46,11 @@ namespace Telerik_ForumTeamProject.Controllers
         }
 
 
-        [HttpPost]
-        public IActionResult CreateComment([FromHeader] string credentials, int postId, [FromBody] CommentRequestDTO commentRequestDTO)
+        [HttpPost("")]
+        [Authorize()]
+        public IActionResult CreateComment(int postId, [FromBody] CommentRequestDTO commentRequestDTO)
         {
-            User user = this.authManager.TryGetUser(credentials);
+            User user = GetCurrentUser();
             Post post = postService.GetPost(postId);
 
             Comment comment = this.modelMapper.Map(commentRequestDTO, postId);
@@ -57,10 +60,11 @@ namespace Telerik_ForumTeamProject.Controllers
             return this.StatusCode(StatusCodes.Status201Created, response);
         }
 
-        [HttpPut]
-        public IActionResult UpdateComment([FromHeader] string credentials, int commentId, [FromBody] CommentRequestDTO commentRequestDTO)
+        [HttpPut("")]
+        [Authorize()]
+        public IActionResult UpdateComment(int commentId, [FromBody] CommentRequestDTO commentRequestDTO)
         {
-            User user = this.authManager.TryGetUser(credentials);
+            User user = GetCurrentUser();
 
             Comment comment = this.modelMapper.MapUpdateComment(commentRequestDTO, commentId);
             Comment commentToEdit = this.commentService.UpdateComment(commentId, comment, user);
@@ -69,11 +73,12 @@ namespace Telerik_ForumTeamProject.Controllers
             return Ok(response);
         }
 
-        [HttpDelete]
+        [HttpDelete("")]
+        [Authorize()]
 
-        public IActionResult DeleteComment([FromHeader] string credentials, int commentId)
+        public IActionResult DeleteComment(int commentId)
         {
-            User user = this.authManager.TryGetUser(credentials);
+            User user = GetCurrentUser();
             bool commentDeleted = this.commentService.DeleteComment(commentId, user);
             return Ok(commentDeleted);
         }

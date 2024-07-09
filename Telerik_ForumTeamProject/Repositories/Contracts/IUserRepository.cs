@@ -11,6 +11,9 @@ namespace Telerik_ForumTeamProject.Repositories.Contracts
         bool UserExists(string username);
         bool UserExistsEmail(string email);
         User GetUserByID(int id);
+        User BlockUser(User user);
+        User MakeAdmin(User user);
+        User UnBlockUser(User user);
 
 
     }

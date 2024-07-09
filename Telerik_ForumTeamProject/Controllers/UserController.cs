@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.VisualBasic;
 using System.Security.Claims;
 using Telerik_ForumTeamProject.Exceptions;
 using Telerik_ForumTeamProject.Helpers;
@@ -30,7 +31,7 @@ namespace Telerik_ForumTeamProject.Controllers
         public IActionResult Get([FromQuery] string information)
         {
             User user = GetCurrentUser();
-            var userInfo = this.userService.GetByInformation(information, user);
+            var userInfo = this.userService.GetByInformation(information);
             var userToDisplay = modelMapper.Map(userInfo);
             return this.Ok(userToDisplay);
              //trycatch later -> think of where to put them 
@@ -83,8 +84,41 @@ namespace Telerik_ForumTeamProject.Controllers
             }
         }
 
+        [HttpPost("block")]
+        [Authorize(Policy = "AdminPolicy")]
+        public IActionResult Block([FromQuery] string userName)
+        {
+            User user = GetCurrentUser();
+            var userInfo = this.userService.GetByInformation(userName);
+            var blockedUser = this.userService.BlockUser(userInfo);
+            var userToDisplay = modelMapper.Map(blockedUser);
+            return this.Ok(userToDisplay);
+            //trycatch later -> think of where to put them 
+        }
 
+        [HttpPost("unblock")]
+        [Authorize(Policy = "AdminPolicy")]
+        public IActionResult UnBlock([FromQuery] string userName)
+        {
+            User user = GetCurrentUser();
+            var userInfo = this.userService.GetByInformation(userName);
+            var unblockedUser = this.userService.UnBlockUser(userInfo);
+            var userToDisplay = modelMapper.Map(unblockedUser);
+            return this.Ok(userToDisplay);
+            //trycatch later -> think of where to put them 
+        }
 
+        [HttpPost("makeAdmin")]
+        [Authorize(Policy = "AdminPolicy")]
+        public IActionResult MakeAdmin([FromQuery] string userName)
+        {
+            User user = GetCurrentUser();
+            var userInfo = this.userService.GetByInformation(userName);
+            var newAdmin = this.userService.MakeAdmin(userInfo);
+            var newAdminToDisplay = modelMapper.Map(newAdmin);
+            return this.Ok(newAdminToDisplay);
+            //trycatch later -> think of where to put them 
+        }
 
     }
 }

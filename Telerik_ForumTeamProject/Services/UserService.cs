@@ -15,12 +15,9 @@ namespace Telerik_ForumTeamProject.Services
             this.userRepository = userRepository;
         }
 
-        public User GetByInformation(string information, User user)
+        public User GetByInformation(string information)
         {
-            if (!user.IsAdmin)
-            {
-                throw new AuthorisationExcpetion("You do not have the authority to do that.");
-            }
+
             return userRepository.GetByInformation(information);
         }
 
@@ -47,6 +44,35 @@ namespace Telerik_ForumTeamProject.Services
             return this.userRepository.UpdateInformation(user, userToUpdate);
         }
 
+        public User BlockUser(User user)
+        {
+            if (user.IsBlocked)
+            {
+                throw new DuplicateEntityException("User already blocked");
+            }
+            if(user.IsAdmin)
+            {
+                throw new AuthorisationExcpetion("You can't block admins");
+            }
+            return this.userRepository.BlockUser(user);
+        }
 
+        public User UnBlockUser(User user)
+        {
+            if (!user.IsBlocked)
+            {
+                throw new DuplicateEntityException("User is not blocked");
+            }
+            return this.userRepository.UnBlockUser(user);
+        }
+
+        public User MakeAdmin(User user)
+        {
+            if (user.IsAdmin)
+            {
+                throw new DuplicateEntityException("User already admin");
+            }
+            return this.userRepository.MakeAdmin(user);
+        }
     }
 }

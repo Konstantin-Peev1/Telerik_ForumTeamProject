@@ -63,8 +63,25 @@ namespace Telerik_ForumTeamProject.Repositories
 
         }
 
-         
+        public User BlockUser(User user)
+        {
+            user.IsBlocked = true;
+            this.applicationConetxt.SaveChanges();
+            return user;
+        }
 
-   
+        public User MakeAdmin(User user)
+        {
+            user.IsAdmin = true;
+            this.applicationConetxt.SaveChanges();
+            return user;
+        }
+
+        public User UnBlockUser(User user)
+        {
+            user.IsBlocked = false;
+            this.applicationConetxt.SaveChanges();
+            return user;
+        }
     }
 }
