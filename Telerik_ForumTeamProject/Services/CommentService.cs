@@ -1,4 +1,5 @@
-﻿using Telerik_ForumTeamProject.Exceptions;
+﻿using Microsoft.EntityFrameworkCore;
+using Telerik_ForumTeamProject.Exceptions;
 using Telerik_ForumTeamProject.Models.Entities;
 using Telerik_ForumTeamProject.Repositories.Contracts;
 using Telerik_ForumTeamProject.Services.Contracts;
@@ -30,6 +31,12 @@ namespace Telerik_ForumTeamProject.Services
             Comment result = this.commentRepository.CreateComment(comment);
             return result;
         }
+        public Comment CreateReply(Comment reply, int parentCommentId, User user)
+        {
+            reply.UserID = user.ID;
+            Comment result = this.commentRepository.CreateReply(reply, parentCommentId);
+            return result;
+        }
 
         public Comment UpdateComment(int id, Comment comment, User user)
         {
@@ -50,12 +57,5 @@ namespace Telerik_ForumTeamProject.Services
             return this.commentRepository.DeleteComment(id, commentToDelete);
         }
 
-        public Comment CreateReply(Comment reply, int parentCommentId, User user)
-        {
-            reply.UserID = user.ID;
-            reply.ParentCommentID = parentCommentId;
-            Comment result = this.commentRepository.CreateReply(reply, parentCommentId);
-            return result;
-        }
     }
 }

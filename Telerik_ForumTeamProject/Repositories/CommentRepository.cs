@@ -40,6 +40,9 @@ namespace Telerik_ForumTeamProject.Repositories
             {
                 throw new EntityNotFoundException("Parent comment does not exist.");
             }
+
+            reply.PostID = parentComment.PostID;
+            reply.ParentCommentID = parentCommentId;
             reply.ParentCommentID = parentCommentId;
             this.applicationContext.Comments.Add(reply);
             this.applicationContext.SaveChanges();
@@ -69,12 +72,22 @@ namespace Telerik_ForumTeamProject.Repositories
                 throw new EntityNotFoundException("Comment does not exist.");
             }
 
-            this.applicationContext.Comments.Remove(comment);
+            DeleteCommentAndReplies(comment);
             return this.applicationContext.SaveChanges() > 0;
             
         }
 
+        private void DeleteCommentAndReplies(Comment comment)
+        {
+            
+            var replies = applicationContext.Comments.Where(c => c.ParentCommentID == comment.Id).ToList();
+            foreach (var reply in replies)
+            {
+                DeleteCommentAndReplies(reply);
+            }
 
+            applicationContext.Comments.Remove(comment);
+        }
         private IQueryable<Comment> GetComments()
         {
             return this.applicationContext.Comments;

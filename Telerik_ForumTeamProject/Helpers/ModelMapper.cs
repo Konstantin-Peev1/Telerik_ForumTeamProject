@@ -116,6 +116,15 @@ namespace Telerik_ForumTeamProject.Helpers
             };
         }
 
+        public Comment MapCreateReply(CommentRequestDTO comment)
+        {
+            return new Comment()
+            {
+                
+                Content = comment.Content,
+                Created = DateTime.Now
+            };
+        }
 
         public Comment MapUpdateComment(CommentRequestDTO comment, int commentId)
         {
