@@ -60,6 +60,20 @@ namespace Telerik_ForumTeamProject.Controllers
             return this.StatusCode(StatusCodes.Status201Created, response);
         }
 
+        [HttpPost("{parentCommentId}/reply")]
+        [Authorize()]
+        public IActionResult CreateReply(int parentCommentId, [FromBody] CommentRequestDTO replyRequestDTO)
+        {
+            User user = GetCurrentUser();
+
+            Comment reply = modelMapper.Map(replyRequestDTO, parentCommentId);
+            Comment replyToCreate = commentService.CreateReply(reply, parentCommentId, user);
+            CommentReplyResponseDTO response = modelMapper.Map(replyToCreate);
+
+            return this.StatusCode(StatusCodes.Status201Created, response);
+        }
+
+
         [HttpPut("")]
         [Authorize()]
         public IActionResult UpdateComment(int commentId, [FromBody] CommentRequestDTO commentRequestDTO)

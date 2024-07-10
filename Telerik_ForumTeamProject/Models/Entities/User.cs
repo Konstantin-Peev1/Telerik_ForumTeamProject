@@ -26,7 +26,6 @@ namespace Telerik_ForumTeamProject.Models.Entities
 
         public List<Post> Posts { get; set; }
         public List<Comment> Comments { get; set; }
-        public List<Reply> Replies { get; set; }
         public List<Like> Likes { get;set; }
      
 

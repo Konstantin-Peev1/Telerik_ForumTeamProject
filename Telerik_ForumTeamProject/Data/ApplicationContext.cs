@@ -15,7 +15,6 @@ namespace Telerik_ForumTeamProject.Data
         public DbSet<Comment> Comments { get; set; }
         public DbSet<Post> Posts { get;set; }
         public DbSet<Tag> Tags { get; set; }
-        public DbSet<Reply> Replies { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -35,14 +34,6 @@ namespace Telerik_ForumTeamProject.Data
                 .HasForeignKey(c => c.PostID)
                 .OnDelete(DeleteBehavior.Cascade); // Cascade delete comments when post is deleted
 
-            // Comment-Reply relationship
-            modelBuilder.Entity<Reply>()
-                .HasOne(r => r.Post)
-                .WithMany(p => p.Replies)
-                .HasForeignKey(r => r.PostID)
-                .OnDelete(DeleteBehavior.Restrict); // Use Restrict to avoid multiple cascade paths
-
-         
 
             // User-Comment relationship
             modelBuilder.Entity<Comment>()
@@ -50,13 +41,14 @@ namespace Telerik_ForumTeamProject.Data
                 .WithMany(u => u.Comments)
                 .HasForeignKey(c => c.UserID)
                 .OnDelete(DeleteBehavior.Cascade); // Cascade delete comments when user is deleted
+            
+            // Comment-Reply relationship
+            modelBuilder.Entity<Comment>()
+                .HasOne(c => c.ParentComment)
+                .WithMany(r => r.Replies)
+                .HasForeignKey(c => c.ParentCommentID)
+                .OnDelete(DeleteBehavior.Restrict); 
 
-            // User-Reply relationship
-            modelBuilder.Entity<Reply>()
-                .HasOne(r => r.User)
-                .WithMany(u => u.Replies)
-                .HasForeignKey(r => r.UserID)
-                .OnDelete(DeleteBehavior.Cascade);
             string plainPassword = "123456778";
             string hashedPassword = BCrypt.Net.BCrypt.HashPassword(plainPassword);
             List<User> users = new List<User>()
@@ -83,7 +75,7 @@ namespace Telerik_ForumTeamProject.Data
                     Title = "This is my first post!!",
                     Content = "Wow this is the first post I have written",
                     UserID = users[0].ID,
-                    Created = DateTime.Now,
+                    Created = DateTime.Now
                     
                 }
             };
@@ -92,24 +84,24 @@ namespace Telerik_ForumTeamProject.Data
                 new Comment
                 {
                     Id = 1,
-                    PostID = posts[0].Id,
-                    
                     Content = "I am just commenting because why not",
-                    UserID = users[0].ID,
-                   
-                }
-            };
-            List<Reply> replies = new List<Reply>()
-            {
-                new Reply
+                    UserID = users[0].ID, 
+                    PostID = posts[0].Id,
+                    Created = DateTime.Now
+                },
+                new Comment
                 {
-                    Id = 1,
-                    PostID = posts[0].Id,
-                    Content = "I am just commenting because why not",
+                    Id = 2,
+                    Content = "I am a reply and just testing the seeding",
                     UserID = users[0].ID,
-                   
+                    PostID = posts[0].Id,
+                    Created = DateTime.Now,
+                    ParentCommentID = 1,
                 }
             };
+
+
+
             List<Tag> tags = new List<Tag>()
             {
                 new Tag
@@ -124,7 +116,6 @@ namespace Telerik_ForumTeamProject.Data
             modelBuilder.Entity<User>().HasData(users);
             modelBuilder.Entity<Post>().HasData(posts);
             modelBuilder.Entity<Comment>().HasData(comments);
-            modelBuilder.Entity<Reply>().HasData(replies);
             modelBuilder.Entity<Tag>().HasData(tags);
 
             modelBuilder.Entity<User>().HasDiscriminator<string>("Discriminator").HasValue<User>("User");

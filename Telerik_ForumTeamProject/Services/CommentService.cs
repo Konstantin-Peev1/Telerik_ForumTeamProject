@@ -49,5 +49,13 @@ namespace Telerik_ForumTeamProject.Services
             }
             return this.commentRepository.DeleteComment(id, commentToDelete);
         }
+
+        public Comment CreateReply(Comment reply, int parentCommentId, User user)
+        {
+            reply.UserID = user.ID;
+            reply.ParentCommentID = parentCommentId;
+            Comment result = this.commentRepository.CreateReply(reply, parentCommentId);
+            return result;
+        }
     }
 }

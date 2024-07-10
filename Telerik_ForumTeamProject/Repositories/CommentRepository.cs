@@ -33,10 +33,27 @@ namespace Telerik_ForumTeamProject.Repositories
             this.applicationContext.SaveChanges();
             return comment;
         }
+        public Comment CreateReply(Comment reply, int parentCommentId)
+        {
+            Comment parentComment = this.GetCommentById(parentCommentId);
+            if(parentComment == null)
+            {
+                throw new EntityNotFoundException("Parent comment does not exist.");
+            }
+            reply.ParentCommentID = parentCommentId;
+            this.applicationContext.Comments.Add(reply);
+            this.applicationContext.SaveChanges();
+            return reply;
+        }
 
         public Comment UpdateComment(int id, Comment comment)
         {
             Comment commentToUpdate = this.GetCommentById(id);
+
+            if(commentToUpdate == null)
+            {
+                throw new EntityNotFoundException("Comment does not exist.");
+            }
 
             commentToUpdate.Content = comment.Content;
             this.applicationContext.SaveChanges();
@@ -46,10 +63,17 @@ namespace Telerik_ForumTeamProject.Repositories
         public bool DeleteComment(int id, Comment comment) 
         {
             comment = this.GetCommentById(id);
+
+            if (comment == null)
+            {
+                throw new EntityNotFoundException("Comment does not exist.");
+            }
+
             this.applicationContext.Comments.Remove(comment);
             return this.applicationContext.SaveChanges() > 0;
             
         }
+
 
         private IQueryable<Comment> GetComments()
         {

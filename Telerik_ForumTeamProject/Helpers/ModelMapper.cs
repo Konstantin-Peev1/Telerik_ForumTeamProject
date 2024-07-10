@@ -14,8 +14,8 @@ namespace Telerik_ForumTeamProject.Helpers
             UserResponseDTO response = new UserResponseDTO();
             response.FirstName = user.FirstName;
             response.LastName = user.LastName;
-            response.Email = user.Email;     
-            if(user.Posts!= null) { response.Posts = Map(user.Posts); }
+            response.Email = user.Email;
+            if (user.Posts != null) { response.Posts = Map(user.Posts); }
             return response;
         }
 
@@ -58,7 +58,7 @@ namespace Telerik_ForumTeamProject.Helpers
                 Posts = tag.Posts.Select(post => Map(post)).ToList(),
             };
         }
-    
+
 
 
         public PostUploadResponseDTO Map(Post post)
@@ -71,7 +71,7 @@ namespace Telerik_ForumTeamProject.Helpers
             postResponse.UserName = post.User.UserName;
             postResponse.Likes = post.Likes?.Count() ?? 0;
             postResponse.Comments = Map(post.Comments) ?? new List<CommentReplyResponseDTO>();
-            postResponse.Replies = Map(post.Replies) ?? new List<CommentReplyResponseDTO>();
+            //postResponse.Replies = Map(post.Replies) ?? new List<CommentReplyResponseDTO>();
             postResponse.Tags = post.Tags?.Select(tag => tag.Description).ToList() ?? new List<string>();
             return postResponse;
             /*return new PostUploadResponseDTO()
@@ -87,18 +87,23 @@ namespace Telerik_ForumTeamProject.Helpers
             };*/
         }
 
-        public List<CommentReplyResponseDTO> Map<T>(List<T> items) where T : PostAddition
+        public List<CommentReplyResponseDTO> Map<T>(List<T> items) where T : Comment
         {
-            if (items != null)
+            return items?.Where(c => c.ParentCommentID == null)
+                         .Select(c => MapCommentWithReplies(c))
+                         .ToList() ?? new List<CommentReplyResponseDTO>();
+        }
+
+        private CommentReplyResponseDTO MapCommentWithReplies(Comment comment)
+        {
+            var dto = new CommentReplyResponseDTO
             {
-                return items.Select(item => new CommentReplyResponseDTO
-                {
-                    Content = item.Content,
-                    UserName = item.User.UserName,
-                    Created = DateTimeFormatter.FormatToStandard(item.Created)
-                }).ToList();
-            }
-            return new List<CommentReplyResponseDTO>();
+                Content = comment.Content,
+                Created = DateTimeFormatter.FormatToStandard(comment.Created),
+                UserName = comment.User.UserName,
+                Replies = comment.Replies?.Select(r => MapCommentWithReplies(r)).ToList() ?? new List<CommentReplyResponseDTO>()
+            };
+            return dto;
         }
 
         public Comment Map(CommentRequestDTO comment, int postId)
@@ -110,6 +115,7 @@ namespace Telerik_ForumTeamProject.Helpers
                 Created = DateTime.Now
             };
         }
+
 
         public Comment MapUpdateComment(CommentRequestDTO comment, int commentId)
         {
@@ -133,9 +139,10 @@ namespace Telerik_ForumTeamProject.Helpers
             };
         }
 
+
         public List<PostResponseDTO> Map(List<Post> posts)
         {
-            if(posts.Count !=  0) 
+            if (posts.Count != 0)
             {
                 return posts.Select(post => new PostResponseDTO
                 {
@@ -143,12 +150,7 @@ namespace Telerik_ForumTeamProject.Helpers
                 }).ToList();
             }
             return new List<PostResponseDTO>();
-
-          
         }
 
-    }
-
-   
-    
+    }   
 }

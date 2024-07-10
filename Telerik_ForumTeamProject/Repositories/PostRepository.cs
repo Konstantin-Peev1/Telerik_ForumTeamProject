@@ -137,8 +137,8 @@ namespace Telerik_ForumTeamProject.Repositories
             return this.applicationContext.Posts
                 .Include(post => post.User)
                 .Include(post => post.Tags)
-                .Include(post => post.Replies)
-                    .ThenInclude(reply => reply.User)
+                //.Include(post => post.Replies)
+                    //.ThenInclude(reply => reply.User)
                 .Include(post => post.Comments)
                     .ThenInclude(comment => comment.User)
                 .Include(post => post.Likes)

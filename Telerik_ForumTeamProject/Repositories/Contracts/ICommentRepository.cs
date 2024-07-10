@@ -9,5 +9,6 @@ namespace Telerik_ForumTeamProject.Repositories.Contracts
         Comment GetCommentById(int id);
         Comment UpdateComment(int id, Comment comment);
         public bool DeleteComment(int id, Comment comment);
+        Comment CreateReply(Comment reply, int parentCommentId);
     }
 }

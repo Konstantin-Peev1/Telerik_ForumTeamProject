@@ -9,9 +9,7 @@ namespace Telerik_ForumTeamProject.Models.ResponseDTO
         public int Likes { get; set; }
         public string PostDate { get; set; }  
         public List<CommentReplyResponseDTO> Comments { get; set; }
-        public List<CommentReplyResponseDTO> Replies { get; set; }
         public string UserName { get; set; }
-
         public List<string> Tags { get; set; }
 
         //maybe tags
