@@ -4,7 +4,8 @@ namespace Telerik_ForumTeamProject.Services.Contracts
 {
     public interface ICommentService
     {
-        public List<Comment> GetComments();
+        List<Comment> GetComments();
+        List<Comment> GetReplies(int parentCommentId, int skip, int take);
         Comment GetComment(int id);
         Comment CreateComment(Comment comment, User user);
         Comment CreateReply(Comment reply, int parentCommentId, User user);

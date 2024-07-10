@@ -6,6 +6,7 @@ using Telerik_ForumTeamProject.Helpers;
 using Telerik_ForumTeamProject.Models.Entities;
 using Telerik_ForumTeamProject.Models.RequestDTO;
 using Telerik_ForumTeamProject.Models.ResponseDTO;
+using Telerik_ForumTeamProject.Services;
 using Telerik_ForumTeamProject.Services.Contracts;
 
 namespace Telerik_ForumTeamProject.Controllers
@@ -45,6 +46,16 @@ namespace Telerik_ForumTeamProject.Controllers
             return this.Ok(response);
         }
 
+        [HttpGet("replies")]
+        [Authorize()]
+        public IActionResult GetReplies(int parentCommentId, int skip = 0, int take = 5)
+        {
+            User currentUser = GetCurrentUser();
+            List<Comment> replies = commentService.GetReplies(parentCommentId, skip, take);
+            List<ReplyResponseDTO> response = modelMapper.MapReplyResponse(replies);
+
+            return Ok(response);
+        }
 
         [HttpPost("")]
         [Authorize()]

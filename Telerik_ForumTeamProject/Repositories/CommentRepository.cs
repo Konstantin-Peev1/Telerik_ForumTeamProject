@@ -20,6 +20,18 @@ namespace Telerik_ForumTeamProject.Repositories
             return GetComments().ToList();
         }
 
+        public List<Comment> GetReplies(int parentCommentId, int skip, int take)
+        {
+            return this.applicationContext.Comments
+                .Where(c => c.ParentCommentID == parentCommentId)
+                .OrderBy(c => c.Created)
+                .Skip(skip)
+                .Take(take)
+                .Include(c => c.User) 
+                .ToList();
+        }
+
+
         public Comment GetCommentById(int id)
         {
             Comment comment = GetComments().FirstOrDefault(x => x.Id == id);
@@ -92,5 +104,6 @@ namespace Telerik_ForumTeamProject.Repositories
         {
             return this.applicationContext.Comments;
         }
+
     }
 }

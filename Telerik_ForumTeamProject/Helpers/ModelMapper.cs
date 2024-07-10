@@ -87,11 +87,26 @@ namespace Telerik_ForumTeamProject.Helpers
             };*/
         }
 
-        public List<CommentReplyResponseDTO> Map<T>(List<T> items) where T : Comment
+        public List<CommentReplyResponseDTO> Map(List<Comment> comments)
         {
-            return items?.Where(c => c.ParentCommentID == null)
-                         .Select(c => MapCommentWithReplies(c))
-                         .ToList() ?? new List<CommentReplyResponseDTO>();
+            return comments?.Where(c => c.ParentCommentID == null)
+                            .Select(c => new CommentReplyResponseDTO
+                            {
+                                Content = c.Content,
+                                Created = DateTimeFormatter.FormatToStandard(c.Created),
+                                UserName = c.User.UserName,
+                                Replies = new List<CommentReplyResponseDTO>() // Empty list to indicate no replies
+                            }).ToList() ?? new List<CommentReplyResponseDTO>();
+        }
+
+        public List<ReplyResponseDTO> MapReplyResponse(List<Comment> reply)
+        {
+            return reply?.Select(c => new ReplyResponseDTO 
+            {
+                Content = c.Content,
+                Created = DateTimeFormatter.FormatToStandard(c.Created),
+                UserName = c.User.UserName,
+            }).ToList() ?? new List<ReplyResponseDTO>();
         }
 
         private CommentReplyResponseDTO MapCommentWithReplies(Comment comment)

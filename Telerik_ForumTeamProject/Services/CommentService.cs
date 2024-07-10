@@ -19,7 +19,10 @@ namespace Telerik_ForumTeamProject.Services
         {
             return this.commentRepository.GetAllComments();
         }
-
+        public List<Comment> GetReplies(int parentCommentId, int skip, int take)
+        {
+            return this.commentRepository.GetReplies(parentCommentId, skip, take);
+        }
         public Comment GetComment(int id)
         {
             return this.commentRepository.GetCommentById(id);
