@@ -24,6 +24,14 @@ namespace Telerik_ForumTeamProject.Repositories
                 || x.Email == information) 
                 ?? throw new EntityNotFoundException("No user with such information found");
         }
+        public User GetByInformationUsername(string information)
+        {
+            return this.GetUser()
+                .FirstOrDefault(x => 
+                x.UserName == information
+                || x.Email == information)
+                ?? throw new EntityNotFoundException("No user with such information found");
+        }
 
         public User CreateUser(User user)
         {

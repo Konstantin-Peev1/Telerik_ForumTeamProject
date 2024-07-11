@@ -24,7 +24,7 @@ namespace Telerik_ForumTeamProject.Helpers
 
         public User Authenticate(string username, string password)
         {
-            var user = userRepository.GetByInformation(username);
+            var user = userRepository.GetByInformationUsername(username);
 
             // Check if user exists and verify password
             if (user == null || !VerifyPassword(password, user.Password))
@@ -43,7 +43,7 @@ namespace Telerik_ForumTeamProject.Helpers
 
             try
             {
-                var user = userRepository.GetByInformation(username);
+                var user = userRepository.GetByInformationUsername(username);
 
                 // Check if user exists and verify password
                 if (user == null || password != user.Password)
