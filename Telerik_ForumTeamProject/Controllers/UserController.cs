@@ -7,6 +7,7 @@ using Telerik_ForumTeamProject.Exceptions;
 using Telerik_ForumTeamProject.Helpers;
 using Telerik_ForumTeamProject.Models.Entities;
 using Telerik_ForumTeamProject.Models.RequestDTO;
+using Telerik_ForumTeamProject.Services;
 using Telerik_ForumTeamProject.Services.Contracts;
 
 namespace Telerik_ForumTeamProject.Controllers
@@ -17,12 +18,14 @@ namespace Telerik_ForumTeamProject.Controllers
     {
         private readonly IUserService userService;
         private readonly ModelMapper modelMapper;
+        private readonly ICloudinaryService cloudinaryService;
       //  private readonly AuthManager authManager;
 
-        public UserController(IUserService userService, ModelMapper modelMapper, AuthManager authManager) :base(authManager)
+        public UserController(IUserService userService, ModelMapper modelMapper, AuthManager authManager, ICloudinaryService cloudinaryService) : base(authManager)
         {
             this.userService = userService;
             this.modelMapper = modelMapper;
+            this.cloudinaryService = cloudinaryService;
         }
 
 
@@ -81,6 +84,36 @@ namespace Telerik_ForumTeamProject.Controllers
             catch (DuplicateEntityException ex)
             {
                 return Conflict(ex.Message);
+            }
+        }
+
+        [HttpPost("{userId}/uploadProfilePicture")]
+        [Authorize]
+        public async Task<IActionResult> UploadProfilePicture(int userId, IFormFile file)
+        {
+            if (file == null || file.Length == 0)
+                return BadRequest("No file uploaded.");
+
+            // Upload image to Cloudinary
+            var uploadResult = await this.cloudinaryService.UploadImageAsync(file);
+
+            if (uploadResult == null)
+                return BadRequest("Error uploading image.");
+
+            try
+            {
+                // Update user's profile picture URL
+                var updatedUser = this.userService.UpdateProfilePicture(userId, uploadResult.Url);
+
+                return Ok(new { updatedUser.ProfilePictureUrl });
+            }
+            catch (EntityNotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
             }
         }
 

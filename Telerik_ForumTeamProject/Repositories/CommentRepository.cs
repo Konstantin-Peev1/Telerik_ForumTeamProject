@@ -55,7 +55,6 @@ namespace Telerik_ForumTeamProject.Repositories
 
             reply.PostID = parentComment.PostID;
             reply.ParentCommentID = parentCommentId;
-            reply.ParentCommentID = parentCommentId;
             this.applicationContext.Comments.Add(reply);
             this.applicationContext.SaveChanges();
             return reply;

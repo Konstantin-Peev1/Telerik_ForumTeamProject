@@ -5,6 +5,7 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Text;
 using Telerik_ForumTeamProject.Data;
+using Telerik_ForumTeamProject.Extensions;
 using Telerik_ForumTeamProject.Helpers;
 using Telerik_ForumTeamProject.Repositories;
 using Telerik_ForumTeamProject.Repositories.Contracts;
@@ -36,7 +37,7 @@ namespace Telerik_ForumTeamProject
                     Scheme = "Bearer",
                     BearerFormat = "JWT",
                     In = ParameterLocation.Header,
-                    Description = "JWT Authorization header using the Bearer scheme. Example: \"Authorization: Bearer {token}\""
+                    Description = "JWT Authorization header using the Bearer scheme. Example: \"Authorization:{token}\""
                 });
                 c.AddSecurityRequirement(new OpenApiSecurityRequirement
     {
@@ -97,6 +98,8 @@ namespace Telerik_ForumTeamProject
             builder.Services.AddScoped<IPostService, PostService>();
             builder.Services.AddScoped<ITagService, TagService>();
             builder.Services.AddScoped<ILikeService, LikeService>();
+            // Cloudinary Service
+            builder.Services.AddCloudinaryService(builder.Configuration);
 
             // Helpers
             builder.Services.AddScoped<ModelMapper>();

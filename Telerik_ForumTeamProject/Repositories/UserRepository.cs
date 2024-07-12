@@ -49,6 +49,13 @@ namespace Telerik_ForumTeamProject.Repositories
             return user;
         }
 
+        public User UpdateProfilePicture(User user, string profilePictureUrl)
+        {
+            user.ProfilePictureUrl = profilePictureUrl;
+            this.applicationConetxt.SaveChanges();
+            return user;
+        }
+
         public bool UserExists(string username)
         {
             return this.applicationConetxt.Users.Any(user => user.UserName == username);

@@ -7,7 +7,8 @@ namespace Telerik_ForumTeamProject.Repositories.Contracts
     {
         User GetByInformation(string information);
         User UpdateInformation(User user, User userToUpdate);
-        User CreateUser (User user);
+        User UpdateProfilePicture(User user, string profilePictureUrl);
+        User CreateUser(User user);
         bool UserExists(string username);
         bool UserExistsEmail(string email);
         User GetUserByID(int id);

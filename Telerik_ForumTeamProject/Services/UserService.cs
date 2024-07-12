@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Server.IIS.Core;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Server.IIS.Core;
 using Telerik_ForumTeamProject.Exceptions;
 using Telerik_ForumTeamProject.Models.Entities;
 using Telerik_ForumTeamProject.Repositories.Contracts;
@@ -42,6 +43,18 @@ namespace Telerik_ForumTeamProject.Services
                 throw new DuplicateEntityException("User with such username exists");
             }
             return this.userRepository.UpdateInformation(user, userToUpdate);
+        }
+
+        public User UpdateProfilePicture(int userId, string profilePictureUrl)
+        {
+            User userToUpdate = this.userRepository.GetUserByID(userId);
+
+            if(userToUpdate == null)
+            {
+                throw new EntityNotFoundException("Such user does not exist");
+            }
+            return this.userRepository.UpdateProfilePicture(userToUpdate, profilePictureUrl);
+
         }
 
         public User BlockUser(User user)
