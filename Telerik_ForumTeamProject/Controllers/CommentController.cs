@@ -77,7 +77,7 @@ namespace Telerik_ForumTeamProject.Controllers
         {
             User user = GetCurrentUser();
 
-            Comment reply = modelMapper.MapCreateReply(replyRequestDTO);
+            Comment reply = modelMapper.Map(replyRequestDTO);
             Comment replyToCreate = commentService.CreateReply(reply, parentCommentId, user);
             CommentReplyResponseDTO response = modelMapper.Map(replyToCreate);
 
@@ -91,7 +91,7 @@ namespace Telerik_ForumTeamProject.Controllers
         {
             User user = GetCurrentUser();
 
-            Comment comment = this.modelMapper.MapUpdateComment(commentRequestDTO, commentId);
+            Comment comment = this.modelMapper.Map(commentRequestDTO, commentId);
             Comment commentToEdit = this.commentService.UpdateComment(commentId, comment, user);
             CommentReplyResponseDTO response = this.modelMapper.Map(commentToEdit);
 
