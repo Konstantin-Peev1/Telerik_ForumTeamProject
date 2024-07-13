@@ -19,7 +19,8 @@ namespace Telerik_ForumTeamProject.Controllers
         private readonly IUserService userService;
         private readonly ModelMapper modelMapper;
         private readonly ICloudinaryService cloudinaryService;
-      //  private readonly AuthManager authManager;
+        private readonly List<string> allowedExtensions = new List<string> { ".jpg", ".jpeg", ".png" };
+        //  private readonly AuthManager authManager;
 
         public UserController(IUserService userService, ModelMapper modelMapper, AuthManager authManager, ICloudinaryService cloudinaryService) : base(authManager)
         {
@@ -93,6 +94,13 @@ namespace Telerik_ForumTeamProject.Controllers
         {
             if (file == null || file.Length == 0)
                 return BadRequest("No file uploaded.");
+
+            //Validate file extension
+            var extension = Path.GetExtension(file.FileName);
+            if (!this.allowedExtensions.Contains(extension))
+            {
+                return BadRequest("Invalid file format. Only .jpg, .jpeg, and .png are allowed.");
+            }
 
             // Upload image to Cloudinary
             var uploadResult = await this.cloudinaryService.UploadImageAsync(file);
