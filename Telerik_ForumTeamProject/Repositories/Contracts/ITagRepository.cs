@@ -9,6 +9,6 @@ namespace Telerik_ForumTeamProject.Repositories.Contracts
         bool RemoveTags(Post post, Tag tag);
         Tag UpdateTags(Post post, string desc);
 
-        List<Tag> GetTagByDesc(string description);
+        ICollection<Tag> GetTagByDesc(string description);
     }
 }

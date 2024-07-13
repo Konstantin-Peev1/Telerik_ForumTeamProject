@@ -37,7 +37,7 @@ namespace Telerik_ForumTeamProject.Services
             return this.postRepository.DeletePost(post);
         }
 
-        public List<Post> FilterBy(PostQueryParamteres filterParameters)
+        public ICollection<Post> FilterBy(PostQueryParamteres filterParameters)
         {
             return this.postRepository.FilterBy(filterParameters);
         }
@@ -47,12 +47,12 @@ namespace Telerik_ForumTeamProject.Services
             return this.postRepository.GetPost(id);
         }
 
-        public List<Post> GetTop10Commented()
+        public ICollection<Post> GetTop10Commented()
         {
             return this.postRepository.GetTop10Commented();
         }
 
-        public List<Post> GetTop10Recent()
+        public ICollection<Post> GetTop10Recent()
         {
             return this.postRepository.GetTop10Recent();
         }

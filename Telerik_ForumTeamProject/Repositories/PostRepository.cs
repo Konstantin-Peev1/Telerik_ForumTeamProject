@@ -15,7 +15,7 @@ namespace Telerik_ForumTeamProject.Repositories
             this.applicationContext = applicationContext;
         }
 
-        public List<Post> GetTop10Commented()
+        public ICollection<Post> GetTop10Commented()
         {
              return GetPosts()
             .OrderByDescending(x => x.Comments.Count)
@@ -23,7 +23,7 @@ namespace Telerik_ForumTeamProject.Repositories
             .ToList();
         }
 
-        public List<Post> GetTop10Recent()
+        public ICollection<Post> GetTop10Recent()
         {
             return GetPosts()
             .OrderByDescending(x => x.Created)
@@ -43,7 +43,7 @@ namespace Telerik_ForumTeamProject.Repositories
             return post;
         }
 
-        public List<Post> FilterBy(PostQueryParamteres filterParameters)
+        public ICollection<Post> FilterBy(PostQueryParamteres filterParameters)
         {
             IQueryable<Post> results = this.GetPosts();
             results = FilterByTitle(results, filterParameters.Title);

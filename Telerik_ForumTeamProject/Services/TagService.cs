@@ -25,7 +25,7 @@ namespace Telerik_ForumTeamProject.Services
             return createdTag;
         }
 
-        public List<Tag> GetTagsByDesc(string desc)
+        public ICollection<Tag> GetTagsByDesc(string desc)
         {
             return this.tagRepository.GetTagByDesc(desc);
         }

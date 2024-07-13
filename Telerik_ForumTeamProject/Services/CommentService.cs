@@ -15,11 +15,11 @@ namespace Telerik_ForumTeamProject.Services
             this.commentRepository = commentRepository;
         }
 
-        public List<Comment> GetComments()
+        public ICollection<Comment> GetComments()
         {
             return this.commentRepository.GetAllComments();
         }
-        public List<Comment> GetReplies(int parentCommentId, int skip, int take)
+        public ICollection<Comment> GetReplies(int parentCommentId, int skip, int take)
         {
             return this.commentRepository.GetReplies(parentCommentId, skip, take);
         }

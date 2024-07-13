@@ -15,12 +15,12 @@ namespace Telerik_ForumTeamProject.Repositories
             this.applicationContext = applicationContext;
         }
 
-        public List<Comment> GetAllComments()
+        public ICollection<Comment> GetAllComments()
         {
             return GetComments().ToList();
         }
 
-        public List<Comment> GetReplies(int parentCommentId, int skip, int take)
+        public ICollection<Comment> GetReplies(int parentCommentId, int skip, int take)
         {
             return this.applicationContext.Comments
                 .Where(c => c.ParentCommentID == parentCommentId)

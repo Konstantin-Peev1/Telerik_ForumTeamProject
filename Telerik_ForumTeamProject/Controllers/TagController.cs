@@ -32,7 +32,7 @@ namespace Telerik_ForumTeamProject.Controllers
         public IActionResult Get([FromQuery] string desc)
         {
             User user = GetCurrentUser();
-            List<Tag> tags = this.tagService.GetTagsByDesc(desc);
+            ICollection<Tag> tags = this.tagService.GetTagsByDesc(desc);
             List<TagResponseDTO> tagsToReturn = tags.Select(tag => this.modelMapper.Map(tag)).ToList();
             return Ok(tagsToReturn);
         }

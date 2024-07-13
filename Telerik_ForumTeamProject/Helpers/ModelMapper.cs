@@ -81,7 +81,7 @@ namespace Telerik_ForumTeamProject.Helpers
             return response;
         }
 
-        public List<CommentReplyResponseDTO> Map(List<Comment> comments)
+        public List<CommentReplyResponseDTO> Map(ICollection<Comment> comments)
         {
             return comments?.Where(c => c.ParentCommentID == null)
                             .Select(c => new CommentReplyResponseDTO
@@ -94,7 +94,7 @@ namespace Telerik_ForumTeamProject.Helpers
                             .ToList() ?? new List<CommentReplyResponseDTO>();
         }
 
-        public List<ReplyResponseDTO> MapReplyResponse(List<Comment> reply)
+        public List<ReplyResponseDTO> MapReplyResponse(ICollection<Comment> reply)
         {
             return reply?.Select(c => new ReplyResponseDTO 
             {
@@ -102,18 +102,6 @@ namespace Telerik_ForumTeamProject.Helpers
                 Created = DateTimeFormatter.FormatToStandard(c.Created),
                 UserName = c.User.UserName,
             }).ToList() ?? new List<ReplyResponseDTO>();
-        }
-
-        private CommentReplyResponseDTO MapCommentWithReplies(Comment comment)
-        {
-            var dto = new CommentReplyResponseDTO
-            {
-                Content = comment.Content,
-                Created = DateTimeFormatter.FormatToStandard(comment.Created),
-                UserName = comment.User.UserName,
-                Replies = comment.Replies?.Select(r => MapCommentWithReplies(r)).ToList() ?? new List<CommentReplyResponseDTO>()
-            };
-            return dto;
         }
 
         public Comment Map(CommentRequestDTO comment, int postId = 0, int commentId = 0)
@@ -159,7 +147,7 @@ namespace Telerik_ForumTeamProject.Helpers
             };
         }
 
-        public List<PostResponseDTO> Map(List<Post> posts)
+        public List<PostResponseDTO> Map(ICollection<Post> posts)
         {
             List<PostResponseDTO> response;
             response = posts.Count != 0 ? posts

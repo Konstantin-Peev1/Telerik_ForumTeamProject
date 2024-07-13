@@ -51,7 +51,7 @@ namespace Telerik_ForumTeamProject.Controllers
         public IActionResult GetReplies(int parentCommentId, int skip = 0, int take = 5)
         {
             User currentUser = GetCurrentUser();
-            List<Comment> replies = commentService.GetReplies(parentCommentId, skip, take);
+            ICollection<Comment> replies = commentService.GetReplies(parentCommentId, skip, take);
             List<ReplyResponseDTO> response = modelMapper.MapReplyResponse(replies);
 
             return Ok(response);

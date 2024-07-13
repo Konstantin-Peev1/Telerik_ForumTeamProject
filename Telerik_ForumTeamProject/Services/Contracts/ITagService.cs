@@ -8,7 +8,7 @@ namespace Telerik_ForumTeamProject.Services.Contracts
         Tag UpdateTags(User user, Post post, string desc);
         Tag Create(string desc);
 
-        List<Tag> GetTagsByDesc(string desc);   
+        ICollection<Tag> GetTagsByDesc(string desc);   
 
     }
 }
