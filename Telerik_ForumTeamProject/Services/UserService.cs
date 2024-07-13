@@ -10,10 +10,12 @@ namespace Telerik_ForumTeamProject.Services
     public class UserService : IUserService
     {
         private readonly IUserRepository userRepository;
+        private readonly string defaultProfilePictureUrl;
 
-        public UserService(IUserRepository userRepository)
+        public UserService(IUserRepository userRepository, IConfiguration configuration)
         {
             this.userRepository = userRepository;
+            this.defaultProfilePictureUrl = configuration["CloudinarySettings:DefaultProfilePictureUrl"];
         }
 
         public User GetByInformation(string information)
@@ -28,6 +30,12 @@ namespace Telerik_ForumTeamProject.Services
             {
                 throw new DuplicateEntityException("User with such username or email exists");
             }
+            
+            if (string.IsNullOrEmpty(user.ProfilePictureUrl))
+            {
+                user.ProfilePictureUrl = this.defaultProfilePictureUrl;
+            }
+
             User createdUser = this.userRepository.CreateUser(user);
             return createdUser;
         }
