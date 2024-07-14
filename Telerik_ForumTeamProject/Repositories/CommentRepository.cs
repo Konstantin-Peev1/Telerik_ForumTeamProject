@@ -20,17 +20,21 @@ namespace Telerik_ForumTeamProject.Repositories
             return GetComments().ToList();
         }
 
-        public ICollection<Comment> GetReplies(int parentCommentId, int skip, int take)
+        public ICollection<Comment> GetPagedReplies(int parentCommentId, int page, int pageSize)
         {
+            int skip = (page - 1) * pageSize;
             return this.applicationContext.Comments
-                .Where(c => c.ParentCommentID == parentCommentId)
-                .OrderBy(c => c.Created)
-                .Skip(skip)
-                .Take(take)
-                .Include(c => c.User) 
-                .ToList();
+                 .Where(c => c.ParentCommentID == parentCommentId)
+                 .Skip(skip)
+                 .Take(pageSize)
+                 .ToList();
         }
 
+        public int GetRepliesCount(int parentCommentId)
+        {
+            return applicationContext.Comments
+                .Count(r => r.ParentCommentID == parentCommentId);
+        }
 
         public Comment GetCommentById(int id)
         {
@@ -91,7 +95,9 @@ namespace Telerik_ForumTeamProject.Repositories
         private void DeleteCommentAndReplies(Comment comment)
         {
             
-            var replies = applicationContext.Comments.Where(c => c.ParentCommentID == comment.Id).ToList();
+            var replies = applicationContext.Comments
+                .Where(c => c.ParentCommentID == comment.Id)
+                .ToList();
             foreach (var reply in replies)
             {
                 DeleteCommentAndReplies(reply);

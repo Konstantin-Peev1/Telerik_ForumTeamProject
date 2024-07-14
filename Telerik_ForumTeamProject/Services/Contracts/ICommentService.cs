@@ -1,11 +1,12 @@
 ﻿using Telerik_ForumTeamProject.Models.Entities;
+using Telerik_ForumTeamProject.Models.ResponseDTO;
 
 namespace Telerik_ForumTeamProject.Services.Contracts
 {
     public interface ICommentService
     {
         ICollection<Comment> GetComments();
-        ICollection<Comment> GetReplies(int parentCommentId, int skip, int take);
+        PagedResult<Comment> GetPagedReplies(int parentCommentId, int page, int pageSize);
         Comment GetComment(int id);
         Comment CreateComment(Comment comment, User user);
         Comment CreateReply(Comment reply, int parentCommentId, User user);

@@ -14,15 +14,18 @@ namespace Telerik_ForumTeamProject.Controllers
     {
         private readonly ILikeService likeService;
         private readonly ModelMapper mapper;
-     //   private readonly AuthManager authManager;
 
         public LikeController(ILikeService likeService, ModelMapper mapper, AuthManager authManager) : base(authManager)
         {
             this.likeService = likeService;
             this.mapper = mapper;
-          //  this.authManager = authManager;
         }
 
+        /// <summary>
+        /// Endpoint to add or remove a like for a specified entity.
+        /// </summary>
+        /// <param name="id">The ID of the entity to like or unlike.</param>
+        /// <returns>The like response DTO indicating the current state of the like.</returns>
         [HttpPost("{id}")]
         [Authorize]
         public IActionResult AddRemoveLike(int id)

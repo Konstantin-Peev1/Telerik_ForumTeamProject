@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Telerik_ForumTeamProject.Exceptions;
 using Telerik_ForumTeamProject.Models.Entities;
+using Telerik_ForumTeamProject.Models.ResponseDTO;
 using Telerik_ForumTeamProject.Repositories.Contracts;
 using Telerik_ForumTeamProject.Services.Contracts;
 
@@ -19,13 +20,37 @@ namespace Telerik_ForumTeamProject.Services
         {
             return this.commentRepository.GetAllComments();
         }
-        public ICollection<Comment> GetReplies(int parentCommentId, int skip, int take)
+        public PagedResult<Comment> GetPagedReplies(int parentCommentId, int page, int pageSize)
         {
-            return this.commentRepository.GetReplies(parentCommentId, skip, take);
+            ICollection<Comment> replies = this.commentRepository.GetPagedReplies(parentCommentId, page, pageSize);
+            int totalReplies = this.GetRepliesCount(parentCommentId);
+
+            PaginationMetadata paginationMetadata = new PaginationMetadata()
+            {
+                TotalCount = totalReplies,
+                PageSize = pageSize,
+                CurrentPage = page,
+                TotalPages = (int)Math.Ceiling(totalReplies / (double)pageSize)
+            };
+
+            if(page > paginationMetadata.TotalPages)
+            {
+                throw new PageNotFoundException("Page not found!");
+            }
+
+            return new PagedResult<Comment>
+            {
+                Items = replies,
+                Metadata = paginationMetadata
+            };
         }
         public Comment GetComment(int id)
         {
             return this.commentRepository.GetCommentById(id);
+        }
+        public int GetRepliesCount(int parentCommentId)
+        {
+            return this.commentRepository.GetRepliesCount(parentCommentId);
         }
 
         public Comment CreateComment(Comment comment, User user)

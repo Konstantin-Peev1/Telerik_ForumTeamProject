@@ -20,7 +20,6 @@ namespace Telerik_ForumTeamProject.Controllers
         private readonly ModelMapper modelMapper;
         private readonly ICloudinaryService cloudinaryService;
         private readonly List<string> allowedExtensions = new List<string> { ".jpg", ".jpeg", ".png" };
-        //  private readonly AuthManager authManager;
 
         public UserController(IUserService userService, ModelMapper modelMapper, AuthManager authManager, ICloudinaryService cloudinaryService) : base(authManager)
         {
@@ -29,7 +28,17 @@ namespace Telerik_ForumTeamProject.Controllers
             this.cloudinaryService = cloudinaryService;
         }
 
-
+        /// <summary>
+        /// Retrieves user information based on provided search criteria.
+        /// </summary>
+        /// <remarks>
+        /// This endpoint is accessible only to administrators.
+        /// The search criteria can be a username, email, or first name.
+        /// </remarks>
+        /// <param name="information">The search criteria (username, email, or first name).</param>
+        /// <returns>
+        /// A UserResponseDTO containing the user's information if found, or a 404 Not Found response if not found.
+        /// </returns>
         [HttpGet("")]
         [Authorize(Policy = "AdminPolicy")]
         public IActionResult Get([FromQuery] string information)
@@ -41,8 +50,16 @@ namespace Telerik_ForumTeamProject.Controllers
              //trycatch later -> think of where to put them 
         }
 
-
-
+        /// <summary>
+        /// Updates user information.
+        /// </summary>
+        /// <remarks>
+        /// This endpoint is accessible only to authenticated users.
+        /// Users can update their own information.
+        /// </remarks>
+        /// <param name="id">The ID of the user to update.</param>
+        /// <param name="userRequest">The updated user data in the request body.</param>
+        /// <returns>A UserResponseDTO containing the updated user information.</returns>
         [HttpPut("{id}")]
         [Authorize()]
         public IActionResult Update(int id, [FromBody] UserRequestDTO userRequest)
@@ -54,6 +71,16 @@ namespace Telerik_ForumTeamProject.Controllers
             return this.Ok(userToReturn);
         }
 
+        /// <summary>
+        /// Updates user information.
+        /// </summary>
+        /// <remarks>
+        /// This endpoint is accessible only to authenticated users.
+        /// Users can update their own information.
+        /// </remarks>
+        /// <param name="id">The ID of the user to update.</param>
+        /// <param name="userRequest">The updated user data in the request body.</param>
+        /// <returns>A UserResponseDTO containing the updated user information.</returns>
         [AllowAnonymous]
         [HttpPost("login")]
         public IActionResult Login(LogInRequestDTO loginRequest)
@@ -69,6 +96,15 @@ namespace Telerik_ForumTeamProject.Controllers
                 return Unauthorized(ex.Message);
             }
         }
+
+        /// <summary>
+        /// Registers a new user.
+        /// </summary>
+        /// <param name="registerRequest">User registration data.</param>
+        /// <returns>
+        /// A 201 Created response with a UserResponseDTO containing the new user's information if successful.
+        /// A 409 Conflict response if a user with the same username or email already exists.
+        /// </returns>
         [AllowAnonymous]
         [HttpPost("register")]
         public IActionResult Register(UserRequestDTO registerRequest)
@@ -88,6 +124,17 @@ namespace Telerik_ForumTeamProject.Controllers
             }
         }
 
+        /// <summary>
+        /// Uploads a profile picture for the specified user.
+        /// </summary>
+        /// <param name="userId">The ID of the user.</param>
+        /// <param name="file">The image file to upload.</param>
+        /// <returns>
+        /// An Ok (200) response with the updated profile picture URL if successful.
+        /// A BadRequest (400) response with an error message if the file is invalid or there's an upload error.
+        /// A NotFound (404) response if the user is not found.
+        /// A 500 Internal Server Error response for unexpected errors.
+        /// </returns>
         [HttpPost("{userId}/uploadProfilePicture")]
         [Authorize]
         public async Task<IActionResult> UploadProfilePicture(int userId, IFormFile file)
@@ -125,6 +172,16 @@ namespace Telerik_ForumTeamProject.Controllers
             }
         }
 
+        /// <summary>
+        /// Blocks the user.
+        /// </summary>
+        /// <remarks>
+        /// This endpoint is accessible only to administrators.
+        /// </remarks>
+        /// <param name="userName">The username of the user to block.</param>
+        /// <returns>
+        /// A UserResponseDTO containing the blocked user's information if found, or a 404 Not Found response if not found.
+        /// </returns>
         [HttpPost("block")]
         [Authorize(Policy = "AdminPolicy")]
         public IActionResult Block([FromQuery] string userName)
@@ -137,6 +194,16 @@ namespace Telerik_ForumTeamProject.Controllers
             //trycatch later -> think of where to put them 
         }
 
+        /// <summary>
+        /// Unblocks the user.
+        /// </summary>
+        /// <remarks>
+        /// This endpoint is accessible only to administrators.
+        /// </remarks>
+        /// <param name="userName">The username of the user to unblock.</param>
+        /// <returns>
+        /// A UserResponseDTO containing the unblocked user's information if found, or a 404 Not Found response if not found.
+        /// </returns>
         [HttpPost("unblock")]
         [Authorize(Policy = "AdminPolicy")]
         public IActionResult UnBlock([FromQuery] string userName)
@@ -149,6 +216,16 @@ namespace Telerik_ForumTeamProject.Controllers
             //trycatch later -> think of where to put them 
         }
 
+        /// <summary>
+        /// Makes the user an admin.
+        /// </summary>
+        /// <remarks>
+        /// This endpoint is accessible only to administrators.
+        /// </remarks>
+        /// <param name="userName">The username of the user to make an admin.</param>
+        /// <returns>
+        /// A UserResponseDTO containing the new admin's information if found, or a 404 Not Found response if not found.
+        /// </returns>
         [HttpPost("makeAdmin")]
         [Authorize(Policy = "AdminPolicy")]
         public IActionResult MakeAdmin([FromQuery] string userName)

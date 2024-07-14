@@ -6,7 +6,8 @@ namespace Telerik_ForumTeamProject.Repositories.Contracts
     {
         Comment CreateComment(Comment comment);
         ICollection<Comment> GetAllComments();
-        ICollection<Comment> GetReplies(int parentCommentId, int skip, int take);
+        ICollection<Comment> GetPagedReplies(int parentCommentId, int page, int pageSize);
+        int GetRepliesCount(int parentCommentId);
         Comment GetCommentById(int id);
         Comment UpdateComment(int id, Comment comment);
         public bool DeleteComment(int id, Comment comment);
