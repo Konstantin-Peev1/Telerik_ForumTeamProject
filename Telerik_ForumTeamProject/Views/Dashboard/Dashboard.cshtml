@@ -1,0 +1,142 @@
+﻿@{
+    ViewData["Title"] = "Dashboard";
+}
+
+<h1>Dashboard</h1>
+
+<!-- Logout Button -->
+<div>
+    <button id="logoutButton">Logout</button>
+</div>
+
+<!-- Posts Section -->
+<div>
+    <label for="postType">Select post type:</label>
+    <select id="postType">
+        <option value="latest">Latest 10 Posts</option>
+        <option value="most-commented">Most Commented 10 Posts</option>
+    </select>
+</div>
+
+<div>
+    <label for="pageSize">Posts per page:</label>
+    <select id="pageSize">
+        <option value="5">5</option>
+        <option value="10" selected>10</option>
+        <option value="20">20</option>
+    </select>
+</div>
+
+<div id="posts"></div>
+
+<div>
+    <button id="prevPage">Previous</button>
+    <span id="pageNumber">1</span>
+    <button id="nextPage">Next</button>
+</div>
+
+<!-- Include the auth helper script -->
+<script src="~/js/authHelper.js"></script>
+
+<script>
+    // Logout Functionality
+    document.getElementById('logoutButton').addEventListener('click', function () {
+        localStorage.removeItem('jwtToken');
+        alert('Logout successful');
+        window.location.href = '/Home/Login';
+    });
+
+    // Check if the user is logged in
+    function checkAuth() {
+        const token = localStorage.getItem('jwtToken');
+        if (!token) {
+            alert('You are not logged in. Redirecting to login page.');
+            window.location.href = '/Home/Login';
+        }
+    }
+
+    checkAuth();
+
+    // Pagination and Post Loading Functionality
+    let currentPage = 1;
+
+    async function loadPosts(page, pageSize, postType) {
+        let url;
+        if (postType === 'latest') {
+            url = `/api/post/latest?page=${page}&pageSize=${pageSize}`;
+        } else if (postType === 'most-commented') {
+            url = `/api/post/most-commented?page=${page}&pageSize=${pageSize}`;
+        } else {
+            url = `/api/post/all-posts?page=${page}&pageSize=${pageSize}`;
+        }
+
+        try {
+            const response = await fetchWithAuth(url);
+            if (response.ok) {
+                const posts = await response.json();
+                const postsContainer = document.getElementById('posts');
+                postsContainer.innerHTML = ''; // Clear previous posts
+
+                posts.forEach(post => {
+                    const postDiv = document.createElement('div');
+                    postDiv.innerHTML = `
+                            <h3 class="post-title" data-post-id="${post.id}">${post.title}</h3>
+                            <p>Likes: ${post.likes}</p>
+                        `;
+                    postsContainer.appendChild(postDiv);
+                });
+
+                document.getElementById('pageNumber').textContent = page;
+                addPostTitleClickEvents(); // Add click event listeners to post titles
+            } else {
+                const error = await response.text();
+                alert('Failed to load posts: ' + error);
+            }
+        } catch (err) {
+            alert('An error occurred: ' + err.message);
+        }
+    }
+
+    function addPostTitleClickEvents() {
+        const postTitles = document.querySelectorAll('.post-title');
+        postTitles.forEach(title => {
+            title.addEventListener('click', function () {
+                const postId = this.getAttribute('data-post-id');
+                window.location.href = `/Post/Details/${postId}`;
+            });
+        });
+    }
+
+    document.getElementById('postType').addEventListener('change', function () {
+        currentPage = 1;
+        const pageSize = document.getElementById('pageSize').value;
+        const postType = this.value;
+        loadPosts(currentPage, pageSize, postType);
+    });
+
+    document.getElementById('pageSize').addEventListener('change', function () {
+        currentPage = 1;
+        const pageSize = this.value;
+        const postType = document.getElementById('postType').value;
+        loadPosts(currentPage, pageSize, postType);
+    });
+
+    document.getElementById('prevPage').addEventListener('click', function () {
+        if (currentPage > 1) {
+            currentPage--;
+            const pageSize = document.getElementById('pageSize').value;
+            const postType = document.getElementById('postType').value;
+            loadPosts(currentPage, pageSize, postType);
+        }
+    });
+
+    document.getElementById('nextPage').addEventListener('click', function () {
+        currentPage++;
+        const pageSize = document.getElementById('pageSize').value;
+        const postType = document.getElementById('postType').value;
+        loadPosts(currentPage, pageSize, postType);
+    });
+
+    // Initial load
+    loadPosts(currentPage, document.getElementById('pageSize').value, document.getElementById('postType').value);
+</script>

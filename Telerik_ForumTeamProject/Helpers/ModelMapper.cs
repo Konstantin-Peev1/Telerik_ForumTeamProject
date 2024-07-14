@@ -4,7 +4,7 @@ using Telerik_ForumTeamProject.Models.Entities;
 using Telerik_ForumTeamProject.Models.RequestDTO;
 using Telerik_ForumTeamProject.Models.ResponseDTO;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
-
+using Microsoft.AspNetCore.SignalR;
 namespace Telerik_ForumTeamProject.Helpers
 {
     public class ModelMapper
@@ -73,6 +73,8 @@ namespace Telerik_ForumTeamProject.Helpers
             postResponse.Comments = Map(post.Comments) ?? new List<CommentReplyResponseDTO>();
             //postResponse.Replies = Map(post.Replies) ?? new List<CommentReplyResponseDTO>();
             postResponse.Tags = post.Tags?.Select(tag => tag.Description).ToList() ?? new List<string>();
+            postResponse.DateCreated = post.Created;
+            postResponse.Id = post.Id;
             return postResponse;
             /*return new PostUploadResponseDTO()
             {

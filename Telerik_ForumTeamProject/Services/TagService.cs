@@ -27,7 +27,7 @@ namespace Telerik_ForumTeamProject.Services
 
         public List<Tag> GetTagsByDesc(string desc)
         {
-            return this.tagRepository.GetTagByDesc(desc);
+            return this.tagRepository.GetTagByDesc(desc).ToList();
         }
 
         public bool RemoveTags(User user, Post post, string desc)

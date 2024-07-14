@@ -45,9 +45,9 @@ namespace Telerik_ForumTeamProject.Repositories
             return this.applicationContext.SaveChanges() > 0;
         }
 
-        public List<Tag> GetTagByDesc(string description)
+        public IQueryable<Tag> GetTagByDesc(string description)
         {
-            return this.applicationContext.Tags.Where(tag => tag.Description.Contains(description)).Include(tag => tag.Posts).ToList();
+            return this.applicationContext.Tags.Where(tag => tag.Description.Contains(description)).Include(tag => tag.Posts);
         }
     }
 }

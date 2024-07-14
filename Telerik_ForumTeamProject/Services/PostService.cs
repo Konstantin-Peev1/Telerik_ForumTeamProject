@@ -68,10 +68,13 @@ namespace Telerik_ForumTeamProject.Services
             var postUpdate = this.postRepository.UpdatePost(post, updatedPost);
             return postUpdate;
         }
-
+        public List<Post> GetAll()
+        {
+            return this.postRepository.GetAll();
+        }
         //Have to create a block user command.
-        
 
-     
+
+
     }
 }

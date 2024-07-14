@@ -1,0 +1,36 @@
+﻿@model Telerik_ForumTeamProject.Models.ResponseDTO.PostUploadResponseDTO
+
+@{
+    ViewData["Title"] = "Post Details";
+}
+
+<h1>@Model.Title</h1>
+
+<p>Posted by: @Model.UserName</p>
+<p>Posted on: @Model.PostDate</p>
+<p>@Model.Content</p>
+<p>Likes: @Model.Likes</p>
+<p>Tags: @string.Join(", ", @Model.Tags)</p>
+
+<input type="hidden" id="postId" value="@Model.Id" />
+
+<h2>Comments</h2>
+<div id="comments"></div>
+<button id="loadMoreComments">Load More Comments</button>
+
+<!-- Comment Modal -->
+<div id="commentModal" class="modal">
+    <div class="modal-content">
+        <span class="close" id="closeCommentModal">&times;</span>
+        <h2>Add Comment</h2>
+        <textarea id="commentContent" placeholder="Enter your comment"></textarea>
+        <button id="submitComment">Submit Comment</button>
+    </div>
+</div>
+
+<a href="/Dashboard">Back to Dashboard</a>
+
+@section Scripts {
+    <script src="~/js/authHelper.js"></script>
+    <script src="~/js/postDetails.js"></script>
+}

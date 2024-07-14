@@ -74,5 +74,6 @@ namespace Telerik_ForumTeamProject.Services
             }
             return this.userRepository.MakeAdmin(user);
         }
+
     }
 }

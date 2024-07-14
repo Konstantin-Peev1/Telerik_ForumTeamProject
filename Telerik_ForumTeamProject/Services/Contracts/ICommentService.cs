@@ -11,5 +11,6 @@ namespace Telerik_ForumTeamProject.Services.Contracts
         Comment CreateReply(Comment reply, int parentCommentId, User user);
         bool DeleteComment(int id, User user);
         Comment UpdateComment(int id, Comment comment, User user);
+        List<Comment> GetCommentsByPostId(int postId);
     }
 }

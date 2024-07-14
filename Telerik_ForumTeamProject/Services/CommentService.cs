@@ -59,6 +59,10 @@ namespace Telerik_ForumTeamProject.Services
             }
             return this.commentRepository.DeleteComment(id, commentToDelete);
         }
+        public List<Comment> GetCommentsByPostId(int postId)
+        {
+            return this.commentRepository.GetCommentsByPostId(postId);
+        }
 
     }
 }

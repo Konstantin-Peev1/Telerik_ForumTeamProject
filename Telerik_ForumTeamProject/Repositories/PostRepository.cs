@@ -42,7 +42,10 @@ namespace Telerik_ForumTeamProject.Repositories
             this.applicationContext.SaveChanges();
             return post;
         }
-
+        public List<Post> GetAll()
+        {
+            return GetPosts().ToList();
+        }
         public List<Post> FilterBy(PostQueryParamteres filterParameters)
         {
             IQueryable<Post> results = this.GetPosts();
@@ -57,7 +60,8 @@ namespace Telerik_ForumTeamProject.Repositories
             return results.ToList();
 
         }
-
+        //Change to IQueryable up until the controller.
+        //response<T> for errors
         public Post UpdatePost(Post post, Post updatedPost)
         {
             post.Title = updatedPost.Title;

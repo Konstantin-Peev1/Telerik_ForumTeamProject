@@ -12,6 +12,7 @@ namespace Telerik_ForumTeamProject.Repositories.Contracts
         List<Post> FilterBy(PostQueryParamteres filterParameters);
         Post UpdatePost(Post post, Post updatedPost);
         bool DeletePost(Post post);
+        List<Post> GetAll();
 
 
 

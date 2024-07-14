@@ -6,6 +6,7 @@ using Microsoft.OpenApi.Models;
 using System.Text;
 using Telerik_ForumTeamProject.Data;
 using Telerik_ForumTeamProject.Helpers;
+using Telerik_ForumTeamProject.Hubs;
 using Telerik_ForumTeamProject.Repositories;
 using Telerik_ForumTeamProject.Repositories.Contracts;
 using Telerik_ForumTeamProject.Services;
@@ -20,10 +21,13 @@ namespace Telerik_ForumTeamProject
             var builder = WebApplication.CreateBuilder(args);
 
             // Add services to the container.
+            builder.Services.AddControllersWithViews(); // Add MVC services
+            builder.Services.AddSignalR(); // Add SignalR services
             builder.Services.AddControllers();
+            builder.Services.AddControllersWithViews(); // Add MVC services
             builder.Services.AddMvc();
             builder.Services.AddRazorPages();
-
+ 
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen(c =>
@@ -39,19 +43,19 @@ namespace Telerik_ForumTeamProject
                     Description = "JWT Authorization header using the Bearer scheme. Example: \"Authorization: Bearer {token}\""
                 });
                 c.AddSecurityRequirement(new OpenApiSecurityRequirement
-    {
-        {
-            new OpenApiSecurityScheme
-            {
-                Reference = new OpenApiReference
                 {
-                    Type = ReferenceType.SecurityScheme,
-                    Id = "Bearer"
-                }
-            },
-            new string[] {}
-        }
-    });
+                    {
+                        new OpenApiSecurityScheme
+                        {
+                            Reference = new OpenApiReference
+                            {
+                                Type = ReferenceType.SecurityScheme,
+                                Id = "Bearer"
+                            }
+                        },
+                        new string[] {}
+                    }
+                });
             });
 
             builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -69,17 +73,17 @@ namespace Telerik_ForumTeamProject
                     };
                 });
 
+            builder.Services.AddAuthorization(options =>
+            {
+                options.AddPolicy("AdminPolicy", policy =>
+                    policy.Requirements.Add(new AdminRequirement()));
+            });
+
             builder.Services.AddDbContext<ApplicationContext>(options =>
             {
                 string connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
                 options.UseSqlServer(connectionString);
                 options.EnableSensitiveDataLogging();
-            });
-
-            builder.Services.AddAuthorization(options =>
-            {
-                options.AddPolicy("AdminPolicy", policy =>
-                    policy.Requirements.Add(new AdminRequirement()));
             });
 
             builder.Services.AddSingleton<IAuthorizationHandler, AdminHandler>();
@@ -114,15 +118,16 @@ namespace Telerik_ForumTeamProject
             }
 
             app.UseHttpsRedirection();
+            app.UseStaticFiles();
             app.UseRouting();
             app.UseAuthentication(); // Ensure UseAuthentication is called before UseAuthorization
             app.UseAuthorization();
 
-            app.MapControllers();
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
-                endpoints.MapRazorPages();
+                endpoints.MapDefaultControllerRoute(); // Ensure default routing
+                endpoints.MapHub<ChatHub>("/chatHub"); // Map SignalR hub
             });
 
             app.Run();

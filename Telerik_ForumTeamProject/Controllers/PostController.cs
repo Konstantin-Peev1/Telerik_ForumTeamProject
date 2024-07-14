@@ -8,19 +8,20 @@ using Telerik_ForumTeamProject.Helpers;
 using Telerik_ForumTeamProject.Models.Entities;
 using Telerik_ForumTeamProject.Models.RequestDTO;
 using Telerik_ForumTeamProject.Models.ResponseDTO;
+using Telerik_ForumTeamProject.Services;
 using Telerik_ForumTeamProject.Services.Contracts;
 
 namespace Telerik_ForumTeamProject.Controllers
 {
     [Route("api/post")]
     [ApiController]
-    public class PostController : BaseController
+    public class PostControllerView : BaseController
     {
         private readonly IPostService postService;
         private readonly ModelMapper modelMapper;
       //  private readonly AuthManager authManager;
 
-        public PostController(IPostService postService, ModelMapper modelMapper, AuthManager authManager) :base(authManager)
+        public PostControllerView(IPostService postService, ModelMapper modelMapper, AuthManager authManager) :base(authManager)
         {
             this.postService = postService;
             this.modelMapper = modelMapper;
@@ -29,21 +30,25 @@ namespace Telerik_ForumTeamProject.Controllers
 
         [AllowAnonymous]
         [HttpGet("latest")]
-
-        public IActionResult GetLatest10()
+        public IActionResult GetLatest10(int page = 1, int pageSize = 10)
         {
-            var posts = this.postService.GetTop10Recent().ToList();
-            List<PostUploadResponseDTO> postsToShow = posts.Select(post => this.modelMapper.Map(post)).ToList();
+            var posts = postService.GetTop10Recent()
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToList();
+            var postsToShow = posts.Select(post => modelMapper.Map(post)).ToList();
             return Ok(postsToShow);
         }
 
         [AllowAnonymous]
         [HttpGet("most-commented")]
-
-        public IActionResult GetMostCommented10()
+        public IActionResult GetMostCommented10(int page = 1, int pageSize = 10)
         {
-            var posts = this.postService.GetTop10Commented().ToList();
-            List<PostUploadResponseDTO> postsToShow = posts.Select(post => this.modelMapper.Map(post)).ToList();
+            var posts = postService.GetTop10Commented()
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToList();
+            var postsToShow = posts.Select(post => modelMapper.Map(post)).ToList();
             return Ok(postsToShow);
         }
 
@@ -57,8 +62,8 @@ namespace Telerik_ForumTeamProject.Controllers
         }
 
         [HttpGet("{id}")]
-        [Authorize(Roles = "Admin")]
-        public IActionResult GetById([FromHeader] string credentials, int id)
+        [Authorize]
+        public IActionResult GetById(int id)
         {
             User user = GetCurrentUser();
             Post post = this.postService.GetPost(id);
@@ -88,6 +93,18 @@ namespace Telerik_ForumTeamProject.Controllers
             var showPost = this.modelMapper.Map(updatedPost);
             return this.Ok(showPost);
 
+        }
+
+        [Authorize]
+        [HttpGet("all-posts")]
+        public IActionResult ShowAllPosts(int page = 1, int pageSize = 10)
+        {
+            var posts = postService.GetAll()
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToList();
+            var postsToShow = posts.Select(post => modelMapper.Map(post)).ToList();
+            return Ok(postsToShow);
         }
 
         [HttpDelete("id")]

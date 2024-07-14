@@ -38,6 +38,12 @@ namespace Telerik_ForumTeamProject.Repositories
 
             return comment ?? throw new EntityNotFoundException("Comment does not exist.");
         }
+        public List<Comment> GetCommentsByPostId(int postId)
+        {
+            return applicationContext.Comments
+                .Where(c => c.PostID == postId)
+                .ToList();
+        }
 
         public Comment CreateComment(Comment comment)
         {
