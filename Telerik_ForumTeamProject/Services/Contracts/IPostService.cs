@@ -1,5 +1,6 @@
 ﻿using Telerik_ForumTeamProject.Models.Entities;
 using Telerik_ForumTeamProject.Models.RequestDTO;
+using Telerik_ForumTeamProject.Models.ResponseDTO;
 
 namespace Telerik_ForumTeamProject.Services.Contracts
 {
@@ -12,6 +13,6 @@ namespace Telerik_ForumTeamProject.Services.Contracts
         ICollection<Post> FilterBy(PostQueryParamteres filterParameters);
         Post UpdatePost(int id, Post updatedPost, User user);
         bool DeletePost(int id, User user);
- 
+        PagedResult<Post> GetPagedPosts(int page, int pageSize);
     }
 }

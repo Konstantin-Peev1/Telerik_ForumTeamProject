@@ -68,7 +68,20 @@ namespace Telerik_ForumTeamProject.Repositories
         }
 
 
+        public ICollection<Post> GetPagedPosts(int page, int pageSize)
+        {
+            int skip = (page - 1) * pageSize;
+            return GetPosts()
+                .OrderByDescending(x => x.Created)
+                .Skip(skip)
+                .Take(pageSize)
+                .ToList();
+        }
 
+        public int GetPostsCount()
+        {
+            return applicationContext.Posts.Count();
+        }
         public bool DeletePost(Post post)
         {
             this.applicationContext.Posts.Remove(post);

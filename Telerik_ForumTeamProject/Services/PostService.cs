@@ -2,6 +2,7 @@
 using Telerik_ForumTeamProject.Exceptions;
 using Telerik_ForumTeamProject.Models.Entities;
 using Telerik_ForumTeamProject.Models.RequestDTO;
+using Telerik_ForumTeamProject.Models.ResponseDTO;
 using Telerik_ForumTeamProject.Repositories.Contracts;
 using Telerik_ForumTeamProject.Services.Contracts;
 
@@ -68,10 +69,34 @@ namespace Telerik_ForumTeamProject.Services
             var postUpdate = this.postRepository.UpdatePost(post, updatedPost);
             return postUpdate;
         }
+        public PagedResult<Post> GetPagedPosts(int page, int pageSize)
+        {
+            ICollection<Post> posts = this.postRepository.GetPagedPosts(page, pageSize);
+            int totalPosts = this.postRepository.GetPostsCount();
+
+            PaginationMetadata paginationMetadata = new PaginationMetadata()
+            {
+                TotalCount = totalPosts,
+                PageSize = pageSize,
+                CurrentPage = page,
+                TotalPages = (int)Math.Ceiling(totalPosts / (double)pageSize)
+            };
+
+            if (page > paginationMetadata.TotalPages)
+            {
+                throw new PageNotFoundException("Page not found!");
+            }
+
+            return new PagedResult<Post>
+            {
+                Items = posts,
+                Metadata = paginationMetadata
+            };
+        }
 
         //Have to create a block user command.
-        
 
-     
+
+
     }
 }
