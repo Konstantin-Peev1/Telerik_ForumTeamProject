@@ -17,10 +17,10 @@ namespace Telerik_ForumTeamProject.Repositories
 
         public ICollection<Post> GetTop10Commented()
         {
-             return GetPosts()
-            .OrderByDescending(x => x.Comments.Count)
-            .Take(10)
-            .ToList();
+            return GetPosts()
+           .OrderByDescending(x => x.Comments.Count)
+           .Take(10)
+           .ToList();
         }
 
         public ICollection<Post> GetTop10Recent()
@@ -47,12 +47,12 @@ namespace Telerik_ForumTeamProject.Repositories
         {
             IQueryable<Post> results = this.GetPosts();
             results = FilterByTitle(results, filterParameters.Title);
-            results = FilterByMinLikes(results, filterParameters.MinLikes);
-            results = FilterByMaxLikes(results, filterParameters.MaxLikes);
             results = FilterByUser(results, filterParameters.UserName);
             results = FilterByTag(results, filterParameters.Tag);
             results = SortBy(results, filterParameters.SortBy);
             results = Order(results, filterParameters.SortOrder);
+            results = FilterByMinLikes(results, filterParameters.MinLikes);
+            results = FilterByMaxLikes(results, filterParameters.MaxLikes);
 
             return results.ToList();
 
@@ -62,7 +62,7 @@ namespace Telerik_ForumTeamProject.Repositories
         {
             post.Title = updatedPost.Title;
             post.Content = updatedPost.Content;
-           // post.Tags = updatedPost.Tags;
+            // post.Tags = updatedPost.Tags;
             this.applicationContext.SaveChanges();
             return post;
         }
@@ -90,24 +90,33 @@ namespace Telerik_ForumTeamProject.Repositories
 
         private static IQueryable<Post> FilterByTitle(IQueryable<Post> posts, string title)
         {
-            if(!string.IsNullOrEmpty(title))
+            if (!string.IsNullOrEmpty(title))
             {
-                return posts.Where(post => post.Title == title);
+                return posts.Where(post => post.Title.Contains(title));
             }
             return posts;
         }
 
-        private static IQueryable<Post> FilterByMinLikes(IQueryable<Post> posts, int minLikes)
+        private static IQueryable<Post> FilterByMinLikes(IQueryable<Post> posts, int? minLikes)
         {
-            return posts.Where(posts => posts.Likes.Count >= minLikes);
+
+            if (minLikes.HasValue && minLikes.Value > 0)
+            {
+                return posts.Where(post => post.Likes.Count >= minLikes.Value);
+            }
+            return posts;
         }
-        private static IQueryable<Post> FilterByMaxLikes(IQueryable<Post> posts, int maxLikes)
+        private static IQueryable<Post> FilterByMaxLikes(IQueryable<Post> posts, int? maxLikes)
         {
-            return posts.Where(posts => posts.Likes.Count <= maxLikes);
+            if (maxLikes.HasValue && maxLikes.Value > 0)
+            {
+                return posts.Where(post => post.Likes.Count <= maxLikes.Value);
+            }
+            return posts;
         }
         private static IQueryable<Post> FilterByUser(IQueryable<Post> posts, string username)
         {
-            if(!string.IsNullOrEmpty(username))
+            if (!string.IsNullOrEmpty(username))
             {
                 return posts.Where(post => post.User.UserName.Contains(username));
             }
@@ -131,7 +140,7 @@ namespace Telerik_ForumTeamProject.Repositories
                 case "title":
                     return posts.OrderBy(posts => posts.Title);
                 case "likes":
-                    return posts.OrderBy(posts=> posts.Likes.Count);
+                    return posts.OrderBy(posts => posts.Likes.Count);
                 case "user":
                     return posts.OrderBy(posts => posts.User.UserName);
                 case "tag":
@@ -146,18 +155,18 @@ namespace Telerik_ForumTeamProject.Repositories
             return (sortOrder == "desc") ? posts.Reverse() : posts;
         }
 
-        private IQueryable<Post> GetPosts() 
+        private IQueryable<Post> GetPosts()
         {
             return this.applicationContext.Posts
                 .Include(post => post.User)
                 .Include(post => post.Tags)
                 //.Include(post => post.Replies)
-                    //.ThenInclude(reply => reply.User)
+                //.ThenInclude(reply => reply.User)
                 .Include(post => post.Comments)
                     .ThenInclude(comment => comment.User)
                 .Include(post => post.Likes)
                     .ThenInclude(likes => likes.User);
-                  
+
         }
     }
 }
