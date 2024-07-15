@@ -46,7 +46,7 @@ namespace Telerik_ForumTeamProject.Repositories
         }
 
         public ICollection<Tag> GetTagByDesc(string description)
-        {
+        {          
             return this.applicationContext.Tags.Where(tag => tag.Description.Contains(description)).Include(tag => tag.Posts).ToList();
         }
         //add method to include everything ili prosto injection idk
