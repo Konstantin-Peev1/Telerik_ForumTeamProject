@@ -125,7 +125,8 @@ namespace Telerik_ForumTeamProject
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
-                endpoints.MapRazorPages();
+                endpoints.MapDefaultControllerRoute(); // Ensure default routing
+                endpoints.MapHub<OnlineUsersHub>("/onlineUsersHub"); // Map SignalR hub
             });
 
             app.Run();

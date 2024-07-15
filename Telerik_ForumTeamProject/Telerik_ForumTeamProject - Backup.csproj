@@ -8,8 +8,6 @@
 
   <ItemGroup>
     <PackageReference Include="BCrypt.Net-Core" Version="1.6.0" />
-    <PackageReference Include="CloudinaryDotNet" Version="1.26.2" />
-    <PackageReference Include="dotenv.net" Version="3.2.0" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="6.0.31" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="6.0.31" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="6.0.31" />
@@ -26,11 +24,6 @@
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
     <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="6.35.0" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="ViewControllers\" />
-    <Folder Include="Views\" />
   </ItemGroup>
 
 </Project>
