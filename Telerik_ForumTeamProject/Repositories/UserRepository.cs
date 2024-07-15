@@ -88,6 +88,7 @@ namespace Telerik_ForumTeamProject.Repositories
         public User MakeAdmin(User user)
         {
             user.IsAdmin = true;
+            user.Role = "Admin";
             this.applicationConetxt.SaveChanges();
             return user;
         }

@@ -58,20 +58,20 @@ namespace Telerik_ForumTeamProject.Helpers
 
         public PostUploadResponseDTO Map(Post post)
         {
-            PostUploadResponseDTO response = new PostUploadResponseDTO()
-            {
-                Title = post.Title,
-                PostDate = DateTimeFormatter.FormatToStandard(post.Created),
-                Content = post.Content,
-                UserName = post.User.UserName,
-                Likes = post.Likes?.Count() ?? 0,
-                Comments = Map(post.Comments) ?? new List<CommentReplyResponseDTO>(),
-                Tags = post.Tags?.Select(tag => tag.Description).ToList() ?? new List<string>()
-            };
-            return response;
+            PostUploadResponseDTO postResponse = new PostUploadResponseDTO();
+
+            postResponse.Title = post.Title;
+            postResponse.PostDate = DateTimeFormatter.FormatToStandard(post.Created);
+            postResponse.Content = post.Content;
+            postResponse.UserName = post.User.UserName;
+            postResponse.Likes = post.Likes?.Count() ?? 0;
+            postResponse.Comments = Map(post.Comments) ?? new List<CommentReplyResponseDTO>();
+            //postResponse.Replies = Map(post.Replies) ?? new List<CommentReplyResponseDTO>();
+            postResponse.Tags = post.Tags?.Select(tag => tag.Description).ToList() ?? new List<string>();
+            return postResponse;
         }
 
-        public TagResponseDTO Map(Tag tag)
+            public TagResponseDTO Map(Tag tag)
         {
             TagResponseDTO response = new TagResponseDTO()
             {

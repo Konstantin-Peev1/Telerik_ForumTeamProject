@@ -28,9 +28,4 @@
     <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="6.35.0" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="ViewControllers\" />
-    <Folder Include="Views\" />
-  </ItemGroup>
-
 </Project>

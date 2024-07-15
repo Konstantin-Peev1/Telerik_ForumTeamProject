@@ -71,8 +71,8 @@ namespace Telerik_ForumTeamProject.Controllers
         /// <param name="id">The ID of the post to retrieve.</param>
         /// <returns>A PostUploadResponseDTO object representing the post if found, or a 404 Not Found response if not found.</returns>
         [HttpGet("{id}")]
-        [Authorize(Roles = "Admin")]
-        public IActionResult GetById([FromHeader] string credentials, int id)
+        [Authorize()]
+        public IActionResult GetById(int id)
         {
             User user = GetCurrentUser();
             Post post = this.postService.GetPost(id);
