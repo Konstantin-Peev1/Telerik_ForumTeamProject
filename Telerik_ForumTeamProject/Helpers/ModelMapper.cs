@@ -100,7 +100,7 @@ namespace Telerik_ForumTeamProject.Helpers
             {
                 Content = c.Content,
                 Created = DateTimeFormatter.FormatToStandard(c.Created),
-                UserName = c.User.UserName,
+                UserName = c.User.UserName, 
             }).ToList() ?? new List<ReplyResponseDTO>();
         }
 
