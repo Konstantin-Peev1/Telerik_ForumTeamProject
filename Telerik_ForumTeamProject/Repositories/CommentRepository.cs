@@ -25,6 +25,7 @@ namespace Telerik_ForumTeamProject.Repositories
             int skip = (page - 1) * pageSize;
             return this.applicationContext.Comments
                  .Where(c => c.ParentCommentID == parentCommentId)
+                 .Include(u => u.User)
                  .Skip(skip)
                  .Take(pageSize)
                  .ToList();

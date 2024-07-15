@@ -118,7 +118,8 @@ namespace Telerik_ForumTeamProject.Repositories
         {
             if (!string.IsNullOrEmpty(tagdesc))
             {
-                return posts.Where(post => post.Tags.Any(tag => tag.Description.Contains(tagdesc)));
+                return posts
+                    .Where(post => post.Tags.Any(tag => tag.Description.Contains(tagdesc)));
             }
             return posts;
         }
