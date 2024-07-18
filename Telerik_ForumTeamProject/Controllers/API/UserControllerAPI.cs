@@ -14,14 +14,14 @@ namespace Telerik_ForumTeamProject.Controllers
 {
     [Route("api/user")]
     [ApiController]
-    public class UserController : BaseController
+    public class UserControllerAPI : BaseController
     {
         private readonly IUserService userService;
         private readonly ModelMapper modelMapper;
         private readonly ICloudinaryService cloudinaryService;
         private readonly List<string> allowedExtensions = new List<string> { ".jpg", ".jpeg", ".png" };
 
-        public UserController(IUserService userService, ModelMapper modelMapper, AuthManager authManager, ICloudinaryService cloudinaryService) : base(authManager)
+        public UserControllerAPI(IUserService userService, ModelMapper modelMapper, AuthManager authManager, ICloudinaryService cloudinaryService) : base(authManager)
         {
             this.userService = userService;
             this.modelMapper = modelMapper;

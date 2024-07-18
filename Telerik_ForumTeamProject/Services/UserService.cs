@@ -65,6 +65,16 @@ namespace Telerik_ForumTeamProject.Services
 
         }
 
+        public bool UserExists(string username)
+        {
+            return this.userRepository.UserExists(username);
+        }
+        public bool UserExistsEmail(string email)
+        {
+            return this.userRepository.UserExists(email);
+
+        }
+
         public User BlockUser(User user)
         {
             if (user.IsBlocked)

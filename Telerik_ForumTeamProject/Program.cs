@@ -68,6 +68,16 @@ namespace Telerik_ForumTeamProject
                         ValidAudience = builder.Configuration["Jwt:Audience"],
                         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
                     };
+
+                    // Read token from HttpOnly cookie
+                    options.Events = new JwtBearerEvents
+                    {
+                        OnMessageReceived = context =>
+                        {
+                            context.Token = context.Request.Cookies["AuthToken"];
+                            return Task.CompletedTask;
+                        }
+                    };
                 });
 
             builder.Services.AddAuthorization(options =>
@@ -105,7 +115,14 @@ namespace Telerik_ForumTeamProject
             builder.Services.AddCloudinaryService(builder.Configuration);
             builder.Services.AddControllers().AddNewtonsoftJson(options =>
                 options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore);
-            
+
+            // Add session services
+            builder.Services.AddSession(options =>
+            {
+                options.Cookie.HttpOnly = true;
+                options.Cookie.IsEssential = true;
+            });
+
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
@@ -118,8 +135,12 @@ namespace Telerik_ForumTeamProject
             app.UseHttpsRedirection();
             app.UseStaticFiles(); // Ensure static files are being served
             app.UseRouting();
+
             app.UseAuthentication(); // Ensure UseAuthentication is called before UseAuthorization
             app.UseAuthorization();
+
+            // Use session
+            app.UseSession();
 
             app.UseEndpoints(endpoints =>
             {

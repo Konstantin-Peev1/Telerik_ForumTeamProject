@@ -10,7 +10,9 @@ namespace Telerik_ForumTeamProject.Services.Contracts
         User UpdateProfilePicture(int userId, string profilePictureUrl);
         User BlockUser(User user);
         User UnBlockUser(User user);
-        User MakeAdmin(User user);  
+        User MakeAdmin(User user);
+        bool UserExists(string username);
+        bool UserExistsEmail(string username);
 
     }
 }
