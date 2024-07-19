@@ -1,0 +1,143 @@
+﻿@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@using Telerik_ForumTeamProject.Models
+@model ChatRoomViewModel
+
+@{
+    ViewData["Title"] = Model.ChatRoom.Name;
+    var userName = Model.CurrentUser.UserName;
+    var userId = Model.CurrentUser.ID;
+    var chatRoomId = Model.ChatRoom.Id;
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - YourAppName</title>
+    <link rel="stylesheet" href="~/css/site.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/5.0.11/signalr.min.js"></script>
+</head>
+<body>
+    <header>
+        <!-- Your header content -->
+    </header>
+    <div class="container">
+        <h1>@Model.ChatRoom.Name</h1>
+
+        <div>
+            Active Users: <span id="activeUserCount">0</span>
+        </div>
+
+        <div id="chatMessages">
+            @foreach (var message in Model.ChatRoom.Messages)
+            {
+                <div>
+                    <strong>@message.UserName:</strong> @message.Message <em>@message.Created</em>
+                </div>
+            }
+        </div>
+
+        <form id="sendMessageForm">
+            <input type="hidden" name="chatRoomId" value="@chatRoomId" />
+            <input type="hidden" name="userId" value="@userId" />
+            <input type="hidden" name="userName" value="@userName" />
+            <textarea name="message" id="messageInput" rows="3" cols="50" required></textarea>
+            <button type="submit">Send</button>
+        </form>
+    </div>
+    <footer>
+        <!-- Your footer content -->
+    </footer>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            console.log('DOM fully loaded and parsed');
+
+            const chatRoomId = document.querySelector("input[name='chatRoomId']").value;
+            const userName = document.querySelector("input[name='userName']").value;
+            const userId = document.querySelector("input[name='userId']").value;
+            let sessionId = localStorage.getItem('SessionId');
+
+            if (!sessionId) {
+                sessionId = generateSessionId();
+                localStorage.setItem('SessionId', sessionId);
+            }
+
+            // Function to generate a unique session ID
+            function generateSessionId() {
+                const array = new Uint8Array(16);
+                window.crypto.getRandomValues(array);
+                return Array.from(array, byte => ('0' + byte.toString(16)).slice(-2)).join('');
+            }
+
+            // Connect to ChatHub
+            const chatConnection = new signalR.HubConnectionBuilder()
+                .withUrl(`/chathub?chatRoomId=${chatRoomId}&sessionId=${sessionId}`)
+                .build();
+
+            chatConnection.on("ReceiveMessage", (user, message) => {
+                console.log('Received message:', user, message);
+                const msg = document.createElement("div");
+                msg.innerHTML = `<strong>${user}:</strong> ${message}`;
+                document.getElementById("chatMessages").appendChild(msg);
+            });
+
+            chatConnection.start()
+                .then(() => {
+                    console.log('SignalR connected to ChatHub');
+                })
+                .catch(err => console.error('SignalR connection error:', err.toString()));
+
+            document.getElementById("sendMessageForm").addEventListener("submit", event => {
+                event.preventDefault(); // Prevent the default form submission
+                console.log('Form submitted');
+
+                const message = document.getElementById("messageInput").value;
+
+                console.log(`User: ${userName}, Message: ${message}, ChatRoomId: ${chatRoomId}, UserId: ${userId}`);
+
+                chatConnection.invoke("SendMessage", parseInt(chatRoomId), parseInt(userId), userName, message)
+                    .then(() => {
+                        console.log('Message sent');
+                    })
+                    .catch(err => {
+                        console.error('Error sending message:', err.toString());
+                        alert(`Error sending message: ${err.toString()}`);
+                    });
+
+                document.getElementById("messageInput").value = '';
+            });
+
+            // Handle disconnect
+            window.addEventListener('beforeunload', function () {
+                chatConnection.stop();
+            });
+
+            // Connect to UserCountHub for tracking active users
+            const userCountConnection = new signalR.HubConnectionBuilder()
+                .withUrl(`/usercounthub?chatRoomId=${chatRoomId}&sessionId=${sessionId}`)
+                .build();
+
+            userCountConnection.on("UpdateUserCount", (chatRoomId, count) => {
+                if (chatRoomId === document.querySelector("input[name='chatRoomId']").value) {
+                    document.getElementById("activeUserCount").innerText = count;
+                }
+            });
+
+            userCountConnection.start()
+                .then(() => {
+                    console.log('SignalR connected to UserCountHub');
+                })
+                .catch(err => console.error('SignalR connection error:', err.toString()));
+
+            // Handle disconnect
+            window.addEventListener('beforeunload', function () {
+                userCountConnection.stop();
+            });
+        });
+    </script>
+</body>
+</html>
+
+

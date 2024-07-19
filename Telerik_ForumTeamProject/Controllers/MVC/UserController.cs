@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Http;
 using System;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Logging;
+using System.Security.Cryptography;
 
 namespace Telerik_ForumTeamProject.Controllers.MVC
 {
@@ -32,7 +33,6 @@ namespace Telerik_ForumTeamProject.Controllers.MVC
         public IActionResult Login()
         {
             var model = new LogInRequestDTO();
-            
             return View(model);
         }
 
@@ -48,8 +48,6 @@ namespace Telerik_ForumTeamProject.Controllers.MVC
 
             logger.LogInformation("Received login request with UserName: {UserName}", loginRequest.UserName);
 
-         
-
             try
             {
                 var user = authManager.Authenticate(loginRequest.UserName, loginRequest.Password);
@@ -60,6 +58,7 @@ namespace Telerik_ForumTeamProject.Controllers.MVC
                 }
 
                 var token = authManager.Generate(user);
+                var sessionId = GenerateSessionId();
 
                 var cookieOptions = new CookieOptions
                 {
@@ -69,6 +68,10 @@ namespace Telerik_ForumTeamProject.Controllers.MVC
                 };
 
                 Response.Cookies.Append("AuthToken", token, cookieOptions);
+                Response.Cookies.Append("UserId", user.ID.ToString(), cookieOptions);
+
+                // Store the sessionId in TempData
+                TempData["SessionId"] = sessionId;
 
                 return RedirectToAction("Index", "Dashboard");
             }
@@ -78,6 +81,7 @@ namespace Telerik_ForumTeamProject.Controllers.MVC
                 return View(loginRequest);
             }
         }
+
         [HttpGet]
         [AllowAnonymous]
         public IActionResult Register()
@@ -100,6 +104,7 @@ namespace Telerik_ForumTeamProject.Controllers.MVC
                 user.Password = authManager.HashPassword(user.Password);
                 var createdUser = userService.CreateUser(user);
                 var token = authManager.Generate(user);
+                var sessionId = GenerateSessionId();
 
                 var cookieOptions = new CookieOptions
                 {
@@ -109,10 +114,10 @@ namespace Telerik_ForumTeamProject.Controllers.MVC
                 };
 
                 Response.Cookies.Append("AuthToken", token, cookieOptions);
+                Response.Cookies.Append("SessionId", sessionId, cookieOptions);
 
                 return RedirectToAction("Index", "Dashboard");
             }
-
             catch (DuplicateEntityException ex)
             {
                 if (userService.UserExists(registerRequest.UserName))
@@ -131,6 +136,16 @@ namespace Telerik_ForumTeamProject.Controllers.MVC
             {
                 ModelState.AddModelError(string.Empty, "An error occurred while registering the user.");
                 return View(registerRequest);
+            }
+        }
+
+        private string GenerateSessionId()
+        {
+            using (var rng = new RNGCryptoServiceProvider())
+            {
+                var byteArray = new byte[16];
+                rng.GetBytes(byteArray);
+                return BitConverter.ToString(byteArray).Replace("-", "").ToLower();
             }
         }
     }

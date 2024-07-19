@@ -1,0 +1,104 @@
+﻿@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@using Telerik_ForumTeamProject.Models.Entities
+@model IEnumerable<ChatRoom>
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Chat Index</title>
+    <link rel="stylesheet" href="~/css/site.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/5.0.11/signalr.min.js"></script>
+</head>
+<body>
+    <header>
+        <!-- Your header content -->
+    </header>
+    <div class="container">
+        <h1>Chat Rooms</h1>
+
+        <!-- Form to Create a New Chat Room -->
+        <form id="createChatRoomForm">
+            <input type="text" id="chatRoomName" name="name" placeholder="Enter chat room name" required />
+            <button type="submit">Create Chat Room</button>
+        </form>
+
+        <ul id="chatRooms">
+            @foreach (var room in Model)
+            {
+                <li data-chatroom-id="@room.Id">
+                    <a href="/Chat/Room/@room.Id">@room.Name</a> - Active Users: <span class="userCount">0</span>
+                </li>
+            }
+        </ul>
+    </div>
+    <footer>
+        <!-- Your footer content -->
+    </footer>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            console.log('DOM fully loaded and parsed');
+
+            const userCountConnection = new signalR.HubConnectionBuilder()
+                .withUrl('/usercounthub')
+                .build();
+
+            userCountConnection.on("InitialUserCounts", (userCounts) => {
+                console.log('Initial user counts:', userCounts);
+                for (const [chatRoomId, count] of Object.entries(userCounts)) {
+                    const roomElement = document.querySelector(`li[data-chatroom-id="${chatRoomId}"] .userCount`);
+                    if (roomElement) {
+                        roomElement.innerText = count;
+                    }
+                }
+            });
+
+            userCountConnection.on("UpdateUserCount", (chatRoomId, count) => {
+                console.log('Updated user count:', chatRoomId, count);
+                const roomElement = document.querySelector(`li[data-chatroom-id="${chatRoomId}"] .userCount`);
+                if (roomElement) {
+                    roomElement.innerText = count;
+                }
+            });
+
+            userCountConnection.start()
+                .then(() => {
+                    console.log('SignalR connected to UserCountHub');
+                })
+                .catch(err => console.error('SignalR connection error:', err.toString()));
+
+            // Handle creating a new chat room
+            document.getElementById("createChatRoomForm").addEventListener("submit", event => {
+                event.preventDefault(); // Prevent the default form submission
+
+                const chatRoomName = document.getElementById("chatRoomName").value;
+
+                // Use fetch to submit the form data to the server
+                fetch('/Chat/CreateChatRoom', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    },
+                    body: new URLSearchParams({ name: chatRoomName })
+                })
+                    .then(response => {
+                        if (response.ok) {
+                            // Reload the page to update the list of chat rooms
+                            window.location.reload();
+                        } else {
+                            throw new Error('Network response was not ok.');
+                        }
+                    })
+                    .catch(err => {
+                        console.error('Error creating chat room:', err.toString());
+                        alert(`Error creating chat room: ${err.toString()}`);
+                    });
+            });
+        });
+    </script>
+</body>
+</html>
+
+

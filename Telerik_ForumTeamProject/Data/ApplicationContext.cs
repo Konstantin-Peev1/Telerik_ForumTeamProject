@@ -15,6 +15,8 @@ namespace Telerik_ForumTeamProject.Data
         public DbSet<Comment> Comments { get; set; }
         public DbSet<Post> Posts { get;set; }
         public DbSet<Tag> Tags { get; set; }
+        public DbSet<ChatRoom> ChatRooms { get; set; }
+        public DbSet<ChatMessage> ChatMessages { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

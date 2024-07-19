@@ -101,6 +101,7 @@ namespace Telerik_ForumTeamProject
             builder.Services.AddScoped<IPostRepository, PostRepository>();
             builder.Services.AddScoped<ITagRepository, TagRepository>();
             builder.Services.AddScoped<ILikeRepository, LikeRepository>();
+            builder.Services.AddScoped<IChatRepository, ChatRepository>();
 
             // Services
             builder.Services.AddScoped<IUserService, UserService>();
@@ -108,6 +109,7 @@ namespace Telerik_ForumTeamProject
             builder.Services.AddScoped<IPostService, PostService>();
             builder.Services.AddScoped<ITagService, TagService>();
             builder.Services.AddScoped<ILikeService, LikeService>();
+            builder.Services.AddScoped<IChatService, ChatService>();
 
             // Helpers
             builder.Services.AddScoped<ModelMapper>();
@@ -148,6 +150,8 @@ namespace Telerik_ForumTeamProject
                     name: "default",
                     pattern: "{controller=Home}/{action=Index}/{id?}");
                 endpoints.MapHub<OnlineUsersHub>("/onlineUsersHub"); // Map SignalR hub
+                endpoints.MapHub<ChatHub>("/chathub");
+                endpoints.MapHub<UserCountHub>("/usercounthub");
             });
 
             app.Run();
