@@ -1,6 +1,6 @@
 ﻿using Telerik_ForumTeamProject.Models.Entities;
 
-namespace Telerik_ForumTeamProject.Models
+namespace Telerik_ForumTeamProject.Models.ViewModels
 {
     public class ChatRoomViewModel
     {

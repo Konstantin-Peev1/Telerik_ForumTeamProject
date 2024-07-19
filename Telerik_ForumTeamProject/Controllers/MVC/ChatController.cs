@@ -7,6 +7,7 @@ using Telerik_ForumTeamProject.Helpers;
 using Telerik_ForumTeamProject.Hubs;
 using Telerik_ForumTeamProject.Models;
 using Telerik_ForumTeamProject.Models.Entities;
+using Telerik_ForumTeamProject.Models.ViewModels;
 using Telerik_ForumTeamProject.Services.Contracts;
 
 namespace Telerik_ForumTeamProject.Controllers.MVC

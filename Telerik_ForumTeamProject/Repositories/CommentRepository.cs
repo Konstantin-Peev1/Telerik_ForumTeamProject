@@ -15,9 +15,9 @@ namespace Telerik_ForumTeamProject.Repositories
             this.applicationContext = applicationContext;
         }
 
-        public ICollection<Comment> GetAllComments()
+        public ICollection<Comment> GetAllPostComments(int postId)
         {
-            return GetComments().ToList();
+            return applicationContext.Comments.Where(p => p.PostID == postId && p.ParentCommentID == null).ToList();
         }
 
         public ICollection<Comment> GetPagedReplies(int parentCommentId, int page, int pageSize)

@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Telerik_ForumTeamProject.Exceptions;
 using Telerik_ForumTeamProject.Models.Entities;
 using Telerik_ForumTeamProject.Models.ResponseDTO;
@@ -16,10 +17,11 @@ namespace Telerik_ForumTeamProject.Services
             this.commentRepository = commentRepository;
         }
 
-        public ICollection<Comment> GetComments()
+        public ICollection<Comment> GetAllPostComments(int postId)
         {
-            return this.commentRepository.GetAllComments();
+            return this.commentRepository.GetAllPostComments(postId);
         }
+
         public PagedResult<Comment> GetPagedReplies(int parentCommentId, int page, int pageSize)
         {
             ICollection<Comment> replies = this.commentRepository.GetPagedReplies(parentCommentId, page, pageSize);

@@ -1,0 +1,8 @@
+﻿@model IEnumerable<Telerik_ForumTeamProject.Models.ResponseDTO.CommentReplyResponseDTO>
+
+<div>
+    @foreach (var reply in Model)
+    {
+        <p>@reply.Content</p>
+    }
+</div>

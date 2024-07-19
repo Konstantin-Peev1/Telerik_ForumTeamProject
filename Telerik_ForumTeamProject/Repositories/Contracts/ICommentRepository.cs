@@ -5,7 +5,7 @@ namespace Telerik_ForumTeamProject.Repositories.Contracts
     public interface ICommentRepository
     {
         Comment CreateComment(Comment comment);
-        ICollection<Comment> GetAllComments();
+        ICollection<Comment> GetAllPostComments(int postId);
         ICollection<Comment> GetPagedReplies(int parentCommentId, int page, int pageSize);
         int GetRepliesCount(int parentCommentId);
         Comment GetCommentById(int id);

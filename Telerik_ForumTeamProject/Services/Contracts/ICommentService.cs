@@ -5,7 +5,7 @@ namespace Telerik_ForumTeamProject.Services.Contracts
 {
     public interface ICommentService
     {
-        ICollection<Comment> GetComments();
+        ICollection<Comment> GetAllPostComments(int postId);
         PagedResult<Comment> GetPagedReplies(int parentCommentId, int page, int pageSize);
         Comment GetComment(int id);
         Comment CreateComment(Comment comment, User user);
