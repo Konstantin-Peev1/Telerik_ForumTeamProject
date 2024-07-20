@@ -14,7 +14,7 @@ namespace Telerik_ForumTeamProject.Controllers
 {
     [Route("api/user")]
     [ApiController]
-    public class UserControllerAPI : BaseController
+    public class UserControllerAPI : BaseControllerAPI
     {
         private readonly IUserService userService;
         private readonly ModelMapper modelMapper;

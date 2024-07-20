@@ -10,12 +10,12 @@ namespace Telerik_ForumTeamProject.Controllers
 {
     [Route("api/likes")]
     [ApiController]
-    public class LikeController : BaseController
+    public class LikeControllerAPI : BaseControllerAPI
     {
         private readonly ILikeService likeService;
         private readonly ModelMapper mapper;
 
-        public LikeController(ILikeService likeService, ModelMapper mapper, AuthManager authManager) : base(authManager)
+        public LikeControllerAPI(ILikeService likeService, ModelMapper mapper, AuthManager authManager) : base(authManager)
         {
             this.likeService = likeService;
             this.mapper = mapper;

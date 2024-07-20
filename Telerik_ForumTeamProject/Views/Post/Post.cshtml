@@ -1,0 +1,19 @@
+﻿@model Telerik_ForumTeamProject.Models.ViewModels.PostViewModel
+
+<div>
+    <h2>@Model.Title</h2>
+    <p>@Model.Content</p>
+    <p>@Model.PostDate</p>
+    <p>Likes: @Model.Likes</p>
+    <p>Creator: @Model.UserName</p>
+    <p>Tags: @string.Join(", ", Model.Tags)</p>
+
+    <h3>Comments:</h3>
+    @foreach (var comment in Model.Comments)
+    {
+        <div>
+            <p>@comment.Content</p>
+            <button onclick="showReplies(@comment.Replies)">Show replies</button>
+        </div>
+    }
+</div>

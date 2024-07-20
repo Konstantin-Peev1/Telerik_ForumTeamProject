@@ -14,12 +14,12 @@ namespace Telerik_ForumTeamProject.Controllers
 {
     [Route("api/post")]
     [ApiController]
-    public class PostController : BaseController
+    public class PostControllerAPI : BaseControllerAPI
     {
         private readonly IPostService postService;
         private readonly ModelMapper modelMapper;
 
-        public PostController(IPostService postService, ModelMapper modelMapper, AuthManager authManager) :base(authManager)
+        public PostControllerAPI(IPostService postService, ModelMapper modelMapper, AuthManager authManager) :base(authManager)
         {
             this.postService = postService;
             this.modelMapper = modelMapper;

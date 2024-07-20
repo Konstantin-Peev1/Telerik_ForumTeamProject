@@ -10,13 +10,13 @@ namespace Telerik_ForumTeamProject.Controllers
 {
     [Route("api/comment")]
     [ApiController]
-    public class CommentController : BaseController
+    public class CommentControllerAPI : BaseControllerAPI
     {
         private readonly ICommentService commentService;
         private readonly IPostService postService;
         private readonly ModelMapper modelMapper;
 
-        public CommentController(ICommentService commentService, IPostService postService, AuthManager authManager, ModelMapper modelMapper)
+        public CommentControllerAPI(ICommentService commentService, IPostService postService, AuthManager authManager, ModelMapper modelMapper)
             : base(authManager)
         {
             this.commentService = commentService;

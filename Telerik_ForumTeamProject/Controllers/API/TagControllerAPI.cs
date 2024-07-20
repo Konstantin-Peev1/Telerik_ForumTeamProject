@@ -10,13 +10,13 @@ namespace Telerik_ForumTeamProject.Controllers
 {
     [Route("api/tag")]
     [ApiController]
-    public class TagController : BaseController
+    public class TagControllerAPI : BaseControllerAPI
     {
         private readonly ITagService tagService;
         private readonly ModelMapper modelMapper;
         private readonly IPostService postService;
     
-        public TagController(ITagService tagService, ModelMapper modelMapper, AuthManager authManager, IPostService postService) : base(authManager)
+        public TagControllerAPI(ITagService tagService, ModelMapper modelMapper, AuthManager authManager, IPostService postService) : base(authManager)
         {
             this.tagService = tagService;
             this.modelMapper = modelMapper;

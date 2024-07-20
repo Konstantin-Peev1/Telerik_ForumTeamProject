@@ -20,7 +20,36 @@ namespace Telerik_ForumTeamProject.Controllers.MVC
             _commentService = commentService;
             _modelMapper = modelMapper;
         }
-        public IActionResult Index(int id)
+        public IActionResult Index(int page = 1, int pageSize = 10)
+        {
+            PagedResult<Post> pagedPosts = _postService.GetPagedPosts(page, pageSize);
+
+            var postViewModels = pagedPosts.Items.Select(post => new PostViewModel
+            {
+                Title = post.Title,
+                Content = post.Content,
+                Likes = post.Likes?.Count ?? 0,
+                PostDate = post.Created.ToString("yyyy-MM-dd HH:mm:ss"),
+                Comments = post.Comments?.Select(comment => new CommentReplyResponseDTO
+                {
+                    Content = comment?.Content ?? "No content",
+                    // Map other properties as needed
+                }).ToList() ?? new List<CommentReplyResponseDTO>(),
+                UserName = post.User.UserName,
+                Tags = post.Tags?.Select(tag => tag.Description).ToList() ?? new List<string>()
+            }).ToList();
+
+            var pagedPostViewModel = new PagedPostViewModel
+            {
+                Posts = postViewModels,
+                PaginationMetadata = pagedPosts.Metadata
+            };
+
+            return View(pagedPostViewModel);
+        }
+
+        [HttpGet]
+        public IActionResult GetPost(int id)
         {
             id = 2;
             Post post = _postService.GetPost(id);
@@ -31,22 +60,16 @@ namespace Telerik_ForumTeamProject.Controllers.MVC
                 Title = post.Title,
                 Content = post.Content,
                 Likes = post.Likes?.Count ?? 0,
-                PostDate = post.Created.ToString("yyyy-MM-dd HH:mm:ss"), // Assuming Created is the date property
+                PostDate = post.Created.ToString("yyyy-MM-dd HH:mm:ss"),
                 Comments = comments?.Select(comment => new CommentReplyResponseDTO
                 {
                     Content = comment?.Content ?? "No content",
-                    // Map other properties as needed and handle null checks
+                    
                 }).ToList() ?? new List<CommentReplyResponseDTO>(),
                 UserName = post.User.UserName,
                 Tags = post.Tags?.Select(tag => tag.Description).ToList() ?? new List<string>()
             };
-            return View(viewModel);
+            return RedirectToAction("Post", viewModel);
         }
-
-/*        [HttpGet]
-        public IActionResult GetPost(int id)
-        {
-
-        }*/
     }
 }

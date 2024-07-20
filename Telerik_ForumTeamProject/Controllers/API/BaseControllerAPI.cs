@@ -4,11 +4,11 @@ using Telerik_ForumTeamProject.Exceptions;
 using Telerik_ForumTeamProject.Helpers;
 using Telerik_ForumTeamProject.Models.Entities;
 
-public class BaseController : ControllerBase
+public class BaseControllerAPI : ControllerBase
 {
     protected readonly AuthManager authManager;
 
-    public BaseController(AuthManager authManager)
+    public BaseControllerAPI(AuthManager authManager)
     {
         this.authManager = authManager;
     }
