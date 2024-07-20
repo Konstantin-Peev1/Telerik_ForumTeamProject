@@ -10,44 +10,44 @@
 }
 
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - YourAppName</title>
+    <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="~/css/site.css" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/5.0.11/signalr.min.js"></script>
 </head>
-<body>
-    <header>
-        <!-- Your header content -->
+<body class="bg-gray-900 text-gray-100">
+    <header class="bg-green-600 p-6 text-center text-white">
+        <h1 class="text-4xl font-extrabold uppercase">@Model.ChatRoom.Name</h1>
     </header>
-    <div class="container">
-        <h1>@Model.ChatRoom.Name</h1>
-
-        <div>
-            Active Users: <span id="activeUserCount">0</span>
+    <div class="container mx-auto p-6 mt-6 bg-gray-800 shadow-md rounded-lg">
+        <div class="mb-4">
+            <p class="text-lg font-medium">Active Users: <span id="activeUserCount" class="font-bold text-green-500">0</span></p>
         </div>
 
-        <div id="chatMessages">
+        <div id="chatMessages" class="bg-gray-700 p-4 rounded-lg h-96 overflow-y-scroll mb-4 flex flex-col-reverse">
             @foreach (var message in Model.ChatRoom.Messages)
             {
-                <div>
-                    <strong>@message.UserName:</strong> @message.Message <em>@message.Created</em>
+                <div class="p-3 bg-gray-600 rounded-lg mb-2 shadow-sm">
+                    <strong class="text-green-400">@message.UserName:</strong> <span class="text-gray-200">@message.Message</span>
+                    <em class="text-gray-500 text-xs block">@message.Created</em>
                 </div>
             }
         </div>
 
-        <form id="sendMessageForm">
+        <form id="sendMessageForm" class="flex flex-col space-y-4">
             <input type="hidden" name="chatRoomId" value="@chatRoomId" />
             <input type="hidden" name="userId" value="@userId" />
             <input type="hidden" name="userName" value="@userName" />
-            <textarea name="message" id="messageInput" rows="3" cols="50" required></textarea>
-            <button type="submit">Send</button>
+            <textarea name="message" id="messageInput" rows="3" required class="p-4 bg-gray-600 border border-gray-500 rounded-lg shadow-sm text-gray-100 placeholder-gray-400" placeholder="Type your message..."></textarea>
+            <button type="submit" class="bg-green-500 text-white p-3 rounded-lg hover:bg-green-700 transition duration-300">Send</button>
         </form>
     </div>
-    <footer>
-        <!-- Your footer content -->
+    <footer class="bg-green-600 p-4 mt-6 text-center text-white">
+        <p class="text-sm font-bold">&copy; 2023 Sports Chat App</p>
     </footer>
 
     <script>
@@ -79,8 +79,10 @@
             chatConnection.on("ReceiveMessage", (user, message) => {
                 console.log('Received message:', user, message);
                 const msg = document.createElement("div");
-                msg.innerHTML = `<strong>${user}:</strong> ${message}`;
-                document.getElementById("chatMessages").appendChild(msg);
+                msg.className = "p-3 bg-gray-600 rounded-lg mb-2 shadow-sm";
+                msg.innerHTML = `<strong class="text-green-400">${user}:</strong> <span class="text-gray-200">${message}</span> <em class="text-gray-500 text-xs block">${new Date().toLocaleString()}</em>`;
+                document.getElementById("chatMessages").prepend(msg);
+                document.getElementById("chatMessages").scrollTop = 0; // Auto-scroll to the top
             });
 
             chatConnection.start()
@@ -139,5 +141,3 @@
     </script>
 </body>
 </html>
-
-
