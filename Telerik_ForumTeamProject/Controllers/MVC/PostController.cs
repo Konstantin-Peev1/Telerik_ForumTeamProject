@@ -26,6 +26,7 @@ namespace Telerik_ForumTeamProject.Controllers.MVC
 
             var postViewModels = pagedPosts.Items.Select(post => new PostViewModel
             {
+                id = post.Id,
                 Title = post.Title,
                 Content = post.Content,
                 Likes = post.Likes?.Count ?? 0,
@@ -51,7 +52,6 @@ namespace Telerik_ForumTeamProject.Controllers.MVC
         [HttpGet]
         public IActionResult GetPost(int id)
         {
-            id = 2;
             Post post = _postService.GetPost(id);
             var comments = _commentService.GetAllPostComments(id);
 
@@ -69,7 +69,7 @@ namespace Telerik_ForumTeamProject.Controllers.MVC
                 UserName = post.User.UserName,
                 Tags = post.Tags?.Select(tag => tag.Description).ToList() ?? new List<string>()
             };
-            return RedirectToAction("Post", viewModel);
+            return View(viewModel);
         }
     }
 }
