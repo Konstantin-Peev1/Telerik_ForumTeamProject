@@ -27,8 +27,11 @@ namespace Telerik_ForumTeamProject.Repositories
 
         public ChatRoom GetChatRoom(int id)
         {
-            return applicationContext.ChatRooms.Include(c => c.Messages).FirstOrDefault(c => c.Id == id);
+            return applicationContext.ChatRooms
+                .Include(c => c.Messages.OrderBy(m => m.Created))
+                .FirstOrDefault(c => c.Id == id);
         }
+
         public void AddChatRoom(ChatRoom chatRoom)
         {
             applicationContext.ChatRooms.Add(chatRoom);

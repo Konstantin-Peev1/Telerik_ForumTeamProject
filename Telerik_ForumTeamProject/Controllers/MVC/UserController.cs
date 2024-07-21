@@ -9,6 +9,8 @@ using System;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Logging;
 using System.Security.Cryptography;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication;
 
 namespace Telerik_ForumTeamProject.Controllers.MVC
 {
@@ -36,51 +38,51 @@ namespace Telerik_ForumTeamProject.Controllers.MVC
             return View(model);
         }
 
-        [HttpPost]
-        [AllowAnonymous]
-        public IActionResult Login(LogInRequestDTO loginRequest)
-        {
-            if (loginRequest == null)
+            [HttpPost]
+            [AllowAnonymous]
+            public IActionResult Login(LogInRequestDTO loginRequest)
             {
-                ModelState.AddModelError(string.Empty, "Invalid login request");
-                return View(new LogInRequestDTO());
-            }
-
-            logger.LogInformation("Received login request with UserName: {UserName}", loginRequest.UserName);
-
-            try
-            {
-                var user = authManager.Authenticate(loginRequest.UserName, loginRequest.Password);
-                if (user == null)
+                if (loginRequest == null)
                 {
-                    ModelState.AddModelError(string.Empty, "Invalid login attempt.");
-                    return View(loginRequest);
+                    ModelState.AddModelError(string.Empty, "Invalid login request");
+                    return View(new LogInRequestDTO());
                 }
 
-                var token = authManager.Generate(user);
-                var sessionId = GenerateSessionId();
+                logger.LogInformation("Received login request with UserName: {UserName}", loginRequest.UserName);
 
-                var cookieOptions = new CookieOptions
+                try
                 {
-                    HttpOnly = true,
-                    Secure = true, // Set to true if using HTTPS
-                    Expires = DateTime.UtcNow.AddMinutes(10) // Match the token expiration
-                };
+                    var user = authManager.Authenticate(loginRequest.UserName, loginRequest.Password);
+                    if (user == null)
+                    {
+                        ModelState.AddModelError(string.Empty, "Invalid login attempt.");
+                        return View(loginRequest);
+                    }
 
-                Response.Cookies.Append("AuthToken", token, cookieOptions);
-                Response.Cookies.Append("UserId", user.ID.ToString(), cookieOptions);
+                    var token = authManager.Generate(user);
+                    var sessionId = GenerateSessionId();
 
-                // Store the sessionId in TempData
-                TempData["SessionId"] = sessionId;
+                    var cookieOptions = new CookieOptions
+                    {
+                        HttpOnly = true,
+                        Secure = true, // Set to true if using HTTPS
+                        Expires = DateTime.UtcNow.AddMinutes(10) // Match the token expiration
+                    };
 
-                return RedirectToAction("Index", "Dashboard");
+                    Response.Cookies.Append("AuthToken", token, cookieOptions);
+                    Response.Cookies.Append("UserId", user.UserName.ToString(), cookieOptions);
+
+                    // Store the sessionId in TempData
+                    TempData["SessionId"] = sessionId;
+
+                    return RedirectToAction("Index", "Dashboard");
+                }
+                catch (AuthorisationExcpetion ex)
+                {
+                    ModelState.AddModelError(string.Empty, ex.Message);
+                    return View(loginRequest);
+                }
             }
-            catch (AuthorisationExcpetion ex)
-            {
-                ModelState.AddModelError(string.Empty, ex.Message);
-                return View(loginRequest);
-            }
-        }
 
         [HttpGet]
         [AllowAnonymous]
@@ -137,6 +139,21 @@ namespace Telerik_ForumTeamProject.Controllers.MVC
                 ModelState.AddModelError(string.Empty, "An error occurred while registering the user.");
                 return View(registerRequest);
             }
+        }
+
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult Logout()
+        {
+            // Remove the authentication cookies
+            Response.Cookies.Delete("AuthToken");
+            Response.Cookies.Delete("UserId");
+
+            // Optionally clear TempData if you're using it for session management
+            TempData.Clear();
+
+            return RedirectToAction("Index", "Home");
         }
 
         private string GenerateSessionId()

@@ -14,7 +14,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - YourAppName</title>
+    <title>@ViewData["Title"] - Sports Chat App</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="~/css/site.css" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/5.0.11/signalr.min.js"></script>
@@ -28,8 +28,8 @@
             <p class="text-lg font-medium">Active Users: <span id="activeUserCount" class="font-bold text-green-500">0</span></p>
         </div>
 
-        <div id="chatMessages" class="bg-gray-700 p-4 rounded-lg h-96 overflow-y-scroll mb-4 flex flex-col-reverse">
-            @foreach (var message in Model.ChatRoom.Messages)
+        <div id="chatMessages" class="bg-gray-700 p-4 rounded-lg h-96 overflow-y-scroll mb-4 flex flex-col">
+            @foreach (var message in Model.ChatRoom.Messages.OrderBy(m => m.Created))
             {
                 <div class="p-3 bg-gray-600 rounded-lg mb-2 shadow-sm">
                     <strong class="text-green-400">@message.UserName:</strong> <span class="text-gray-200">@message.Message</span>
@@ -53,6 +53,9 @@
     <script>
         document.addEventListener("DOMContentLoaded", function () {
             console.log('DOM fully loaded and parsed');
+
+            const chatMessagesContainer = document.getElementById('chatMessages');
+            chatMessagesContainer.scrollTop = chatMessagesContainer.scrollHeight;
 
             const chatRoomId = document.querySelector("input[name='chatRoomId']").value;
             const userName = document.querySelector("input[name='userName']").value;
@@ -81,8 +84,8 @@
                 const msg = document.createElement("div");
                 msg.className = "p-3 bg-gray-600 rounded-lg mb-2 shadow-sm";
                 msg.innerHTML = `<strong class="text-green-400">${user}:</strong> <span class="text-gray-200">${message}</span> <em class="text-gray-500 text-xs block">${new Date().toLocaleString()}</em>`;
-                document.getElementById("chatMessages").prepend(msg);
-                document.getElementById("chatMessages").scrollTop = 0; // Auto-scroll to the top
+                chatMessagesContainer.appendChild(msg);
+                chatMessagesContainer.scrollTop = chatMessagesContainer.scrollHeight; // Auto-scroll to the bottom
             });
 
             chatConnection.start()
