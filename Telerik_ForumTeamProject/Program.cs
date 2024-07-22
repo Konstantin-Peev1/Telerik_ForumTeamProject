@@ -55,9 +55,12 @@ namespace Telerik_ForumTeamProject
                 });
             });
 
+            //Add Authentication
+            //AddCookie check out what can be done
             builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(options =>
                 {
+                    
                     options.TokenValidationParameters = new TokenValidationParameters()
                     {
                         ValidateIssuer = true,

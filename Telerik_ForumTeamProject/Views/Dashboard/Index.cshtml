@@ -1,32 +1,14 @@
 ﻿@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - Sports Chat App</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="~/css/site.css" />
-</head>
-<body class="bg-gray-900 text-gray-100">
-    <header class="bg-green-600 p-6 text-center text-white flex justify-between items-center">
-        <h1 class="text-4xl font-extrabold uppercase">Dashboard</h1>
-        <form id="logoutForm" asp-action="Logout" asp-controller="User" method="post" class="inline">
-            @Html.AntiForgeryToken()
-            <button type="submit" class="bg-red-500 text-white p-2 rounded hover:bg-red-700 transition duration-300">Logout</button>
-        </form>
-    </header>
-    <div class="container mx-auto p-6 mt-6 bg-gray-800 shadow-md rounded-lg">
-        <h2 class="text-2xl font-bold mb-4">Welcome to the Dashboard</h2>
-        <p class="mb-6">This page is accessible only to authenticated users.</p>
+@{
+    ViewData["Title"] = "Dashboard";
+    Layout = "_Layout";
+}
 
-        <!-- Chat button -->
-        <a href="/Chat" class="bg-blue-500 text-white p-3 rounded-lg hover:bg-blue-700 transition duration-300 font-bold">Go to Chats</a>
-    </div>
-    <footer class="bg-green-600 p-4 mt-6 text-center text-white">
-        <p class="text-sm font-bold">&copy; 2023 Sports Chat App</p>
-    </footer>
+<div class="container mx-auto p-6 mt-6 bg-gray-800 shadow-md rounded-lg">
+    <h2 class="text-2xl font-bold mb-4 text-white">Welcome to the Dashboard</h2>
+    <p class="mb-6 text-white">This page is accessible only to authenticated users.</p>
+</div>
 
     <script>
         document.getElementById('logoutForm').addEventListener('submit', function (event) {
@@ -54,5 +36,5 @@
                 });
         });
     </script>
-</body>
+
 </html>

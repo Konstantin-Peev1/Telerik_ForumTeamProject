@@ -1,0 +1,56 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewData["Title"] - Forum</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="~/css/site.css" />
+</head>
+<body class="bg-gray-100">
+    <header class="bg-white shadow">
+        <div class="container mx-auto px-4 py-6 flex justify-between items-center">
+            <h1 class="text-3xl font-bold text-gray-900">Forum</h1>
+            <nav class="flex space-x-4">
+                <a href="/Dashboard" class="auth-required bg-gray-500 text-white p-2 rounded hover:bg-gray-700 transition duration-300">Dashboard</a>
+                <a href="/Chat" class="auth-required bg-gray-500 text-white p-2 rounded hover:bg-gray-700 transition duration-300">Chats</a>
+                @if (User.Identity != null && User.Identity.IsAuthenticated)
+                {
+                    <form id="logoutForm" asp-action="Logout" asp-controller="User" method="post" class="inline">
+                        @Html.AntiForgeryToken()
+                        <button type="submit" class="bg-red-500 text-white p-2 rounded hover:bg-red-700 transition duration-300">Logout</button>
+                    </form>
+                }
+                else
+                {
+                    <a href="/User/Login" class="bg-green-500 text-white p-2 rounded hover:bg-green-700 transition duration-300">Login</a>
+                    <a href="/User/Register" class="bg-green-500 text-white p-2 rounded hover:bg-green-700 transition duration-300">Register</a>
+                }
+                <form asp-action="Search" method="get" class="inline">
+                    <input type="text" name="query" placeholder="Search..." class="p-2 rounded border border-gray-300" />
+                    <button type="submit" class="bg-blue-500 text-white p-2 rounded hover:bg-blue-700 transition duration-300">Search</button>
+                </form>
+            </nav>
+        </div>
+    </header>
+    <div class="container mx-auto px-4 py-6">
+        @RenderBody()
+    </div>
+    @RenderSection("Scripts", required: false)
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const authRequiredLinks = document.querySelectorAll('.auth-required');
+
+            authRequiredLinks.forEach(link => {
+                link.addEventListener('click', function (event) {
+                    if (!@Html.Raw(User.Identity?.IsAuthenticated.ToString().ToLower())) {
+                        event.preventDefault();
+                        window.location.href = '/User/Login';
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
