@@ -1,10 +1,53 @@
-﻿@{
+﻿@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+@{
     ViewData["Title"] = "Home";
     Layout = "_Layout";
 }
 
-
-<div class="container mx-auto p-6 mt-6 bg-gray-800 shadow-md rounded-lg">
-    <h2 class="text-2xl font-bold mb-4 text-white">Welcome to the Forum</h2>
-    <p class="mb-6 text-white">Please log in or register to continue.</p>
+<div class="container mx-auto p-6 mt-6 bg-gray-700 shadow-md rounded-lg">
+    @if (User.Identity != null && User.Identity.IsAuthenticated)
+    {
+        <h2 class="text-2xl font-bold mb-4 text-white">Welcome to the Dashboard</h2>
+        <p class="mb-6 text-white">This page is accessible only to authenticated users.</p>
+    }
+    else
+    {
+        <h2 class="text-2xl font-bold mb-4 text-white">Welcome to the Forum</h2>
+        <p class="mb-6 text-white">Please login or register to access more features.</p>
+    }
 </div>
+
+<script>
+    document.getElementById('logoutForm').addEventListener('submit', function (event) {
+        event.preventDefault();
+        fetch('@Url.Action("Logout", "User")', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'RequestVerificationToken': document.querySelector('[name="__RequestVerificationToken"]').value
+            }
+        })
+            .then(response => {
+                if (response.ok) {
+                    localStorage.removeItem('AuthToken');
+                    localStorage.removeItem('SessionId');
+                    localStorage.removeItem('UserId');
+                    localStorage.removeItem('isAuthenticated');
+                    window.location.href = '@Url.Action("Index", "Home")';
+                } else {
+                    alert('Logout failed. Please try again.');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred while logging out. Please try again.');
+            });
+
+        if (@Html.Raw(User.Identity?.IsAuthenticated.ToString().ToLower())) {
+            localStorage.setItem('isAuthenticated', 'true');
+        } else {
+            localStorage.removeItem('isAuthenticated');
+        }
+    });
+</script>

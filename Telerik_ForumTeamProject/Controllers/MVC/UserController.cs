@@ -74,8 +74,8 @@ namespace Telerik_ForumTeamProject.Controllers.MVC
 
                     // Store the sessionId in TempData
                     TempData["SessionId"] = sessionId;
-
-                    return RedirectToAction("Index", "Dashboard");
+                    TempData["IsAuthenticated"] = true;
+                return RedirectToAction("Index", "Home");
                 }
                 catch (AuthorisationExcpetion ex)
                 {
@@ -118,7 +118,7 @@ namespace Telerik_ForumTeamProject.Controllers.MVC
                 Response.Cookies.Append("AuthToken", token, cookieOptions);
                 Response.Cookies.Append("SessionId", sessionId, cookieOptions);
 
-                return RedirectToAction("Index", "Dashboard");
+                return RedirectToAction("Index", "Home");
             }
             catch (DuplicateEntityException ex)
             {
@@ -146,12 +146,13 @@ namespace Telerik_ForumTeamProject.Controllers.MVC
         [ValidateAntiForgeryToken]
         public IActionResult Logout()
         {
-            // Remove the authentication cookies
+            
             Response.Cookies.Delete("AuthToken");
             Response.Cookies.Delete("UserId");
 
-            // Optionally clear TempData if you're using it for session management
+           
             TempData.Clear();
+            TempData["IsAuthenticated"] = false;
 
             return RedirectToAction("Index", "Home");
         }

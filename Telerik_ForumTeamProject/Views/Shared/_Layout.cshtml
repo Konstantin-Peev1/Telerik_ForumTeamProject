@@ -1,42 +1,48 @@
-﻿<!DOCTYPE html>
+﻿@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@using Microsoft.AspNetCore.Mvc.Localization
+
+<!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - Forum</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <link rel="stylesheet" href="~/css/site.css" />
 </head>
-<body class="bg-gray-100">
-    <header class="bg-white shadow">
-        <div class="container mx-auto px-4 py-6 flex justify-between items-center">
-            <h1 class="text-3xl font-bold text-gray-900">Forum</h1>
-            <nav class="flex space-x-4">
-                <a href="/Dashboard" class="auth-required bg-gray-500 text-white p-2 rounded hover:bg-gray-700 transition duration-300">Dashboard</a>
-                <a href="/Chat" class="auth-required bg-gray-500 text-white p-2 rounded hover:bg-gray-700 transition duration-300">Chats</a>
-                @if (User.Identity != null && User.Identity.IsAuthenticated)
-                {
-                    <form id="logoutForm" asp-action="Logout" asp-controller="User" method="post" class="inline">
-                        @Html.AntiForgeryToken()
-                        <button type="submit" class="bg-red-500 text-white p-2 rounded hover:bg-red-700 transition duration-300">Logout</button>
-                    </form>
-                }
-                else
-                {
-                    <a href="/User/Login" class="bg-green-500 text-white p-2 rounded hover:bg-green-700 transition duration-300">Login</a>
-                    <a href="/User/Register" class="bg-green-500 text-white p-2 rounded hover:bg-green-700 transition duration-300">Register</a>
-                }
-                <form asp-action="Search" method="get" class="inline">
-                    <input type="text" name="query" placeholder="Search..." class="p-2 rounded border border-gray-300" />
-                    <button type="submit" class="bg-blue-500 text-white p-2 rounded hover:bg-blue-700 transition duration-300">Search</button>
+<body class="bg-gray-900 text-gray-100">
+    <header class="bg-gray-800 p-6 text-white shadow flex justify-between items-center">
+        <h1 class="text-3xl font-extrabold">Forum</h1>
+        <nav class="flex space-x-4">
+            <a href="/Home" class="bg-green-500 text-white p-2 rounded hover:bg-green-700 transition duration-300">Home</a>
+            <a href="/Chat" class="auth-required bg-green-500 text-white p-2 rounded hover:bg-green-700 transition duration-300">Chats</a>
+            <a href="/Post" class="bg-green-500 text-white p-2 rounded hover:bg-green-700 transition duration-300">Posts</a>
+            @if (User.Identity != null && User.Identity.IsAuthenticated)
+            {
+                <form id="logoutForm" asp-action="Logout" asp-controller="User" method="post" class="inline">
+                    @Html.AntiForgeryToken()
+                    <button type="submit" class="bg-red-500 text-white p-2 rounded hover:bg-red-700 transition duration-300">Logout</button>
                 </form>
-            </nav>
-        </div>
+            }
+            else
+            {
+                <a href="/User/Login" class="bg-green-500 text-white p-2 rounded hover:bg-green-700 transition duration-300">Login</a>
+                <a href="/User/Register" class="bg-green-500 text-white p-2 rounded hover:bg-green-700 transition duration-300">Register</a>
+            }
+            <form asp-action="Search" method="get" class="inline">
+                <input type="text" name="query" placeholder="Search..." class="p-2 rounded-l-lg bg-gray-700 border border-gray-600 text-gray-300 placeholder-gray-500" />
+                <button type="submit" class="bg-blue-500 text-white p-2 rounded-r-lg hover:bg-blue-700 transition duration-300">Search</button>
+            </form>
+        </nav>
     </header>
-    <div class="container mx-auto px-4 py-6">
+    <div class="container mx-auto p-6 mt-6 bg-gray-700 shadow-md rounded-lg">
         @RenderBody()
     </div>
     @RenderSection("Scripts", required: false)
+
+    <footer class="bg-gray-800 p-4 mt-6 text-center text-white">
+        <p class="text-sm font-bold">&copy; 2023 Forum</p>
+    </footer>
 
     <script>
         document.addEventListener('DOMContentLoaded', function () {
@@ -44,12 +50,44 @@
 
             authRequiredLinks.forEach(link => {
                 link.addEventListener('click', function (event) {
-                    if (!@Html.Raw(User.Identity?.IsAuthenticated.ToString().ToLower())) {
+                    if (!localStorage.getItem('isAuthenticated')) {
                         event.preventDefault();
                         window.location.href = '/User/Login';
                     }
                 });
             });
+
+            if (@Html.Raw(User.Identity?.IsAuthenticated.ToString().ToLower())) {
+                localStorage.setItem('isAuthenticated', 'true');
+            } else {
+                localStorage.removeItem('isAuthenticated');
+            }
+        });
+
+        document.getElementById('logoutForm')?.addEventListener('submit', function (event) {
+            event.preventDefault();
+            fetch('@Url.Action("Logout", "User")', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'RequestVerificationToken': document.querySelector('[name="__RequestVerificationToken"]').value
+                }
+            })
+                .then(response => {
+                    if (response.ok) {
+                        localStorage.removeItem('AuthToken');
+                        localStorage.removeItem('SessionId');
+                        localStorage.removeItem('UserId');
+                        localStorage.removeItem('isAuthenticated');
+                        window.location.href = '@Url.Action("Index", "Home")';
+                    } else {
+                        alert('Logout failed. Please try again.');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('An error occurred while logging out. Please try again.');
+                });
         });
     </script>
 </body>
