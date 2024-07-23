@@ -13,6 +13,6 @@ namespace Telerik_ForumTeamProject.Services.Contracts
         User MakeAdmin(User user);
         bool UserExists(string username);
         bool UserExistsEmail(string username);
-
+        IEnumerable<User> SearchUsers(string searchTerm);
     }
 }

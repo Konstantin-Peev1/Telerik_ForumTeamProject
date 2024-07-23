@@ -16,6 +16,7 @@ namespace Telerik_ForumTeamProject.Repositories.Contracts
         User MakeAdmin(User user);
         User UnBlockUser(User user);
         User GetByInformationUsername(string information);
+        IQueryable<User> SearchUsers(string searchTerm);
 
 
     }

@@ -1,25 +1,111 @@
-﻿@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+﻿@model Telerik_ForumTeamProject.Models.ViewModels.HomeViewModel
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
 
 @{
     ViewData["Title"] = "Home";
     Layout = "_Layout";
 }
 
-<div class="container mx-auto p-6 mt-6 bg-gray-700 shadow-md rounded-lg">
-    @if (User.Identity != null && User.Identity.IsAuthenticated)
+<div class="container mx-auto p-6 mt-6 bg-gray-700 shadow-md rounded-lg relative">
+    @if (Model.IsAuthenticated)
     {
         <h2 class="text-2xl font-bold mb-4 text-white">Welcome to the Dashboard</h2>
         <p class="mb-6 text-white">This page is accessible only to authenticated users.</p>
     }
+
+    <div class="mb-4 relative">
+        <div class="relative inline-block text-left">
+            <div>
+                <button type="button" class="inline-flex justify-center w-full rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-green-500 text-sm font-medium text-white hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500" id="menu-button" aria-expanded="true" aria-haspopup="true" onclick="toggleDropdown()">
+                    Select View
+                    <svg class="-mr-1 ml-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                        <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+                    </svg>
+                </button>
+            </div>
+
+            <div id="dropdown-menu" class="origin-top-left absolute left-0 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none hidden" role="menu" aria-orientation="vertical" aria-labelledby="menu-button" tabindex="-1">
+                <div class="py-1" role="none">
+                    <a href="@Url.Action("Index", "Home", new { viewOption = "mostCommented" })" class="text-gray-700 block px-4 py-2 text-sm hover:bg-gray-100" role="menuitem" tabindex="-1" id="menu-item-0">Most Commented</a>
+                    <a href="@Url.Action("Index", "Home", new { viewOption = "mostRecent" })" class="text-gray-700 block px-4 py-2 text-sm hover:bg-gray-100" role="menuitem" tabindex="-1" id="menu-item-1">Most Recent</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @if (Model.ViewOption == "mostCommented")
+    {
+        <h2 class="text-2xl font-bold mb-4 text-white">Top 10 Most Commented Posts</h2>
+        <ul class="mb-6">
+            @foreach (var post in Model.TopCommentedPosts)
+            {
+                <li class="mb-4 bg-gray-800 p-4 rounded-lg shadow-md">
+                    <a href="@((User.Identity != null && User.Identity.IsAuthenticated) ? Url.Action("Details", "Post", new { id = post.Id }) : Url.Action("Login", "User"))" class="text-lg text-green-500 hover:underline">
+                        @post.Title
+                    </a>
+                    <p class="text-gray-300">
+                        @if (post.Content.Length > 100)
+                        {
+                            @post.Content.Substring(0, 100);
+                            
+                       }
+                        else
+                        {
+                            @post.Content
+                        }
+                    </p>
+                    <p class="text-gray-500 text-sm">Comments: @post.Comments.Count</p>
+                </li>
+            }
+        </ul>
+    }
     else
     {
-        <h2 class="text-2xl font-bold mb-4 text-white">Welcome to the Forum</h2>
-        <p class="mb-6 text-white">Please login or register to access more features.</p>
+        <h2 class="text-2xl font-bold mb-4 text-white">10 Latest Posts</h2>
+        <ul>
+            @foreach (var post in Model.RecentPosts)
+            {
+                <li class="mb-4 bg-gray-800 p-4 rounded-lg shadow-md">
+                    <a href="@((User.Identity != null && User.Identity.IsAuthenticated) ? Url.Action("Details", "Post", new { id = post.Id }) : Url.Action("Login", "User"))" class="text-lg text-green-500 hover:underline">
+                        @post.Title
+                    </a>
+                    <p class="text-gray-300">
+                        @if (post.Content.Length > 100)
+                        {
+                            @post.Content.Substring(0, 100);
+                            
+                       }
+                        else
+                        {
+                            @post.Content
+                        }
+                    </p>
+                    <p class="text-gray-500 text-sm">Posted on: @post.Created.ToString("MMM dd, yyyy")</p>
+                </li>
+            }
+        </ul>
     }
 </div>
 
 <script>
-    document.getElementById('logoutForm').addEventListener('submit', function (event) {
+    function toggleDropdown() {
+        var menu = document.getElementById('dropdown-menu');
+        if (menu.classList.contains('hidden')) {
+            menu.classList.remove('hidden');
+        } else {
+            menu.classList.add('hidden');
+        }
+    }
+
+    document.addEventListener('click', function (event) {
+        var menuButton = document.getElementById('menu-button');
+        var menu = document.getElementById('dropdown-menu');
+        if (!menuButton.contains(event.target)) {
+            menu.classList.add('hidden');
+        }
+    });
+
+    document.getElementById('logoutForm')?.addEventListener('submit', function (event) {
         event.preventDefault();
         fetch('@Url.Action("Logout", "User")', {
             method: 'POST',
@@ -44,9 +130,10 @@
                 alert('An error occurred while logging out. Please try again.');
             });
 
-        if (@Html.Raw(User.Identity?.IsAuthenticated.ToString().ToLower())) {
+        if (@Html.Raw(User.Identity?.IsAuthenticated.ToString().ToLower()) == "true") {
             localStorage.setItem('isAuthenticated', 'true');
-        } else {
+        }
+        else {
             localStorage.removeItem('isAuthenticated');
         }
     });

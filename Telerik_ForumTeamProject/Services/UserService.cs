@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Server.IIS.Core;
 using Telerik_ForumTeamProject.Exceptions;
 using Telerik_ForumTeamProject.Models.Entities;
+using Telerik_ForumTeamProject.Repositories;
 using Telerik_ForumTeamProject.Repositories.Contracts;
 using Telerik_ForumTeamProject.Services.Contracts;
 
@@ -22,6 +23,11 @@ namespace Telerik_ForumTeamProject.Services
         {
 
             return userRepository.GetByInformation(information);
+        }
+
+        public IEnumerable<User> SearchUsers(string searchTerm)
+        {
+            return this.userRepository.SearchUsers(searchTerm).ToList();
         }
 
         public User CreateUser(User user)

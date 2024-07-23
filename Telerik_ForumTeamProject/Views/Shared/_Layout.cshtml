@@ -29,8 +29,8 @@
                 <a href="/User/Login" class="bg-green-500 text-white p-2 rounded hover:bg-green-700 transition duration-300">Login</a>
                 <a href="/User/Register" class="bg-green-500 text-white p-2 rounded hover:bg-green-700 transition duration-300">Register</a>
             }
-            <form asp-action="Search" method="get" class="inline">
-                <input type="text" name="query" placeholder="Search..." class="p-2 rounded-l-lg bg-gray-700 border border-gray-600 text-gray-300 placeholder-gray-500" />
+            <form asp-controller="User" asp-action="Search" method="get" class="inline">
+                <input type="text" name="query" placeholder="Search for users..." class="p-2 rounded-l-lg bg-gray-700 border border-gray-600 text-gray-300 placeholder-gray-500" />
                 <button type="submit" class="bg-blue-500 text-white p-2 rounded-r-lg hover:bg-blue-700 transition duration-300">Search</button>
             </form>
         </nav>

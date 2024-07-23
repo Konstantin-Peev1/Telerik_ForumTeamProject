@@ -11,6 +11,8 @@ using Microsoft.Extensions.Logging;
 using System.Security.Cryptography;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication;
+using Telerik_ForumTeamProject.Models.ViewModels;
+using System.Linq;
 
 namespace Telerik_ForumTeamProject.Controllers.MVC
 {
@@ -20,7 +22,6 @@ namespace Telerik_ForumTeamProject.Controllers.MVC
         private readonly ModelMapper modelMapper;
         private readonly AuthManager authManager;
         private readonly ILogger<UserController> logger;
-
 
         public UserController(IUserService userService, ModelMapper modelMapper, AuthManager authManager, ILogger<UserController> logger)
         {
@@ -38,51 +39,51 @@ namespace Telerik_ForumTeamProject.Controllers.MVC
             return View(model);
         }
 
-            [HttpPost]
-            [AllowAnonymous]
-            public IActionResult Login(LogInRequestDTO loginRequest)
+        [HttpPost]
+        [AllowAnonymous]
+        public IActionResult Login(LogInRequestDTO loginRequest)
+        {
+            if (loginRequest == null)
             {
-                if (loginRequest == null)
+                ModelState.AddModelError(string.Empty, "Invalid login request");
+                return View(new LogInRequestDTO());
+            }
+
+            logger.LogInformation("Received login request with UserName: {UserName}", loginRequest.UserName);
+
+            try
+            {
+                var user = authManager.Authenticate(loginRequest.UserName, loginRequest.Password);
+                if (user == null)
                 {
-                    ModelState.AddModelError(string.Empty, "Invalid login request");
-                    return View(new LogInRequestDTO());
-                }
-
-                logger.LogInformation("Received login request with UserName: {UserName}", loginRequest.UserName);
-
-                try
-                {
-                    var user = authManager.Authenticate(loginRequest.UserName, loginRequest.Password);
-                    if (user == null)
-                    {
-                        ModelState.AddModelError(string.Empty, "Invalid login attempt.");
-                        return View(loginRequest);
-                    }
-
-                    var token = authManager.Generate(user);
-                    var sessionId = GenerateSessionId();
-
-                    var cookieOptions = new CookieOptions
-                    {
-                        HttpOnly = true,
-                        Secure = true, // Set to true if using HTTPS
-                        Expires = DateTime.UtcNow.AddMinutes(10) // Match the token expiration
-                    };
-
-                    Response.Cookies.Append("AuthToken", token, cookieOptions);
-                    Response.Cookies.Append("UserId", user.UserName.ToString(), cookieOptions);
-
-                    // Store the sessionId in TempData
-                    TempData["SessionId"] = sessionId;
-                    TempData["IsAuthenticated"] = true;
-                return RedirectToAction("Index", "Home");
-                }
-                catch (AuthorisationExcpetion ex)
-                {
-                    ModelState.AddModelError(string.Empty, ex.Message);
+                    ModelState.AddModelError(string.Empty, "Invalid login attempt.");
                     return View(loginRequest);
                 }
+
+                var token = authManager.Generate(user);
+                var sessionId = GenerateSessionId();
+
+                var cookieOptions = new CookieOptions
+                {
+                    HttpOnly = true,
+                    Secure = true, // Set to true if using HTTPS
+                    Expires = DateTime.UtcNow.AddMinutes(10) // Match the token expiration
+                };
+
+                Response.Cookies.Append("AuthToken", token, cookieOptions);
+                Response.Cookies.Append("UserId", user.UserName.ToString(), cookieOptions);
+
+                // Store the sessionId in TempData
+                TempData["SessionId"] = sessionId;
+                TempData["IsAuthenticated"] = true;
+                return RedirectToAction("Index", "Home");
             }
+            catch (AuthorisationExcpetion ex)
+            {
+                ModelState.AddModelError(string.Empty, ex.Message);
+                return View(loginRequest);
+            }
+        }
 
         [HttpGet]
         [AllowAnonymous]
@@ -141,20 +142,36 @@ namespace Telerik_ForumTeamProject.Controllers.MVC
             }
         }
 
-
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult Logout()
         {
-            
             Response.Cookies.Delete("AuthToken");
             Response.Cookies.Delete("UserId");
 
-           
             TempData.Clear();
             TempData["IsAuthenticated"] = false;
 
             return RedirectToAction("Index", "Home");
+        }
+
+        [HttpGet]
+        public IActionResult Search(string query)
+        {
+            var users = userService.SearchUsers(query);
+            var model = new UserSearchViewModel
+            {
+                Query = query,
+                Users = users.ToList()
+            };
+            return View(model);
+        }
+
+        [HttpGet]
+        public IActionResult Details(string id)
+        {
+            // Placeholder for user details
+            return View();
         }
 
         private string GenerateSessionId()

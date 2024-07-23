@@ -78,6 +78,14 @@ namespace Telerik_ForumTeamProject.Repositories
 
         }
 
+        public IQueryable<User> SearchUsers(string searchTerm)
+        {
+
+            return applicationConetxt.Users
+                .Where(u => u.UserName.Contains(searchTerm) || u.Email.Contains(searchTerm));
+                
+        }
+
         public User BlockUser(User user)
         {
             user.IsBlocked = true;
