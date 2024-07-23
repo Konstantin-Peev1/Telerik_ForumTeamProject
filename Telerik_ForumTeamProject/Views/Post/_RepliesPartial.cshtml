@@ -1,0 +1,20 @@
+﻿@model Telerik_ForumTeamProject.Models.ViewModels.PagedRepliesViewModel
+
+<div>
+    @foreach (var reply in Model.Replies)
+    {
+        <div>
+            <p>@reply.Content</p>
+            <p>By: @reply.UserName on @reply.Created</p>
+        </div>
+    }
+
+    @if (Model.Metadata.HasNext)
+    {
+        <form method="get" asp-controller="Post" asp-action="GetReplies">
+            <input type="hidden" name="commentId" value="@Model.ParentCommentId" />
+            <input type="hidden" name="page" value="@(Model.Metadata.CurrentPage + 1)" />
+            <button type="submit">Load more replies</button>
+        </form>
+    }
+</div>

@@ -1,10 +1,12 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
+using System.ComponentModel.Design;
 using System.Xml.Linq;
 using Telerik_ForumTeamProject.Helpers;
 using Telerik_ForumTeamProject.Models.Entities;
 using Telerik_ForumTeamProject.Models.ResponseDTO;
 using Telerik_ForumTeamProject.Models.ViewModels;
+using Telerik_ForumTeamProject.Services;
 using Telerik_ForumTeamProject.Services.Contracts;
 
 namespace Telerik_ForumTeamProject.Controllers.MVC
@@ -30,11 +32,10 @@ namespace Telerik_ForumTeamProject.Controllers.MVC
                 Title = post.Title,
                 Content = post.Content,
                 Likes = post.Likes?.Count ?? 0,
-                PostDate = post.Created.ToString("yyyy-MM-dd HH:mm:ss"),
+                PostDate = DateTimeFormatter.FormatToStandard(post.Created),
                 Comments = post.Comments?.Select(comment => new CommentReplyResponseDTO
                 {
                     Content = comment?.Content ?? "No content",
-                    // Map other properties as needed
                 }).ToList() ?? new List<CommentReplyResponseDTO>(),
                 UserName = post.User.UserName,
                 Tags = post.Tags?.Select(tag => tag.Description).ToList() ?? new List<string>()
@@ -50,26 +51,55 @@ namespace Telerik_ForumTeamProject.Controllers.MVC
         }
 
         [HttpGet]
-        public IActionResult GetPost(int id)
+        public IActionResult GetPost(int id, int? commentId = null)
         {
-            Post post = _postService.GetPost(id);
+            var post = _postService.GetPost(id);
             var comments = _commentService.GetAllPostComments(id);
 
-            PostViewModel viewModel = new PostViewModel
+            var viewModel = new PostViewModel
             {
                 Title = post.Title,
                 Content = post.Content,
                 Likes = post.Likes?.Count ?? 0,
-                PostDate = post.Created.ToString("yyyy-MM-dd HH:mm:ss"),
+                PostDate = DateTimeFormatter.FormatToStandard(post.Created),
                 Comments = comments?.Select(comment => new CommentReplyResponseDTO
                 {
+                    Id = comment.Id,
                     Content = comment?.Content ?? "No content",
-                    
+                    UserName = comment.User.UserName,
+                    Created = DateTimeFormatter.FormatToStandard(comment.Created),
+                    Replies = new List<CommentReplyResponseDTO>() 
+
                 }).ToList() ?? new List<CommentReplyResponseDTO>(),
                 UserName = post.User.UserName,
-                Tags = post.Tags?.Select(tag => tag.Description).ToList() ?? new List<string>()
+                Tags = post.Tags?.Select(tag => tag.Description).ToList() ?? new List<string>(),
+                Replies = null
             };
+
+            ViewData["PostId"] = id;
+
             return View(viewModel);
+        }
+
+        public IActionResult GetReplies(int commentId, int page = 1, int pageSize = 5)
+        {
+            var pagedReplies = _commentService.GetPagedReplies(commentId, page, pageSize);
+
+            var replies = pagedReplies.Items.Select(reply => new RepliesViewModel
+            {
+                Content = reply.Content,
+                UserName = reply.User.UserName,
+                Created = DateTimeFormatter.FormatToStandard(reply.Created),
+            }).ToList();
+
+            var pagedRepliesViewModel = new PagedRepliesViewModel
+            {
+                ParentCommentId = commentId,
+                Replies = replies,
+                Metadata = pagedReplies.Metadata
+            };
+
+            return PartialView("_RepliesPartial", pagedRepliesViewModel);
         }
     }
 }

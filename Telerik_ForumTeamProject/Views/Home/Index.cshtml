@@ -40,7 +40,7 @@
             @foreach (var post in Model.TopCommentedPosts)
             {
                 <li class="mb-4 bg-gray-800 p-4 rounded-lg shadow-md">
-                    <a href="@((User.Identity != null && User.Identity.IsAuthenticated) ? Url.Action("Details", "Post", new { id = post.Id }) : Url.Action("Login", "User"))" class="text-lg text-green-500 hover:underline">
+                    <a href="@((User.Identity != null && User.Identity.IsAuthenticated) ? Url.Action("GetPost", "Post", new { id = post.Id }) : Url.Action("Login", "User"))" class="text-lg text-green-500 hover:underline">
                         @post.Title
                     </a>
                     <p class="text-gray-300">

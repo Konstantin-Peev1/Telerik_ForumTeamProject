@@ -1,4 +1,7 @@
-﻿@model Telerik_ForumTeamProject.Models.ViewModels.PostViewModel
+﻿@using Telerik_ForumTeamProject.Models.ResponseDTO
+@using Telerik_ForumTeamProject.Models.ViewModels
+@model Telerik_ForumTeamProject.Models.ViewModels.PostViewModel
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
 
 <div>
     <h2>@Model.Title</h2>
@@ -13,7 +16,35 @@
     {
         <div>
             <p>@comment.Content</p>
-            <button onclick="showReplies(@comment.Replies)">Show replies</button>
+            <p>By: @comment.UserName on @comment.Created</p>
+            <form method="get" asp-controller="Post" asp-action="GetReplies">
+                <input type="hidden" name="commentId" value="@comment.Id" />
+                <button type="submit">Show replies</button>
+            </form>
+        </div>
+
+        <div id="replies-@comment.Id">
+            @if (Model.Replies != null && Model.Replies.Any())
+            {
+                <h3>Replies:</h3>
+                <partial name="_RepliesPartial" model="new Telerik_ForumTeamProject.Models.ViewModels.PagedRepliesViewModel
+                    {
+                        Replies = Model.Replies.Select(reply => new RepliesViewModel
+                        {
+                            Content = reply.Content,
+                            UserName = reply.UserName,
+                            Created = reply.Created
+                        }).ToList(),
+                        Metadata = new PaginationMetadata
+                        {
+                            TotalCount = Model.Replies.Count,
+                            PageSize = 10,
+                            CurrentPage = 1,
+                            TotalPages = (int)Math.Ceiling((double)Model.Replies.Count / 10)
+                        }
+                    }" />
+            }
         </div>
     }
+
 </div>
