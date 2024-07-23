@@ -1,8 +1,11 @@
 ﻿@model IEnumerable<Telerik_ForumTeamProject.Models.ResponseDTO.CommentReplyResponseDTO>
 
-<div>
+<div class="ml-6">
     @foreach (var reply in Model)
     {
-        <p>@reply.Content</p>
+        <div class="bg-gray-800 p-4 mb-2 rounded-lg shadow-md">
+            <p class="text-gray-300">@reply.Content</p>
+            <p class="text-gray-500 text-sm">By: @reply.UserName on @reply.Created</p>
+        </div>
     }
 </div>

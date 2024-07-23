@@ -1,20 +1,35 @@
 ﻿@model Telerik_ForumTeamProject.Models.ViewModels.PagedRepliesViewModel
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
 
-<div>
-    @foreach (var reply in Model.Replies)
-    {
-        <div>
-            <p>@reply.Content</p>
-            <p>By: @reply.UserName on @reply.Created</p>
-        </div>
-    }
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Forum</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="~/css/site.css" />
+</head>
+<body class="bg-gray-900 text-gray-100">
 
-    @if (Model.Metadata.HasNext)
-    {
-        <form method="get" asp-controller="Post" asp-action="GetReplies">
-            <input type="hidden" name="commentId" value="@Model.ParentCommentId" />
-            <input type="hidden" name="page" value="@(Model.Metadata.CurrentPage + 1)" />
-            <button type="submit">Load more replies</button>
-        </form>
-    }
-</div>
+    <div class="ml-6">
+        @foreach (var reply in Model.Replies)
+        {
+            <div class="bg-gray-800 p-4 mb-2 rounded-lg shadow-md">
+                <p class="text-gray-300">@reply.Content</p>
+                <p class="text-gray-500 text-sm">By: @reply.UserName on @reply.Created</p>
+            </div>
+        }
+
+        @if (Model.Metadata.HasNext)
+        {
+            <form method="get" asp-controller="Post" asp-action="GetReplies" class="mt-4">
+                <input type="hidden" name="commentId" value="@Model.ParentCommentId" />
+                <input type="hidden" name="page" value="@(Model.Metadata.CurrentPage + 1)" />
+                <button type="submit" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-700 transition duration-300">Load more replies</button>
+            </form>
+        }
+    </div>
+
+</body>
+</html>

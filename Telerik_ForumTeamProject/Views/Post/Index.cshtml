@@ -1,62 +1,93 @@
 ﻿@using System.Text
 @model Telerik_ForumTeamProject.Models.ViewModels.PagedPostViewModel
 @addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
-<script src="https://cdn.tailwindcss.com"></script>
 
-@* <div>
-    @foreach (var post in Model.Posts)
-    {
-        <div>
-            <h2>@post.Title</h2>
-            <p>@post.Content</p>
-            <p>@post.PostDate</p>
-            <p>Likes: @post.Likes</p>
-            <p>Creator: @post.UserName</p>
-            <p>Tags: @string.Join(", ", post.Tags)</p>
-        </div>
-    }
+@{
+    ViewData["Title"] = "Posts";
+    Layout = "_Layout";
+}
 
-</div> *@
-<body>
-
-    <div class="bg-white py-24 sm:py-32">
-        <div class="mx-auto max-w-7xl px-6 lg:px-8">
-            <div class="mx-auto max-w-2xl lg:mx-0">
-                <h2 class="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">Posts</h2>
-            </div>
-            @foreach (var post in Model.Posts)
-            {
-                <div class="mx-auto mt-10 grid max-w-2xl grid-cols-1 gap-x-8 gap-y-16 border-t border-gray-200 pt-10 sm:mt-16 sm:pt-16 lg:mx-0 lg:max-w-none lg:grid-cols-3">
-                    <article class="flex max-w-xl flex-col items-start justify-between">
-                        <div class="flex items-center gap-x-4 text-xs">
-                            <time datetime="2020-03-16" class="text-gray-500">@post.PostDate</time>
-                            <a href="#" class="relative z-10 rounded-full bg-gray-50 px-3 py-1.5 font-medium text-gray-600 hover:bg-gray-100">@string.Join(", ", post.Tags)</a>
-                        </div>
-
-                            <div class="group relative">
-                                <h3 class="mt-3 text-lg font-semibold leading-6 text-gray-900 group-hover:text-gray-600">
-                                    <a asp-controller="Post" asp-action="GetPost" method="get" asp-route-id="@post.id">
-                                        <span class="absolute inset-0"></span>
-                                        @post.Title
-                                    </a>
-                                </h3>
-                                <p class="mt-5 line-clamp-3 text-sm leading-6 text-gray-600">@post.Content</p>
-                            </div>
-                        <div class="relative mt-8 flex items-center gap-x-4">
-                            <img src="https://images.unsplash.com/photo-1519244703995-f4e0f30006d5?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80" alt="" class="h-10 w-10 rounded-full bg-gray-50">
-                            <div class="text-sm leading-6">
-                                <p class="font-semibold text-gray-900">
-                                    <a href="#">
-                                        <span class="absolute inset-0"></span>
-                                        @post.UserName
-                                    </a>
-                                </p>
-                                <p class="text-gray-600">Co-Founder / CTO</p>
-                            </div>
-                        </div>
-                    </article>
+<div class="container mx-auto p-6 mt-6 bg-gray-700 shadow-md rounded-lg">
+    <h2 class="text-3xl font-bold tracking-tight text-white sm:text-4xl">Posts</h2>
+    <div class="mx-auto mt-10 grid max-w-2xl grid-cols-1 gap-x-8 gap-y-16 border-t border-gray-600 pt-10 sm:mt-16 sm:pt-16 lg:mx-0 lg:max-w-none lg:grid-cols-3">
+        @foreach (var post in Model.Posts)
+        {
+            var formattedDate = post.PostDate;
+            var displayDate = post.PostDate;
+            <article class="flex max-w-xl flex-col items-start justify-between bg-gray-800 p-6 rounded-lg shadow-lg">
+                <div class="flex items-center gap-x-4 text-xs text-gray-400">
+                    <time datetime="@formattedDate" class="text-gray-500">@displayDate</time>
+                    <a href="#" class="relative z-10 rounded-full bg-gray-50 px-3 py-1.5 font-medium text-gray-600 hover:bg-gray-100">@string.Join(", ", post.Tags)</a>
                 </div>
-            }
-        </div>
+                <div class="group relative">
+                    <h3 class="mt-3 text-lg font-semibold leading-6 text-white group-hover:text-gray-400">
+                        <a asp-controller="Post" asp-action="GetPost" method="get" asp-route-id="@post.id">
+                            <span class="absolute inset-0"></span>
+                            @post.Title
+                        </a>
+                    </h3>
+                    <p class="mt-5 line-clamp-3 text-sm leading-6 text-gray-300">@post.Content</p>
+                </div>
+                <div class="relative mt-8 flex items-center gap-x-4">
+                    <img src="https://images.unsplash.com/photo-1519244703995-f4e0f30006d5?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80" alt="" class="h-10 w-10 rounded-full bg-gray-50">
+                    <div class="text-sm leading-6">
+                        <p class="font-semibold text-white">
+                            <a href="#">
+                                <span class="absolute inset-0"></span>
+                                @post.UserName
+                            </a>
+                        </p>
+                        <p class="text-gray-400">Co-Founder / CTO</p>
+                    </div>
+                </div>
+            </article>
+        }
     </div>
-</body>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const authRequiredLinks = document.querySelectorAll('.auth-required');
+
+        authRequiredLinks.forEach(link => {
+            link.addEventListener('click', function (event) {
+                if (!localStorage.getItem('isAuthenticated')) {
+                    event.preventDefault();
+                    window.location.href = '/User/Login';
+                }
+            });
+        });
+
+        if (@Html.Raw(User.Identity?.IsAuthenticated.ToString().ToLower())) {
+            localStorage.setItem('isAuthenticated', 'true');
+        } else {
+            localStorage.removeItem('isAuthenticated');
+        }
+    });
+
+    document.getElementById('logoutForm')?.addEventListener('submit', function (event) {
+        event.preventDefault();
+        fetch('@Url.Action("Logout", "User")', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'RequestVerificationToken': document.querySelector('[name="__RequestVerificationToken"]').value
+            }
+        })
+            .then(response => {
+                if (response.ok) {
+                    localStorage.removeItem('AuthToken');
+                    localStorage.removeItem('SessionId');
+                    localStorage.removeItem('UserId');
+                    localStorage.removeItem('isAuthenticated');
+                    window.location.href = '@Url.Action("Index", "Home")';
+                } else {
+                    alert('Logout failed. Please try again.');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred while logging out. Please try again.');
+            });
+    });
+</script>
