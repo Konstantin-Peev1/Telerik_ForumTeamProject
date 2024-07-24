@@ -1,9 +1,12 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.ComponentModel.Design;
 using System.Xml.Linq;
+using Telerik_ForumTeamProject.Exceptions;
 using Telerik_ForumTeamProject.Helpers;
 using Telerik_ForumTeamProject.Models.Entities;
+using Telerik_ForumTeamProject.Models.RequestDTO;
 using Telerik_ForumTeamProject.Models.ResponseDTO;
 using Telerik_ForumTeamProject.Models.ViewModels;
 using Telerik_ForumTeamProject.Services;
@@ -11,12 +14,14 @@ using Telerik_ForumTeamProject.Services.Contracts;
 
 namespace Telerik_ForumTeamProject.Controllers.MVC
 {
-    public class PostController : Controller
+    [Authorize]
+    public class PostController : BaseControllerMVC
     {
         private readonly IPostService _postService;
         private readonly ICommentService _commentService;
         private readonly ModelMapper _modelMapper;
-        public PostController(IPostService postService, ICommentService commentService, ModelMapper modelMapper)
+        private readonly AuthManager _authManager;
+        public PostController(IPostService postService, ICommentService commentService, ModelMapper modelMapper, AuthManager authManager) :base(authManager)
         {
             _postService = postService;
             _commentService = commentService;
@@ -101,5 +106,40 @@ namespace Telerik_ForumTeamProject.Controllers.MVC
 
             return PartialView("_RepliesPartial", pagedRepliesViewModel);
         }
+
+        [HttpGet]
+        public IActionResult Create()
+        {
+            var postModel = new PostRequestDTO();
+            return View(postModel);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult Create(PostRequestDTO model)
+        {
+            if (ModelState.IsValid)
+            {
+                var user = GetCurrentUser();
+
+
+                try
+                {
+                    var post = _modelMapper.Map(model);
+                    _postService.CreatePost(post, user);
+                    return RedirectToAction("Index", "Post");
+                }
+                catch (AuthorisationExcpetion ex)
+                {
+                    ModelState.AddModelError(string.Empty, ex.Message);
+                }
+            }
+           
+
+          
+
+            return View(model);
+        }
+
     }
 }

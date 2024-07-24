@@ -15,15 +15,15 @@ namespace Telerik_ForumTeamProject.Controllers.MVC
    
     
 
-    public class ChatController : Controller
+    public class ChatController : BaseControllerMVC
     {
         private readonly IChatService _chatService;
         private readonly AuthManager _authManager;
 
-        public ChatController(IChatService chatService, AuthManager auth)
+        public ChatController(IChatService chatService, AuthManager auth) :base(auth)
         {
             _chatService = chatService;
-            _authManager = auth;
+         //   _authManager = auth;
         }
 
         public IActionResult Index()
@@ -64,20 +64,7 @@ namespace Telerik_ForumTeamProject.Controllers.MVC
         }
 
 
-        protected User GetCurrentUser()
-        {
-            var identity = HttpContext.User.Identity as ClaimsIdentity;
-
-            if (identity != null)
-            {
-                var userClaims = identity.Claims;
-                var userName = userClaims.FirstOrDefault(o => o.Type == ClaimTypes.NameIdentifier)?.Value;
-                var password = userClaims.First(o => o.Type == ClaimTypes.Hash)?.Value;
-                string credentials = $"{userName}:{password}";
-                return _authManager.TryGetUser(credentials);
-            }
-            throw new EntityNotFoundException("No such user");
-        }
+        
 
         [HttpPost]
         public IActionResult CreateChatRoom(string name) // New action method for creating chat rooms

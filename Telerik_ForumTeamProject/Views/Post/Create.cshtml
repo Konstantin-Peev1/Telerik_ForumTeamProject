@@ -1,0 +1,48 @@
+﻿@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@model Telerik_ForumTeamProject.Models.RequestDTO.PostRequestDTO
+
+@{
+    ViewData["Title"] = "Create a Post";
+    
+}
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Forum</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="~/css/site.css" />
+</head>
+
+<div class="container mx-auto p-6 mt-6 bg-gray-700 shadow-md rounded-lg">
+    <h2 class="text-3xl font-bold tracking-tight text-white sm:text-4xl mb-4">Create Post</h2>
+
+    <form asp-action="Create" method="post">
+        <div class="mb-4">
+            <label asp-for="Title" class="block text-white font-bold mb-2"></label>
+            <input asp-for="Title" class="form-control bg-gray-800 text-white p-2 rounded-lg w-full" />
+            <span asp-validation-for="Title" class="text-red-500"></span>
+        </div>
+        <div class="mb-4">
+            <label asp-for="Content" class="block text-white font-bold mb-2"></label>
+            <textarea asp-for="Content" class="form-control bg-gray-800 text-white p-2 rounded-lg w-full"></textarea>
+            <span asp-validation-for="Content" class="text-red-500"></span>
+        </div>
+        <button type="submit" class="bg-green-500 text-white px-6 py-2 rounded-lg hover:bg-green-700 transition duration-300">Create</button>
+    </form>
+
+    <div class="text-red-500 mt-4">
+        @if (!ViewData.ModelState.IsValid)
+        {
+            <ul>
+                @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+                {
+                    <li>@error.ErrorMessage</li>
+                }
+            </ul>
+        }
+    </div>
+</div>
+
+<script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
+<script src="~/lib/jquery-validation-unobtrusive/dist/jquery.validate.unobtrusive.min.js"></script>
