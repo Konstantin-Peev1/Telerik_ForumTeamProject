@@ -20,6 +20,7 @@ namespace Telerik_ForumTeamProject.Models.ViewModels
         public string PostDate { get; set; }
         public List<CommentReplyResponseDTO> Comments { get; set; }
         public string UserName { get; set; }
+        public string userProfilePictureURL { get; set; }
         public List<string> Tags { get; set; }
         public List<CommentReplyResponseDTO> Replies { get; set; }
     }

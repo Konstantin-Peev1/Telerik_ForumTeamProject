@@ -43,6 +43,7 @@ namespace Telerik_ForumTeamProject.Controllers.MVC
                     Content = comment?.Content ?? "No content",
                 }).ToList() ?? new List<CommentReplyResponseDTO>(),
                 UserName = post.User.UserName,
+                userProfilePictureURL = post.User.ProfilePictureUrl,
                 Tags = post.Tags?.Select(tag => tag.Description).ToList() ?? new List<string>()
             }).ToList();
 
@@ -77,6 +78,7 @@ namespace Telerik_ForumTeamProject.Controllers.MVC
 
                 }).ToList() ?? new List<CommentReplyResponseDTO>(),
                 UserName = post.User.UserName,
+                userProfilePictureURL = post.User.ProfilePictureUrl,
                 Tags = post.Tags?.Select(tag => tag.Description).ToList() ?? new List<string>(),
                 Replies = null
             };
