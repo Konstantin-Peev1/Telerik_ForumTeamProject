@@ -27,6 +27,7 @@ namespace Telerik_ForumTeamProject.Repositories
         {
             user.Likes.Remove(like);
             post.Likes.Remove(like);
+            applicationContext.SaveChanges();
             return like;
         }
     }

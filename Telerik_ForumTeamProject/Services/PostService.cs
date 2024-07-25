@@ -69,9 +69,9 @@ namespace Telerik_ForumTeamProject.Services
             var postUpdate = this.postRepository.UpdatePost(post, updatedPost);
             return postUpdate;
         }
-        public PagedResult<Post> GetPagedPosts(int page, int pageSize)
+        public PagedResult<Post> GetPagedPosts(int page, int pageSize, PostQueryParamteres filterParams)
         {
-            ICollection<Post> posts = this.postRepository.GetPagedPosts(page, pageSize);
+            ICollection<Post> posts = this.postRepository.GetPagedPosts(page, pageSize, filterParams);
             int totalPosts = this.postRepository.GetPostsCount();
 
             PaginationMetadata paginationMetadata = new PaginationMetadata()

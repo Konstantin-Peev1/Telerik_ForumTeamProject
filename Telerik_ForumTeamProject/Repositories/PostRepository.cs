@@ -49,12 +49,14 @@ namespace Telerik_ForumTeamProject.Repositories
             results = FilterByTitle(results, filterParameters.Title);
             results = FilterByUser(results, filterParameters.UserName);
             results = FilterByTag(results, filterParameters.Tag);
-            results = SortBy(results, filterParameters.SortBy);
-            results = Order(results, filterParameters.SortOrder);
             results = FilterByMinLikes(results, filterParameters.MinLikes);
             results = FilterByMaxLikes(results, filterParameters.MaxLikes);
+            results = SortBy(results, filterParameters.SortBy);
+            var resultsFixed = results.ToList();
+            resultsFixed = Order(resultsFixed, filterParameters.SortOrder).ToList();
+            
 
-            return results.ToList();
+            return resultsFixed;
 
         }
 
@@ -68,10 +70,11 @@ namespace Telerik_ForumTeamProject.Repositories
         }
 
 
-        public ICollection<Post> GetPagedPosts(int page, int pageSize)
+        public ICollection<Post> GetPagedPosts(int page, int pageSize, PostQueryParamteres filterparams)
         {
             int skip = (page - 1) * pageSize;
-            return GetPosts()
+            var filteredPosts = FilterBy(filterparams);
+            return filteredPosts
                 .OrderByDescending(x => x.Created)
                 .Skip(skip)
                 .Take(pageSize)
@@ -137,20 +140,20 @@ namespace Telerik_ForumTeamProject.Repositories
         {
             switch (sortCriteria)
             {
-                case "title":
+                case "Title":
                     return posts.OrderBy(posts => posts.Title);
-                case "likes":
+                case "Likes":
                     return posts.OrderBy(posts => posts.Likes.Count);
-                case "user":
+                case "User":
                     return posts.OrderBy(posts => posts.User.UserName);
-                case "tag":
+                case "Tag":
                     return posts.OrderBy(posts => posts.Tags.OrderBy(tag => tag.Description));
                 default:
                     return posts;
             }
         }
 
-        private static IQueryable<Post> Order(IQueryable<Post> posts, string sortOrder)
+        private static IEnumerable<Post> Order(IList<Post> posts, string sortOrder)
         {
             return (sortOrder == "desc") ? posts.Reverse() : posts;
         }

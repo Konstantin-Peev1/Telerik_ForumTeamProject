@@ -13,6 +13,6 @@ namespace Telerik_ForumTeamProject.Services.Contracts
         ICollection<Post> FilterBy(PostQueryParamteres filterParameters);
         Post UpdatePost(int id, Post updatedPost, User user);
         bool DeletePost(int id, User user);
-        PagedResult<Post> GetPagedPosts(int page, int pageSize);
+        PagedResult<Post> GetPagedPosts(int page, int pageSize, PostQueryParamteres filterParams);
     }
 }

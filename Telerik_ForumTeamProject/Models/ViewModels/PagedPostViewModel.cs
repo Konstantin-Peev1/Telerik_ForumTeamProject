@@ -1,4 +1,5 @@
-﻿using Telerik_ForumTeamProject.Models.ResponseDTO;
+﻿using Telerik_ForumTeamProject.Models.RequestDTO;
+using Telerik_ForumTeamProject.Models.ResponseDTO;
 
 namespace Telerik_ForumTeamProject.Models.ViewModels
 {
@@ -6,5 +7,6 @@ namespace Telerik_ForumTeamProject.Models.ViewModels
     {
         public List<PostViewModel> Posts { get; set; }
         public PaginationMetadata PaginationMetadata { get; set; }
+        public PostQueryParamteres FilterParameters { get; set; }
     }
 }

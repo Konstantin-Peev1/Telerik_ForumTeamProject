@@ -13,7 +13,7 @@ namespace Telerik_ForumTeamProject.Repositories.Contracts
         Post UpdatePost(Post post, Post updatedPost);
         bool DeletePost(Post post);
 
-        ICollection<Post> GetPagedPosts(int page, int pageSize);
+        ICollection<Post> GetPagedPosts(int page, int pageSize, PostQueryParamteres filterParams);
         int GetPostsCount();
 
 

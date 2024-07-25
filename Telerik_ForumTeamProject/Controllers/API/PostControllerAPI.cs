@@ -130,9 +130,9 @@ namespace Telerik_ForumTeamProject.Controllers
 
         [Authorize]
         [HttpGet("all-posts")]
-        public IActionResult ShowAllPosts(int page = 1, int pageSize = 10)
+        public IActionResult ShowAllPosts(PostQueryParamteres paramteres,int page = 1, int pageSize = 10)
         {
-            var pagedPosts = postService.GetPagedPosts(page, pageSize);
+            var pagedPosts = postService.GetPagedPosts(page, pageSize, paramteres);
             var postsToShow = pagedPosts.Items.Select(post => modelMapper.Map(post)).ToList();
 
             var response = new PagedResult<PostUploadResponseDTO>

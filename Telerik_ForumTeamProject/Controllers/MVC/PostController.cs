@@ -21,15 +21,45 @@ namespace Telerik_ForumTeamProject.Controllers.MVC
         private readonly ICommentService _commentService;
         private readonly ModelMapper _modelMapper;
         private readonly AuthManager _authManager;
-        public PostController(IPostService postService, ICommentService commentService, ModelMapper modelMapper, AuthManager authManager) :base(authManager)
+        private readonly ILikeService _likeService;
+        public PostController(IPostService postService, ICommentService commentService, ModelMapper modelMapper, AuthManager authManager, ILikeService likeService) : base(authManager)
         {
             _postService = postService;
             _commentService = commentService;
             _modelMapper = modelMapper;
+            _likeService = likeService;
         }
-        public IActionResult Index(int page = 1, int pageSize = 10)
+
+        [HttpPost]
+        public IActionResult ToggleLike([FromBody] int postId)
         {
-            PagedResult<Post> pagedPosts = _postService.GetPagedPosts(page, pageSize);
+            User user = GetCurrentUser();
+            var post = _postService.GetPost(postId);
+
+            if (post == null)
+            {
+                return Json(new { success = false, message = "Post not found" });
+            }
+
+            var existingLike = post.Likes.FirstOrDefault(like => like.UserId == user.ID);
+
+            if (existingLike != null)
+            {
+                _likeService.Delete(postId, user, existingLike);
+            }
+            else
+            {
+                _likeService.Create(postId, user);
+            }
+
+            var likeCount = post.Likes.Count;
+
+            return Json(new { success = true, likeCount });
+        }
+
+        public IActionResult Index(PostQueryParamteres filterParams, int page = 1, int pageSize = 10)
+        {
+            PagedResult<Post> pagedPosts = _postService.GetPagedPosts(page, pageSize, filterParams);
 
             var postViewModels = pagedPosts.Items.Select(post => new PostViewModel
             {
@@ -117,7 +147,7 @@ namespace Telerik_ForumTeamProject.Controllers.MVC
         }
 
         [HttpPost]
-        [ValidateAntiForgeryToken]
+        
         public IActionResult Create(PostRequestDTO model)
         {
             if (ModelState.IsValid)
