@@ -71,7 +71,8 @@ namespace Telerik_ForumTeamProject.Services
         }
         public PagedResult<Post> GetPagedPosts(int page, int pageSize, PostQueryParamteres filterParams)
         {
-            ICollection<Post> posts = this.postRepository.GetPagedPosts(page, pageSize, filterParams);
+          //  ICollection<Post> posts = this.postRepository.GetPagedPosts(page, pageSize, filterParams);
+            var filteredPosts = this.postRepository.FilterBy(page, pageSize, filterParams);
             int totalPosts = this.postRepository.GetPostsCount();
 
             PaginationMetadata paginationMetadata = new PaginationMetadata()
@@ -89,7 +90,7 @@ namespace Telerik_ForumTeamProject.Services
 
             return new PagedResult<Post>
             {
-                Items = posts,
+                Items = filteredPosts,
                 Metadata = paginationMetadata
             };
         }

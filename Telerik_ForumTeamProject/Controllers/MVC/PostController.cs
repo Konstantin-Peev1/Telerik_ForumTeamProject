@@ -59,6 +59,7 @@ namespace Telerik_ForumTeamProject.Controllers.MVC
 
         public IActionResult Index(PostQueryParamteres filterParams, int page = 1, int pageSize = 10)
         {
+            User currentUser = GetCurrentUser();
             PagedResult<Post> pagedPosts = _postService.GetPagedPosts(page, pageSize, filterParams);
 
             var postViewModels = pagedPosts.Items.Select(post => new PostViewModel
@@ -74,7 +75,10 @@ namespace Telerik_ForumTeamProject.Controllers.MVC
                 }).ToList() ?? new List<CommentReplyResponseDTO>(),
                 UserName = post.User.UserName,
                 userProfilePictureURL = post.User.ProfilePictureUrl,
-                Tags = post.Tags?.Select(tag => tag.Description).ToList() ?? new List<string>()
+                Tags = post.Tags?.Select(tag => tag.Description).ToList() ?? new List<string>(),
+                IsCreator = post.UserID == currentUser.ID,
+                IsAdmin = currentUser.IsAdmin,
+                LastModified = post.LastModified,
             }).ToList();
 
             var pagedPostViewModel = new PagedPostViewModel
@@ -173,5 +177,53 @@ namespace Telerik_ForumTeamProject.Controllers.MVC
             return View(model);
         }
 
+        [HttpGet]
+        public IActionResult Edit(int id)
+        {
+            var post = _postService.GetPost(id);
+            if (post == null)
+            {
+                return NotFound();
+            }
+
+            var model = new PostRequestDTO
+            {
+                Title = post.Title,
+                Content = post.Content,
+                
+            };
+
+            return View(model);
+        }
+
+        [HttpPost]
+        public IActionResult Edit(int id, PostRequestDTO model)
+        {
+            if (ModelState.IsValid)
+            {
+                User user = GetCurrentUser();
+                Post post = _modelMapper.Map(model);
+                Post updatedPost = _postService.UpdatePost(id, post, user);
+
+                return RedirectToAction("Index");
+            }
+
+            return View(model);
+        }
+
+        [HttpPost]
+        public IActionResult Delete(int id)
+        {
+            User user = GetCurrentUser();
+            var post = _postService.GetPost(id);
+            if (post == null)
+            {
+                return NotFound();
+            }
+
+            _postService.DeletePost(post.Id, user);
+
+            return Ok(new { success = true });
+        }
     }
 }

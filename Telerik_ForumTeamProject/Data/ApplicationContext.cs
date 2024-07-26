@@ -49,7 +49,20 @@ namespace Telerik_ForumTeamProject.Data
                 .HasOne(c => c.ParentComment)
                 .WithMany(r => r.Replies)
                 .HasForeignKey(c => c.ParentCommentID)
-                .OnDelete(DeleteBehavior.Restrict); 
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // ChatRoom-ChatMessage relationship
+            modelBuilder.Entity<ChatMessage>()
+                .HasOne(cm => cm.ChatRoom)
+                .WithMany(cr => cr.Messages)
+                .HasForeignKey(cm => cm.ChatRoomId)
+                .OnDelete(DeleteBehavior.Cascade); // Cascade delete messages when chat room is deleted
+
+            modelBuilder.Entity<ChatRoom>()
+               .HasOne(cr => cr.Creator)
+               .WithMany(u => u.ChatRooms)
+               .HasForeignKey(cr => cr.UserId)
+               .OnDelete(DeleteBehavior.Restrict);
 
             string plainPassword = "123456778";
             string hashedPassword = BCrypt.Net.BCrypt.HashPassword(plainPassword);

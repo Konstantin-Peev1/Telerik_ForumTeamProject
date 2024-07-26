@@ -9,6 +9,7 @@ namespace Telerik_ForumTeamProject.Repositories.Contracts
         ChatRoom GetChatRoom(int id);
         void AddMessage(ChatMessage message);
         void AddChatRoom(ChatRoom chatRoom);
-
+        void DeleteChatRoom(ChatRoom chatRoom);
+        void DeleteChatRoomIfOld(int chatRoomId);
     }
 }

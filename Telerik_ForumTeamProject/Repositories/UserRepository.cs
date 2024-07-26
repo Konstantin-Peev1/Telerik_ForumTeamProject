@@ -73,7 +73,7 @@ namespace Telerik_ForumTeamProject.Repositories
 
         private IQueryable<User> GetUser()
         {
-            return this.applicationConetxt.Users;
+            return this.applicationConetxt.Users.Include(u => u.ChatRooms);
                 
 
         }

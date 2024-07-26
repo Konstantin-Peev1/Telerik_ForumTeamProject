@@ -15,6 +15,7 @@ namespace Telerik_ForumTeamProject.Models.Entities
         public User User { get; set; }
 
         public DateTime Created { get; set; }
+        public DateTime? LastModified { get; set; }
         public List<Comment> Comments { get; set; }
         public List<Tag> Tags { get; set; }
         public List<Like> Likes { get; set; }

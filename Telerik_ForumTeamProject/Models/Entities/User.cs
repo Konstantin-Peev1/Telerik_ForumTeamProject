@@ -24,6 +24,8 @@ namespace Telerik_ForumTeamProject.Models.Entities
         public string Role { get; set; }
         public bool IsBlocked { get; set; }
 
+        public List<ChatRoom> ChatRooms { get; set; }
+
         public List<Post> Posts { get; set; }
         public List<Comment> Comments { get; set; }
         public List<Like> Likes { get;set; }

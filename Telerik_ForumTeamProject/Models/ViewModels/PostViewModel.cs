@@ -23,5 +23,8 @@ namespace Telerik_ForumTeamProject.Models.ViewModels
         public string userProfilePictureURL { get; set; }
         public List<string> Tags { get; set; }
         public List<CommentReplyResponseDTO> Replies { get; set; }
+        public bool IsCreator { get; set; }
+        public bool IsAdmin { get; set; }
+        public DateTime? LastModified { get; set; }
     }
 }

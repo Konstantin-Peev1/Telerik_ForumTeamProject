@@ -5,6 +5,8 @@
 @{
     ViewData["Title"] = "Chats";
     Layout = "_Layout";
+    var currentUserId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+    var isAdmin = bool.Parse(User.FindFirst("isAdmin")?.Value ?? "false");
 }
 <!DOCTYPE html>
 <html>
@@ -22,7 +24,7 @@
     </header>
     <div class="container mx-auto p-6 mt-6 bg-gray-800 shadow-md rounded-lg">
         <!-- Form to Create a New Chat Room -->
-        <form id="createChatRoomForm" class="mb-6 flex">
+        <form id="createChatRoomForm" class="mb-6 flex" asp-controller="Chat" asp-action="CreateChatRoom" method="post">
             <input type="text" id="chatRoomName" name="name" placeholder="Enter chat room name" required class="flex-1 p-3 rounded-l-lg bg-gray-700 border border-gray-600 text-gray-300 placeholder-gray-500" />
             <button type="submit" class="bg-green-500 text-white p-3 rounded-r-lg hover:bg-green-700 transition duration-300">Create Chat Room</button>
         </form>
@@ -31,7 +33,16 @@
             @foreach (var room in Model)
             {
                 <li data-chatroom-id="@room.Id" class="p-4 bg-gray-700 rounded-lg flex justify-between items-center hover:bg-gray-600 transition duration-300">
-                    <a href="/Chat/Room/@room.Id" class="text-green-400 hover:text-green-200 font-bold">@room.Name</a>
+                    <div class="flex items-center space-x-4">
+                        <a href="/Chat/Room/@room.Id" class="text-green-400 hover:text-green-200 font-bold">@room.Name</a>
+                        @if (room.Creator.UserName == currentUserId || isAdmin)
+                        {
+                            <form asp-controller="Chat" asp-action="DeleteChatRoom" method="post" class="inline">
+                                <input type="hidden" name="chatRoomId" value="@room.Id" />
+                                <button type="submit" class="bg-red-500 text-white p-2 rounded hover:bg-red-700 transition duration-300">Delete</button>
+                            </form>
+                        }
+                    </div>
                     <span class="text-gray-400">Active Users: <span class="userCount font-extrabold text-yellow-500">0</span></span>
                 </li>
             }

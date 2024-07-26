@@ -9,11 +9,12 @@ namespace Telerik_ForumTeamProject.Repositories.Contracts
         ICollection<Post> GetTop10Recent();
         Post GetPost(int id);
         Post CreatePost(Post post);
-        ICollection<Post> FilterBy(PostQueryParamteres filterParameters);
+        ICollection<Post> FilterBy(PostQueryParamteres filterParams);
+        ICollection<Post> FilterBy(int page, int pageSize, PostQueryParamteres filterParams);
         Post UpdatePost(Post post, Post updatedPost);
         bool DeletePost(Post post);
 
-        ICollection<Post> GetPagedPosts(int page, int pageSize, PostQueryParamteres filterParams);
+        
         int GetPostsCount();
 
 

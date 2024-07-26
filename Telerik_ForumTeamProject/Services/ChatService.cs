@@ -1,6 +1,7 @@
 ﻿
 using System;
 using System.Collections.Generic;
+using Telerik_ForumTeamProject.Exceptions;
 using Telerik_ForumTeamProject.Models.Entities;
 using Telerik_ForumTeamProject.Repositories.Contracts;
 using Telerik_ForumTeamProject.Services.Contracts;
@@ -45,14 +46,39 @@ namespace Telerik_ForumTeamProject.Services
                 _chatRepository.AddMessage(chatMessage);
             }
         }
-        public void CreateChatRoom(string name)
+        public void CreateChatRoom(string name, User user)
         {
             var chatRoom = new ChatRoom
             {
+                UserId = user.ID,
                 Name = name,
                 Messages = new List<ChatMessage>()
             };
+
             _chatRepository.AddChatRoom(chatRoom);
+        }
+        public void DeleteChatRoom(int chatRoomId, User user)
+        {
+            var chatRoom = _chatRepository.GetChatRoom(chatRoomId);
+            if (chatRoom != null)
+            {
+                if (chatRoom.UserId == user.ID || user.IsAdmin)
+                {
+                    if ((DateTime.UtcNow - chatRoom.Created).TotalHours > 24)
+                    {
+                        _chatRepository.DeleteChatRoom(chatRoom);
+                    }
+                    else
+                    {
+                        _chatRepository.DeleteChatRoomIfOld(chatRoomId);
+                    }
+                }
+                else
+                {
+                    throw new UnauthorizedAccessException("User is not authorized to delete this chat room.");
+                }
+            }
+            
         }
     }
 }

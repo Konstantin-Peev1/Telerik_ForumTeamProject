@@ -12,9 +12,9 @@ using Telerik_ForumTeamProject.Services.Contracts;
 
 namespace Telerik_ForumTeamProject.Controllers.MVC
 {
-   
-    
 
+
+    [Authorize]
     public class ChatController : BaseControllerMVC
     {
         private readonly IChatService _chatService;
@@ -53,7 +53,7 @@ namespace Telerik_ForumTeamProject.Controllers.MVC
         }
 
         [HttpPost]
-        [Authorize]
+        
         public IActionResult SendMessage(int chatRoomId, string message)
         {
             User user = GetCurrentUser();
@@ -69,13 +69,38 @@ namespace Telerik_ForumTeamProject.Controllers.MVC
         [HttpPost]
         public IActionResult CreateChatRoom(string name) // New action method for creating chat rooms
         {
+            User user = GetCurrentUser();
+            if(user.ChatRooms.Count() != 0)
+            {
+                throw new AuthorisationExcpetion("No more chatRooms");
+            }
             if (!string.IsNullOrEmpty(name))
             {
-                _chatService.CreateChatRoom(name);
+                _chatService.CreateChatRoom(name, user);
             }
             return RedirectToAction("Index");
         }
 
-     
+
+        [HttpPost]
+        
+        public IActionResult DeleteChatRoom(int chatRoomId)
+        {
+            User user = GetCurrentUser();
+            try
+            {
+                _chatService.DeleteChatRoom(chatRoomId, user);
+                return RedirectToAction("Index");
+            }
+            catch (UnauthorizedAccessException)
+            {
+                return Forbid();
+            }
+            catch (ArgumentException)
+            {
+                return NotFound();
+            }
+        }
+
     }
 }

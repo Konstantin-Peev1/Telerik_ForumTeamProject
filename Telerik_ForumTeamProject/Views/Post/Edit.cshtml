@@ -1,0 +1,31 @@
+﻿@model Telerik_ForumTeamProject.Models.RequestDTO.PostRequestDTO
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+
+@{
+    ViewData["Title"] = "Edit Post";
+    Layout = "_Layout";
+}
+
+<div class="container mx-auto p-6 mt-6 bg-gray-700 shadow-md rounded-lg">
+    <h2 class="text-3xl font-bold tracking-tight text-white sm:text-4xl">Edit Post</h2>
+
+    <form asp-action="Edit" method="post" class="mt-6">
+        <div class="form-group mb-4">
+            <label asp-for="Title" class="block text-sm font-medium text-white"></label>
+            <input asp-for="Title" class="form-control bg-gray-800 text-white p-2 rounded-lg w-full" />
+            <span asp-validation-for="Title" class="text-danger"></span>
+        </div>
+        <div class="form-group mb-4">
+            <label asp-for="Content" class="block text-sm font-medium text-white"></label>
+            <textarea asp-for="Content" class="form-control bg-gray-800 text-white p-2 rounded-lg w-full" rows="5"></textarea>
+            <span asp-validation-for="Content" class="text-danger"></span>
+        </div>
+        <!-- Add tag input fields if necessary -->
+        
+        <button type="submit" class="bg-green-500 text-white px-6 py-2 rounded-lg hover:bg-green-700 transition duration-300">Save</button>
+    </form>
+</div>
+
+<script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
+<script src="~/lib/jquery-validation-unobtrusive/dist/jquery.validate.unobtrusive.min.js"></script>

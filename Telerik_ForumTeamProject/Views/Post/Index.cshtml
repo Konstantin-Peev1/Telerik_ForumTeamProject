@@ -46,7 +46,6 @@
                             <option value="Title">Title</option>
                             <option value="User">User</option>
                             <option value="Likes">Likes</option>
-                            
                         </select>
                     </div>
                     <div class="form-group mb-3">
@@ -66,19 +65,23 @@
         {
             var formattedDate = post.PostDate;
             var displayDate = post.PostDate;
-            <article class="flex max-w-xl flex-col items-start justify-between bg-gray-800 p-6 rounded-lg shadow-lg">
+            <article class="flex max-w-xl flex-col items-start justify-between bg-gray-800 p-6 rounded-lg shadow-lg relative">
                 <div class="flex items-center gap-x-4 text-xs text-gray-400">
                     <time datetime="@formattedDate" class="text-gray-500">@displayDate</time>
+                    @if (post.LastModified != null)
+                    {
+                        <span class="text-xs text-gray-500">(edited)</span>
+                    }
                     <a href="#" class="relative z-10 rounded-full bg-gray-50 px-3 py-1.5 font-medium text-gray-600 hover:bg-gray-100">@string.Join(", ", post.Tags)</a>
                 </div>
                 <div class="group relative mt-3">
                     <h3 class="text-lg font-semibold leading-6 text-white group-hover:text-gray-400">
                         <a asp-controller="Post" asp-action="GetPost" method="get" asp-route-id="@post.id">
                             <span class="absolute inset-0"></span>
-                            @Truncate(post.Title, 12)
+                            @Truncate(post.Title, 24)
                         </a>
                     </h3>
-                    <p class="mt-2 line-clamp-3 text-sm leading-6 text-gray-300">@Truncate(post.Content, 12)</p>
+                    <p class="mt-2 line-clamp-3 text-sm leading-6 text-gray-300">@Truncate(post.Content, 24)</p>
                 </div>
                 <div class="relative mt-6 flex items-center gap-x-4">
                     <img src="@post.userProfilePictureURL" alt="" class="h-10 w-10 rounded-full bg-gray-50">
@@ -97,6 +100,18 @@
                         Like (<span class="like-count">@post.Likes</span>)
                     </button>
                 </div>
+                @if (post.IsCreator || post.IsAdmin)
+                {
+                    <div class="absolute top-0 right-0">
+                        <button class="text-white px-4 py-2" onclick="toggleMenu(this)">
+                            <i class="fa fa-ellipsis-h"></i>
+                        </button>
+                        <div class="hidden bg-gray-800 text-white rounded-lg shadow-lg">
+                            <a href="@Url.Action("Edit", "Post", new { id = post.id })" class="block px-4 py-2">Edit</a>
+                            <a href="javascript:void(0);" onclick="confirmDelete(@post.id)" class="block px-4 py-2">Delete</a>
+                        </div>
+                    </div>
+                }
             </article>
         }
     </div>
@@ -149,6 +164,30 @@
             .catch(error => console.error('Error:', error));
     }
 
+    function toggleMenu(button) {
+        var menu = button.nextElementSibling;
+        menu.classList.toggle("hidden");
+    }
+
+    function confirmDelete(postId) {
+        if (confirm('Are you sure you want to delete this post?')) {
+            fetch(`/Post/Delete/${postId}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+                .then(response => {
+                    if (response.ok) {
+                        window.location.reload();
+                    } else {
+                        alert('Failed to delete post.');
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+        }
+    }
+
     document.addEventListener('DOMContentLoaded', function () {
         const authRequiredLinks = document.querySelectorAll('.auth-required');
 
@@ -166,30 +205,5 @@
         } else {
             localStorage.removeItem('isAuthenticated');
         }
-    });
-
-    document.getElementById('logoutForm')?.addEventListener('submit', function (event) {
-        event.preventDefault();
-        fetch('@Url.Action("Logout", "User")', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded'
-            }
-        })
-            .then(response => {
-                if (response.ok) {
-                    localStorage.removeItem('AuthToken');
-                    localStorage.removeItem('SessionId');
-                    localStorage.removeItem('UserId');
-                    localStorage.removeItem('isAuthenticated');
-                    window.location.href = '@Url.Action("Index", "Home")';
-                } else {
-                    alert('Logout failed. Please try again.');
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('An error occurred while logging out. Please try again.');
-            });
     });
 </script>

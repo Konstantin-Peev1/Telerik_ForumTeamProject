@@ -42,8 +42,24 @@ namespace Telerik_ForumTeamProject.Repositories
             this.applicationContext.SaveChanges();
             return post;
         }
-
         public ICollection<Post> FilterBy(PostQueryParamteres filterParameters)
+        {
+            IQueryable<Post> results = this.GetPosts();
+            results = FilterByTitle(results, filterParameters.Title);
+            results = FilterByUser(results, filterParameters.UserName);
+            results = FilterByTag(results, filterParameters.Tag);
+            results = FilterByMinLikes(results, filterParameters.MinLikes);
+            results = FilterByMaxLikes(results, filterParameters.MaxLikes);
+            results = SortBy(results, filterParameters.SortBy);
+            var resultsFixed = results.ToList();
+            resultsFixed = Order(resultsFixed, filterParameters.SortOrder).ToList();
+
+
+            return resultsFixed;
+
+        }
+
+        public ICollection<Post> FilterBy(int page, int pageSize, PostQueryParamteres filterParameters)
         {
             IQueryable<Post> results = this.GetPosts();
             results = FilterByTitle(results, filterParameters.Title);
@@ -56,7 +72,7 @@ namespace Telerik_ForumTeamProject.Repositories
             resultsFixed = Order(resultsFixed, filterParameters.SortOrder).ToList();
             
 
-            return resultsFixed;
+            return GetPagedPosts(page, pageSize, resultsFixed);
 
         }
 
@@ -64,16 +80,17 @@ namespace Telerik_ForumTeamProject.Repositories
         {
             post.Title = updatedPost.Title;
             post.Content = updatedPost.Content;
+            post.LastModified = DateTime.UtcNow;
             // post.Tags = updatedPost.Tags;
             this.applicationContext.SaveChanges();
             return post;
         }
 
 
-        public ICollection<Post> GetPagedPosts(int page, int pageSize, PostQueryParamteres filterparams)
+        private ICollection<Post> GetPagedPosts(int page, int pageSize, ICollection<Post> filteredPosts)
         {
             int skip = (page - 1) * pageSize;
-            var filteredPosts = FilterBy(filterparams);
+            //var filteredPosts = GetPosts();
             return filteredPosts
                 .OrderByDescending(x => x.Created)
                 .Skip(skip)
