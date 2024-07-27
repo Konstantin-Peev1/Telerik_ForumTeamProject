@@ -5,6 +5,8 @@ namespace Telerik_ForumTeamProject.Services.Contracts
     public interface IUserService
     {
         User GetByInformation(string information);
+        User GetByInformationUsername(string information);
+        User GetUserById(int id);
         User CreateUser(User user);
         User UpdateUser(User user, User userToUpdate, int id);
         User UpdateProfilePicture(int userId, string profilePictureUrl);

@@ -81,6 +81,7 @@ namespace Telerik_ForumTeamProject.Helpers
                 new Claim(ClaimTypes.GivenName, user.FirstName),
                 new Claim(ClaimTypes.Surname, user.LastName),
                 new Claim(ClaimTypes.Hash, user.Password),
+                new Claim(ClaimTypes.Uri, user.ProfilePictureUrl),
                 new Claim("isAdmin", user.IsAdmin.ToString())
             };
 

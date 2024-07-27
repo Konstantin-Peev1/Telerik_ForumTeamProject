@@ -19,13 +19,15 @@ namespace Telerik_ForumTeamProject.Controllers.MVC
     public class UserController : Controller
     {
         private readonly IUserService userService;
+        private readonly IPostService postService;
         private readonly ModelMapper modelMapper;
         private readonly AuthManager authManager;
         private readonly ILogger<UserController> logger;
 
-        public UserController(IUserService userService, ModelMapper modelMapper, AuthManager authManager, ILogger<UserController> logger)
+        public UserController(IUserService userService, IPostService postService, ModelMapper modelMapper, AuthManager authManager, ILogger<UserController> logger)
         {
             this.userService = userService;
+            this.postService = postService;
             this.modelMapper = modelMapper;
             this.authManager = authManager;
             this.logger = logger;
@@ -162,16 +164,16 @@ namespace Telerik_ForumTeamProject.Controllers.MVC
             var model = new UserSearchViewModel
             {
                 Query = query,
-                Users = users.ToList()
+                Users = users.ToList(),
             };
-            return View(model);
+            return PartialView(model);
         }
 
         [HttpGet]
-        public IActionResult Details(string id)
+        public IActionResult Details([FromQuery]string username)
         {
-            // Placeholder for user details
-            return View();
+            var user = userService.GetByInformationUsername(username);
+            return View(user);
         }
 
         private string GenerateSessionId()

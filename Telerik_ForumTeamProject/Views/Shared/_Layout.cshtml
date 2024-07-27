@@ -1,5 +1,7 @@
 ﻿@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
 @using Microsoft.AspNetCore.Mvc.Localization
+@using System.Security.Claims
+
 
 <!DOCTYPE html>
 <html lang="en">
@@ -13,27 +15,45 @@
 </head>
 <body class="bg-gray-900 text-gray-100">
     <header class="bg-gray-800 p-6 text-white shadow flex justify-between items-center">
-        <h1 class="text-3xl font-extrabold">Forum</h1>
-        <nav class="flex space-x-4">
-            <a href="/Home" class="bg-green-500 text-white p-2 rounded hover:bg-green-700 transition duration-300">Home</a>
-            <a href="/Chat" class="auth-required bg-green-500 text-white p-2 rounded hover:bg-green-700 transition duration-300">Chats</a>
-            <a href="/Post" class="bg-green-500 text-white p-2 rounded hover:bg-green-700 transition duration-300">Posts</a>
-            @if (User.Identity != null && User.Identity.IsAuthenticated)
-            {
-                <form id="logoutForm" asp-action="Logout" asp-controller="User" method="post" class="inline">
-                    @Html.AntiForgeryToken()
-                    <button type="submit" class="bg-red-500 text-white p-2 rounded hover:bg-red-700 transition duration-300">Logout</button>
-                </form>
-            }
-            else
-            {
-                <a href="/User/Login" class="bg-green-500 text-white p-2 rounded hover:bg-green-700 transition duration-300">Login</a>
-                <a href="/User/Register" class="bg-green-500 text-white p-2 rounded hover:bg-green-700 transition duration-300">Register</a>
-            }
-            <form asp-controller="User" asp-action="Search" method="get" class="inline">
-                <input type="text" name="query" placeholder="Search for users..." class="p-2 rounded-l-lg bg-gray-700 border border-gray-600 text-gray-300 placeholder-gray-500" />
+        <nav class="flex justify-between items-center w-full">
+            <div class="flex items-center space-x-4 flex-1">
+                <h1 class="text-3xl font-extrabold">Forum</h1>
+                <a href="/Home" class="bg-green-500 text-white p-2 rounded hover:bg-green-700 transition duration-300">Home</a>
+                <a href="/Chat" class="auth-required bg-green-500 text-white p-2 rounded hover:bg-green-700 transition duration-300">Chats</a>
+                <a href="/Post" class="bg-green-500 text-white p-2 rounded hover:bg-green-700 transition duration-300">Posts</a>
+            </div>
+
+            <!-- Search Bar in the middle -->
+            <form asp-controller="User" asp-action="Search" method="get" class="mx-4 flex justify-center flex-1">
+                <input type="text" name="query" placeholder="Search for users..." class="p-2 rounded-l-lg bg-gray-700 border border-gray-600 text-gray-300 placeholder-gray-500 w-full max-w-md" />
                 <button type="submit" class="bg-blue-500 text-white p-2 rounded-r-lg hover:bg-blue-700 transition duration-300">Search</button>
             </form>
+
+            <div class="flex items-center space-x-4 flex-1 justify-end">
+                @if (User.Identity != null && User.Identity.IsAuthenticated)
+                {
+                    var profilePictureUrl = User.FindFirst(ClaimTypes.Uri)?.Value;
+                    var username = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                    <!-- User Profile Dropdown -->
+                    <div class="relative inline-block text-left">
+                        <button id="profileDropdownButton" class="flex items-center space-x-2 focus:outline-none">
+                            <img src="@profilePictureUrl" alt="Profile Picture" class="w-10 h-10 rounded-full border-2 border-gray-600">
+                        </button>
+                        <div id="profileDropdown" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg z-10">
+                            <a href="/User/Details?username=@username" class="block px-4 py-2 text-gray-800 hover:bg-gray-200">Profile</a>
+                            <form id="logoutForm" asp-action="Logout" asp-controller="User" method="post" class="block w-full text-left">
+                                @Html.AntiForgeryToken()
+                                <button type="submit" class="block w-full px-4 py-2 text-gray-800 text-left hover:bg-gray-200">Logout</button>
+                            </form>
+                        </div>
+                    </div>
+                }
+                else
+                {
+                    <a href="/User/Login" class="bg-green-500 text-white p-2 rounded hover:bg-green-700 transition duration-300">Login</a>
+                    <a href="/User/Register" class="bg-green-500 text-white p-2 rounded hover:bg-green-700 transition duration-300">Register</a>
+                }
+            </div>
         </nav>
     </header>
     <div class="container mx-auto p-6 mt-6 bg-gray-700 shadow-md rounded-lg">
@@ -89,6 +109,23 @@
                     console.error('Error:', error);
                     alert('An error occurred while logging out. Please try again.');
                 });
+        });
+
+        // drop-down menu
+        document.addEventListener('DOMContentLoaded', function () {
+            document.getElementById('profileDropdownButton').addEventListener('click', function (event) {
+                event.stopPropagation();
+                var dropdown = document.getElementById('profileDropdown');
+                dropdown.classList.toggle('hidden');
+            });
+
+            document.addEventListener('click', function (event) {
+                var dropdown = document.getElementById('profileDropdown');
+                var button = document.getElementById('profileDropdownButton');
+                if (!button.contains(event.target)) {
+                    dropdown.classList.add('hidden');
+                }
+            });
         });
     </script>
 </body>

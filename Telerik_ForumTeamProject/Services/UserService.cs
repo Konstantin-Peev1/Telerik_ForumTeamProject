@@ -24,7 +24,15 @@ namespace Telerik_ForumTeamProject.Services
 
             return userRepository.GetByInformation(information);
         }
+        public User GetByInformationUsername(string information)
+        {
+            return userRepository.GetByInformationUsername(information);
+        }
 
+        public User GetUserById(int id) 
+        {
+            return userRepository.GetUserByID(id);
+        }
         public IEnumerable<User> SearchUsers(string searchTerm)
         {
             return this.userRepository.SearchUsers(searchTerm).ToList();
@@ -111,5 +119,6 @@ namespace Telerik_ForumTeamProject.Services
             }
             return this.userRepository.MakeAdmin(user);
         }
+
     }
 }

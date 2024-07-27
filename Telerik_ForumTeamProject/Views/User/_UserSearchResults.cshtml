@@ -1,0 +1,20 @@
+﻿@model Telerik_ForumTeamProject.Models.ViewModels.UserSearchViewModel
+
+@if (Model.Users != null && Model.Users.Any())
+{
+    <ul class="bg-white border border-gray-300 rounded-lg shadow-lg mt-2">
+        @foreach (var user in Model.Users)
+        {
+            <li class="cursor-pointer hover:bg-gray-100 px-4 py-2">
+                <a href="@Url.Action("Details", "User", new { id = user.ID })" class="flex items-center space-x-2">
+                    <img src="@user.ProfilePictureUrl" alt="Profile Picture" class="w-8 h-8 rounded-full border border-gray-300" />
+                    <span>@user.FirstName @user.LastName</span>
+                </a>
+            </li>
+        }
+    </ul>
+}
+else
+{
+    <p class="px-4 py-2 text-gray-600">No users found.</p>
+}
