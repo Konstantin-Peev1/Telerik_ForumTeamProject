@@ -6,6 +6,8 @@
 @{
     ViewData["Title"] = "Post Details";
     Layout = "_Layout";
+    var currentUserId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+    var isAdmin = bool.Parse(User.FindFirst("isAdmin")?.Value ?? "false");
 }
 
 <div class="container mx-auto p-6 mt-6 bg-gray-700 shadow-md rounded-lg">
@@ -22,37 +24,59 @@
         <h3 class="text-2xl font-bold text-white mb-4">Comments:</h3>
         @foreach (var comment in Model.Comments)
         {
-            <div class="bg-gray-800 p-4 mb-4 rounded-lg shadow-md">
+            <div class="bg-gray-800 p-4 mb-4 rounded-lg shadow-md relative">
                 <p class="text-gray-300">@comment.Content</p>
                 <p class="text-gray-500 mb-4">By: @comment.UserName on @comment.Created</p>
+
+                @if (comment.UserName == currentUserId || isAdmin)
+                {
+                    <div class="absolute top-0 right-0">
+                        <button class="text-white px-2 py-1 hover:bg-gray-700 rounded-lg" onclick="toggleMenu(@comment.Id)">
+                            <i class="fa fa-ellipsis-h"></i>
+                        </button>
+                        <div id="menu-@comment.Id" class="hidden bg-gray-800 text-white rounded-lg shadow-lg">
+                            <a href="@Url.Action("EditComment", "Comment", new { id = comment.Id })" class="block px-4 py-2">Edit</a>
+                            <form method="post" asp-action="DeleteComment" asp-controller="Comment" onsubmit="return confirm('Are you sure you want to delete this comment?');">
+                                <input type="hidden" name="commentId" value="@comment.Id" />
+                                <button type="submit" class="block px-4 py-2 text-left w-full">Delete</button>
+                            </form>
+                        </div>
+                    </div>
+                }
+
                 <form method="get" asp-controller="Post" asp-action="GetReplies">
                     <input type="hidden" name="commentId" value="@comment.Id" />
-                    <button type="submit" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-700 transition duration-300">Show replies</button>
+                    <button type="submit" class="bg-green-500 text-white px-2 py-1 rounded hover:bg-green-700 transition duration-300 mt-2 w-32">Show replies</button>
                 </form>
-            </div>
 
-            <div id="replies-@comment.Id" class="ml-6">
-                @if (Model.Replies != null && Model.Replies.Any())
-                {
-                    <h3 class="text-xl font-bold text-white mb-4">Replies:</h3>
-                    <partial name="_RepliesPartial" model="new Telerik_ForumTeamProject.Models.ViewModels.PagedRepliesViewModel
+                <div id="replies-@comment.Id" class="ml-6">
+                    @if (comment.Replies != null && comment.Replies.Any())
+                    {
+                        <h3 class="text-xl font-bold text-white mb-4">Replies:</h3>
+                        @foreach (var reply in comment.Replies)
                         {
-                            Replies = Model.Replies.Select(reply => new RepliesViewModel
-                            {
-                                Content = reply.Content,
-                                UserName = reply.UserName,
-                                Created = reply.Created
-                            }).ToList(),
-                            Metadata = new PaginationMetadata
-                            {
-                                TotalCount = Model.Replies.Count,
-                                PageSize = 10,
-                                CurrentPage = 1,
-                                TotalPages = (int)Math.Ceiling((double)Model.Replies.Count / 10)
-                            }
-                        }" />
-                }
+                            <div class="bg-gray-700 p-4 mb-4 rounded-lg shadow-md">
+                                <p class="text-gray-300">@reply.Content</p>
+                                <p class="text-gray-500 mb-4">By: @reply.UserName on @reply.Created</p>
+                            </div>
+                        }
+                    }
+                </div>
             </div>
         }
+
+        <h3 class="text-2xl font-bold text-white mt-6 mb-4">Add a Comment:</h3>
+        <form method="post" asp-controller="Post" asp-action="AddComment" class="mb-6">
+            <input type="hidden" name="postId" value="@Model.id" />
+            <textarea name="Content" class="form-control bg-gray-800 text-white p-2 rounded-lg w-full" rows="4" placeholder="Write your comment..."></textarea>
+            <button type="submit" class="bg-green-500 text-white px-4 py-2 mt-2 rounded hover:bg-green-700 transition duration-300">Submit</button>
+        </form>
     </div>
 </div>
+
+<script>
+    function toggleMenu(commentId) {
+        var menu = document.getElementById('menu-' + commentId);
+        menu.classList.toggle('hidden');
+    }
+</script>

@@ -22,6 +22,7 @@ namespace Telerik_ForumTeamProject.Controllers.MVC
         private readonly ModelMapper _modelMapper;
         private readonly AuthManager _authManager;
         private readonly ILikeService _likeService;
+
         public PostController(IPostService postService, ICommentService commentService, ModelMapper modelMapper, AuthManager authManager, ILikeService likeService) : base(authManager)
         {
             _postService = postService;
@@ -98,6 +99,7 @@ namespace Telerik_ForumTeamProject.Controllers.MVC
 
             var viewModel = new PostViewModel
             {
+                id = post.Id,
                 Title = post.Title,
                 Content = post.Content,
                 Likes = post.Likes?.Count ?? 0,
@@ -108,7 +110,7 @@ namespace Telerik_ForumTeamProject.Controllers.MVC
                     Content = comment?.Content ?? "No content",
                     UserName = comment.User.UserName,
                     Created = DateTimeFormatter.FormatToStandard(comment.Created),
-                    Replies = new List<CommentReplyResponseDTO>() 
+                    Replies = new List<CommentReplyResponseDTO>()
 
                 }).ToList() ?? new List<CommentReplyResponseDTO>(),
                 UserName = post.User.UserName,
@@ -151,7 +153,7 @@ namespace Telerik_ForumTeamProject.Controllers.MVC
         }
 
         [HttpPost]
-        
+
         public IActionResult Create(PostRequestDTO model)
         {
             if (ModelState.IsValid)
@@ -170,9 +172,9 @@ namespace Telerik_ForumTeamProject.Controllers.MVC
                     ModelState.AddModelError(string.Empty, ex.Message);
                 }
             }
-           
 
-          
+
+
 
             return View(model);
         }
@@ -190,7 +192,7 @@ namespace Telerik_ForumTeamProject.Controllers.MVC
             {
                 Title = post.Title,
                 Content = post.Content,
-                
+
             };
 
             return View(model);
@@ -225,5 +227,24 @@ namespace Telerik_ForumTeamProject.Controllers.MVC
 
             return Ok(new { success = true });
         }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult AddComment(int postId, CommentRequestDTO commentRequest)
+        {
+            if (commentRequest == null || string.IsNullOrWhiteSpace(commentRequest.Content))
+            {
+                return RedirectToAction("GetPost", new { id = postId });
+            }
+
+            var user = GetCurrentUser();
+            var comment = _modelMapper.Map(commentRequest, postId);
+
+            
+            _commentService.CreateComment(comment, user);
+
+            return RedirectToAction("GetPost", new { id = postId });
+        }
+
     }
 }
