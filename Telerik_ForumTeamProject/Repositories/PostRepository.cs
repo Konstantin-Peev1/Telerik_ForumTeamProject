@@ -92,7 +92,7 @@ namespace Telerik_ForumTeamProject.Repositories
             int skip = (page - 1) * pageSize;
             //var filteredPosts = GetPosts();
             return filteredPosts
-                .OrderByDescending(x => x.Created)
+                
                 .Skip(skip)
                 .Take(pageSize)
                 .ToList();
@@ -166,7 +166,7 @@ namespace Telerik_ForumTeamProject.Repositories
                 case "Tag":
                     return posts.OrderBy(posts => posts.Tags.OrderBy(tag => tag.Description));
                 default:
-                    return posts;
+                    return posts.OrderByDescending(x => x.Created);
             }
         }
 
