@@ -11,7 +11,7 @@
         @foreach (var user in Model.Users)
         {
             <li class="mb-4 bg-gray-800 p-4 rounded-lg shadow-md">
-                <a href="@Url.Action("Details", "User", new { id = user.ID })" class="text-lg text-green-500 hover:underline">
+                <a href="@Url.Action("Details", "User", new { username = user.UserName })" class="text-lg text-green-500 hover:underline">
                     @user.FirstName
                     @user.LastName
                 </a>

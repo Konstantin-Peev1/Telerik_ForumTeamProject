@@ -13,6 +13,8 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication;
 using Telerik_ForumTeamProject.Models.ViewModels;
 using System.Linq;
+using System.Security.Claims;
+using static System.Net.WebRequestMethods;
 
 namespace Telerik_ForumTeamProject.Controllers.MVC
 {
@@ -20,16 +22,19 @@ namespace Telerik_ForumTeamProject.Controllers.MVC
     {
         private readonly IUserService userService;
         private readonly IPostService postService;
+        private readonly ICloudinaryService cloudinaryService;
         private readonly ModelMapper modelMapper;
         private readonly AuthManager authManager;
         private readonly ILogger<UserController> logger;
+        private readonly List<string> allowedExtensions = new List<string> { ".jpg", ".jpeg", ".png" };
 
-        public UserController(IUserService userService, IPostService postService, ModelMapper modelMapper, AuthManager authManager, ILogger<UserController> logger)
+        public UserController(IUserService userService, IPostService postService, ICloudinaryService cloudinaryService, ModelMapper modelMapper, AuthManager authManager, ILogger<UserController> logger)
         {
             this.userService = userService;
             this.postService = postService;
             this.modelMapper = modelMapper;
             this.authManager = authManager;
+            this.cloudinaryService = cloudinaryService;
             this.logger = logger;
         }
 
@@ -174,6 +179,59 @@ namespace Telerik_ForumTeamProject.Controllers.MVC
         {
             var user = userService.GetByInformationUsername(username);
             return View(user);
+        }
+
+        [HttpPost]
+        [Authorize]
+        public async Task<IActionResult> UpdateProfilePicture(IFormFile profilePicture)
+        {
+            var user = userService.GetByInformationUsername(User.FindFirst(ClaimTypes.NameIdentifier).Value);
+            if (profilePicture == null || profilePicture.Length == 0)
+            {
+                TempData["Error"] = "Please select a valid image file.";
+                return RedirectToAction("Details", new { username = user.UserName });
+            }
+
+            // Validate file extension
+            var extension = Path.GetExtension(profilePicture.FileName);
+            if (!this.allowedExtensions.Contains(extension))
+            {
+                TempData["Error"] = "Invalid file format. Only .jpg, .jpeg, and .png are allowed.";
+                return RedirectToAction("Details", new { username = user.UserName });
+            }
+
+            // Upload image to Cloudinary
+            var uploadResult = await this.cloudinaryService.UploadImageAsync(profilePicture);
+
+            //var uploadResult = "https://res.cloudinary.com/dpfnd2zns/image/upload/v1722120515/qhpqteatf2vsx3ny6aze.jpg";
+
+            if (uploadResult == null)
+            {
+                TempData["Error"] = "Error uploading image.";
+                return RedirectToAction("Details", new { username = user.UserName });
+            }
+
+            try
+            {
+                // Get the user ID from the authenticated user
+                //var user = userService.GetByInformationUsername(User.FindFirst(ClaimTypes.NameIdentifier).Value);
+                int userId = user.ID;
+                // Update user's profile picture URL uploadResult.Url
+                var updatedUser = this.userService.UpdateProfilePicture(userId, uploadResult.Url);
+
+                TempData["Success"] = "Profile picture updated successfully.";
+                return RedirectToAction("Details", new { username = user.UserName });
+            }
+            catch (EntityNotFoundException ex)
+            {
+                TempData["Error"] = ex.Message;
+                return RedirectToAction("Details", new { username = user.UserName });
+            }
+            catch (Exception ex)
+            {
+                TempData["Error"] = "An error occurred while updating the profile picture. Please try again.";
+                return RedirectToAction("Details", new { username = user.UserName });
+            }
         }
 
         private string GenerateSessionId()
