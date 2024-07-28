@@ -35,28 +35,17 @@ namespace Telerik_ForumTeamProject.Helpers
             return user;
         }
 
-        public User TryGetUser(string credentials)
+        public User TryGetUserByUserName(string userName)
         {
-            string[] credentialsArray = credentials.Split(':');
-            string username = credentialsArray[0];
-            string password = credentialsArray[1];
+            
+            var user = userRepository.GetByInformationUsername(userName);
 
-            try
+            if (user == null)
             {
-                var user = userRepository.GetByInformationUsername(username);
-
-                // Check if user exists and verify password
-                if (user == null || password != user.Password)
-                {
-                    throw new AuthorisationExcpetion(InvalidCredentialsErrorMessage);
-                }
-
-                return user;
+                throw new EntityNotFoundException("No such user");
             }
-            catch (EntityNotFoundException)
-            {
-                throw new AuthorisationExcpetion(InvalidCredentialsErrorMessage);
-            }
+
+            return user;
         }
 
         public bool VerifyPassword(string password, string hashedPassword)
@@ -74,16 +63,20 @@ namespace Telerik_ForumTeamProject.Helpers
             var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["Jwt:Key"]));
             var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
 
-            var claims = new[]
+            var claims = new List<Claim>
             {
                 new Claim(ClaimTypes.NameIdentifier, user.UserName),
                 new Claim(ClaimTypes.Email, user.Email),
                 new Claim(ClaimTypes.GivenName, user.FirstName),
                 new Claim(ClaimTypes.Surname, user.LastName),
-                new Claim(ClaimTypes.Hash, user.Password),
-                new Claim(ClaimTypes.Uri, user.ProfilePictureUrl),
                 new Claim("isAdmin", user.IsAdmin.ToString())
             };
+
+            if (!string.IsNullOrEmpty(user.ProfilePictureUrl))
+            {
+                claims.Add(new Claim(ClaimTypes.Uri, user.ProfilePictureUrl));
+            }
+
 
             var token = new JwtSecurityToken(
                 configuration["Jwt:Issuer"], configuration["Jwt:Audience"],

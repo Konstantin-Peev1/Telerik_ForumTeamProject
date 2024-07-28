@@ -23,10 +23,15 @@ namespace Telerik_ForumTeamProject.Controllers.MVC
             {
                 var userClaims = identity.Claims;
                 var userName = userClaims.FirstOrDefault(o => o.Type == ClaimTypes.NameIdentifier)?.Value;
-                var password = userClaims.First(o => o.Type == ClaimTypes.Hash)?.Value;
-                string credentials = $"{userName}:{password}";
-                return authManager.TryGetUser(credentials);
+
+                if (string.IsNullOrEmpty(userName))
+                {
+                    throw new EntityNotFoundException("No such user");
+                }
+
+                return authManager.TryGetUserByUserName(userName);
             }
+
             throw new EntityNotFoundException("No such user");
         }
     }
