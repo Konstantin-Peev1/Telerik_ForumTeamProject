@@ -39,6 +39,7 @@ namespace Telerik_ForumTeamProject.Repositories
         public Post CreatePost(Post post)
         {
             this.applicationContext.Add(post);
+            post.Tags = new List<Tag>();
             this.applicationContext.SaveChanges();
             return post;
         }

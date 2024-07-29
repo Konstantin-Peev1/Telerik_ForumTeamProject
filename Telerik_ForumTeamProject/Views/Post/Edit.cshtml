@@ -1,7 +1,6 @@
 ﻿@model Telerik_ForumTeamProject.Models.RequestDTO.PostRequestDTO
 @addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
 
-
 @{
     ViewData["Title"] = "Edit Post";
     Layout = "_Layout";
@@ -11,6 +10,7 @@
     <h2 class="text-3xl font-bold tracking-tight text-white sm:text-4xl">Edit Post</h2>
 
     <form asp-action="Edit" method="post" class="mt-6">
+        <input type="hidden" name="id" value="@ViewData["PostId"]" />
         <div class="form-group mb-4">
             <label asp-for="Title" class="block text-sm font-medium text-white"></label>
             <input asp-for="Title" class="form-control bg-gray-800 text-white p-2 rounded-lg w-full" />
@@ -21,11 +21,58 @@
             <textarea asp-for="Content" class="form-control bg-gray-800 text-white p-2 rounded-lg w-full" rows="5"></textarea>
             <span asp-validation-for="Content" class="text-danger"></span>
         </div>
-        <!-- Add tag input fields if necessary -->
-        
-        <button type="submit" class="bg-green-500 text-white px-6 py-2 rounded-lg hover:bg-green-700 transition duration-300">Save</button>
+        <div class="mb-4">
+            <label for="TagDescriptions" class="block text-white font-bold mb-2">Tags (optional)</label>
+            <input type="text" asp-for="TagDescriptions" class="form-control bg-gray-800 text-white p-2 rounded-lg w-full" placeholder="Enter tags separated by commas" value="" />
+        </div>
+        <div class="mt-6">
+            <button type="submit" class="bg-green-500 text-white px-6 py-2 rounded-lg hover:bg-green-700 transition duration-300">Save</button>
+        </div>
     </form>
+
+    <div class="mb-4 mt-6">
+        <label class="block text-white font-bold mb-2">Existing Tags</label>
+        <ul id="tagList" class="list-disc list-inside text-white">
+            @if (Model.TagDescriptions != null)
+            {
+                var tags = Model.TagDescriptions;
+                foreach (var tag in tags)
+                {
+                    <li>
+                        @tag
+                        <form method="post" asp-action="DeleteTag" asp-controller="Post" class="inline">
+                            <input type="hidden" name="postId" value="@ViewData["PostId"]" />
+                            <input type="hidden" name="tagDescription" value="@tag" />
+                            <button type="submit" class="bg-red-500 text-white px-2 py-1 rounded-lg ml-2">Remove</button>
+                        </form>
+                    </li>
+                }
+            }
+        </ul>
+    </div>
 </div>
 
-<script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
-<script src="~/lib/jquery-validation-unobtrusive/dist/jquery.validate.unobtrusive.min.js"></script>
+@section Scripts {
+    <script>
+        function deleteTag(postId, tagDescription) {
+            var form = document.createElement('form');
+            form.method = 'post';
+            form.action = '/Post/DeleteTag';
+
+            var postIdInput = document.createElement('input');
+            postIdInput.type = 'hidden';
+            postIdInput.name = 'postId';
+            postIdInput.value = postId;
+            form.appendChild(postIdInput);
+
+            var tagDescriptionInput = document.createElement('input');
+            tagDescriptionInput.type = 'hidden';
+            tagDescriptionInput.name = 'tagDescription';
+            tagDescriptionInput.value = tagDescription;
+            form.appendChild(tagDescriptionInput);
+
+            document.body.appendChild(form);
+            form.submit();
+        }
+    </script>
+}

@@ -20,15 +20,17 @@ namespace Telerik_ForumTeamProject.Controllers.MVC
         private readonly IPostService _postService;
         private readonly ICommentService _commentService;
         private readonly ModelMapper _modelMapper;
-        private readonly AuthManager _authManager;
+        
         private readonly ILikeService _likeService;
+        private readonly ITagService _tagService;
 
-        public PostController(IPostService postService, ICommentService commentService, ModelMapper modelMapper, AuthManager authManager, ILikeService likeService) : base(authManager)
+        public PostController(IPostService postService, ICommentService commentService, ITagService tagService, ModelMapper modelMapper, AuthManager authManager, ILikeService likeService) : base(authManager)
         {
             _postService = postService;
             _commentService = commentService;
             _modelMapper = modelMapper;
             _likeService = likeService;
+            _tagService = tagService;
         }
 
         [HttpPost]
@@ -152,19 +154,31 @@ namespace Telerik_ForumTeamProject.Controllers.MVC
             return View(postModel);
         }
 
-        [HttpPost]
+       
 
+        [HttpPost]
         public IActionResult Create(PostRequestDTO model)
         {
             if (ModelState.IsValid)
             {
                 var user = GetCurrentUser();
 
-
                 try
                 {
                     var post = _modelMapper.Map(model);
                     _postService.CreatePost(post, user);
+
+                    // Add tags if provided
+                    if (model.TagDescriptions != null && model.TagDescriptions[0] != null)
+                    {
+                        var tags = model.TagDescriptions.First().Split(',').Select(t => t.Trim()).Where(t => !string.IsNullOrWhiteSpace(t)).ToList();
+                        
+                        foreach (var tag in tags)
+                        {
+                            _tagService.UpdateTags(user, post, tag);
+                        }
+                    }
+
                     return RedirectToAction("Index", "Post");
                 }
                 catch (AuthorisationExcpetion ex)
@@ -173,11 +187,9 @@ namespace Telerik_ForumTeamProject.Controllers.MVC
                 }
             }
 
-
-
-
             return View(model);
         }
+
 
         [HttpGet]
         public IActionResult Edit(int id)
@@ -192,9 +204,10 @@ namespace Telerik_ForumTeamProject.Controllers.MVC
             {
                 Title = post.Title,
                 Content = post.Content,
-
+                TagDescriptions = post.Tags.Select(tag => tag.Description).ToList()
             };
 
+            ViewData["PostId"] = id;
             return View(model);
         }
 
@@ -204,13 +217,42 @@ namespace Telerik_ForumTeamProject.Controllers.MVC
             if (ModelState.IsValid)
             {
                 User user = GetCurrentUser();
-                Post post = _modelMapper.Map(model);
-                Post updatedPost = _postService.UpdatePost(id, post, user);
+                var post = _modelMapper.Map(model);
+                try
+                {
+                    if(model.TagDescriptions[0] != null)
+                    {
+                        var newTags = model.TagDescriptions?.First().Split(',').Select(t => t.Trim()).Where(t => !string.IsNullOrWhiteSpace(t)).ToList() ?? new List<string>();
+                        foreach (string tag in newTags)
+                        {
+                            _tagService.UpdateTags(user, _postService.GetPost(id), tag);
+                        }
+                    }
+                   
+                }
+                catch(AuthorisationExcpetion ex)
+                {
+                    ModelState.AddModelError(string.Empty, ex.Message);
+                }
+               
+
+                _postService.UpdatePost(id, post, user);
 
                 return RedirectToAction("Index");
             }
 
             return View(model);
+        }
+
+        [HttpPost]
+        public IActionResult DeleteTag(int postId, string tagDescription)
+        {
+            var user = GetCurrentUser();
+            var post = _postService.GetPost(postId);      
+            _tagService.RemoveTags(user, post, tagDescription);
+            
+
+            return RedirectToAction("Edit", new { id = postId });
         }
 
         [HttpPost]

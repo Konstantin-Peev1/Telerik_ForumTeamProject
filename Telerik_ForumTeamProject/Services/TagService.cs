@@ -52,6 +52,12 @@ namespace Telerik_ForumTeamProject.Services
             {
                 throw new AuthorisationExcpetion("You can't edit tags of other users");
             }
+            if(post.Tags.Count > 2)
+            {
+               
+                   throw new AuthorisationExcpetion("No more than two tags!");
+                
+            }
             if(tagRepository.TagExists(desc) 
                 && !post.Tags.Any(tagToChecl => tagToChecl.Description == desc))
             {
