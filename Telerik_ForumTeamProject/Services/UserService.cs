@@ -85,7 +85,7 @@ namespace Telerik_ForumTeamProject.Services
         }
         public bool UserExistsEmail(string email)
         {
-            return this.userRepository.UserExists(email);
+            return this.userRepository.UserExistsEmail(email);
 
         }
 

@@ -58,24 +58,27 @@ namespace Telerik_ForumTeamProject.Repositories
 
         public bool UserExists(string username)
         {
-            return this.applicationConetxt.Users.Any(user => user.UserName == username);
+            return GetUser().Any(user => user.UserName == username);
         }
         public bool UserExistsEmail(string email)
         {
-            return this.applicationConetxt.Users.Any(user => user.Email == email);
+            return GetUser().Any(user => user.Email == email);
 
         }
 
         public User GetUserByID(int id)
         {
-            return this.applicationConetxt.Users.FirstOrDefault(u => u.ID == id) ?? throw new EntityNotFoundException("No such user");
+            return GetUser().FirstOrDefault(u => u.ID == id) ?? throw new EntityNotFoundException("No such user");
         }
 
-        private IQueryable<User> GetUser()
+        public IList<User> GetUser()
         {
-            return this.applicationConetxt.Users.Include(u => u.ChatRooms);
+            return this.applicationConetxt.Users
+                .Include(x => x.Posts)
+                .Include(x => x.Comments)
+                .Include(x => x.ChatRooms)
+                .ToList();
                 
-
         }
 
         public IQueryable<User> SearchUsers(string searchTerm)
@@ -107,5 +110,7 @@ namespace Telerik_ForumTeamProject.Repositories
             this.applicationConetxt.SaveChanges();
             return user;
         }
+
+      
     }
 }

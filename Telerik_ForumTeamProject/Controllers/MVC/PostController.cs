@@ -96,6 +96,7 @@ namespace Telerik_ForumTeamProject.Controllers.MVC
         [HttpGet]
         public IActionResult GetPost(int id, int? commentId = null)
         {
+            User currentUser = GetCurrentUser();
             var post = _postService.GetPost(id);
             var comments = _commentService.GetAllPostComments(id);
 
@@ -118,6 +119,8 @@ namespace Telerik_ForumTeamProject.Controllers.MVC
                 UserName = post.User.UserName,
                 userProfilePictureURL = post.User.ProfilePictureUrl,
                 Tags = post.Tags?.Select(tag => tag.Description).ToList() ?? new List<string>(),
+                IsCreator = post.UserID == currentUser.ID,
+                IsAdmin = currentUser.IsAdmin,
                 Replies = null
             };
 
