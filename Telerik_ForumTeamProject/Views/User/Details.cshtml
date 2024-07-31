@@ -10,38 +10,47 @@
 
 <div class="container mx-auto p-6 mt-6 bg-gray-700 shadow-md rounded-lg">
     <div class="bg-gray-800 p-6 rounded-lg shadow-md">
-        <img src="@Model.ProfilePictureUrl" class="w-32 h-32 rounded-full shadow-md" alt="Profile Picture" />
+        <img src="@Model.ProfilePictureUrl" class="w-32 h-32 rounded-full shadow-md bg-white" alt="Profile Picture" />
         <h2 class="text-3xl font-bold text-white mb-4">@Model.UserName</h2>
         <p class="text-gray-300 mb-4">First Name: @Model.FirstName</p>
         <p class="text-gray-300 mb-4">Last Name: @Model.LastName</p>
         <p class="text-gray-300 mb-4">Role: @Model.Role</p>
-        @*         @{
-        foreach (var post in Model.Posts)
+
+        <h3 class="text-2xl font-bold text-white mt-6">Posts (@Model.Posts.Count())</h3>
+        @foreach (var post in Model.Posts)
         {
-        <div class="container mx-auto p-6 mt-6 bg-gray-700 shadow-md rounded-lg">
-        <div class="bg-gray-800 p-6 rounded-lg shadow-md">
-        <h2 class="text-3xl font-bold text-white mb-4">@post.Title</h2>
-        <p class="text-gray-300 mb-4">@post.Content</p>
-        <p class="text-gray-500 mb-4">Posted on: @post.Created</p>
-        <p class="text-gray-500 mb-4">Likes: @post.Likes</p>
-        <p class="text-gray-500 mb-4">Creator: @Model.UserName</p>
-        <p class="text-gray-500 mb-4">Tags: @string.Join(", ", post.Tags)</p>
-        </div>
-        </div>
-
+            <div class="mt-4 bg-gray-700 p-6 rounded-lg shadow-md">
+                <div class="bg-gray-800 p-6 rounded-lg shadow-md">
+                    <h2 class="text-3xl font-bold text-white mb-4">
+                        <a href="@Url.Action("GetPost", "Post", new { id = post.Id })" class="text-gray-300 no-underline hover:underline">@post.Title</a>
+                    </h2>
+                    <p class="text-gray-300 mb-4">@post.Content</p>
+                    <p class="text-gray-500 mb-4">Posted on: @post.Created</p>
+                </div>
+            </div>
         }
-        } *@
-        <p class="text-gray-300 mb-4">Comments: @Model.Comments</p>
-        @{
-            if (loggedInUser == Model.UserName)
-            {
 
-                <form asp-action="UpdateProfilePicture" method="post" enctype="multipart/form-data" class="mt-4">
-                    <label for="profilePicture" class="block text-sm font-medium text-gray-300">Upload new profile picture</label>
-                    <input type="file" name="profilePicture" class="mt-2 p-2 rounded bg-gray-600 text-gray-100" />
-                    <button type="submit" class="bg-green-500 text-white p-2 mt-2 rounded hover:bg-green-700 transition duration-300">Update profile picture</button>
-                </form>
-            }
+        <h3 class="text-2xl font-bold text-white mt-6">Comments (@Model.Comments.Count())</h3>
+        @foreach (var comment in Model.Comments)
+        {
+            <div class="mt-4 bg-gray-700 p-6 rounded-lg shadow-md">
+                <div class="bg-gray-800 p-6 rounded-lg shadow-md">
+                    <h2 class="text-3xl font-bold text-white mb-4">
+                        <a href="@Url.Action("GetPost", "Post", new { id = comment.PostID })" class="text-gray-300 no-underline hover:underline">@comment.Post.Title</a>
+                    </h2>
+                    <p class="text-gray-300 mb-4">@comment.Content</p>
+                    <p class="text-gray-500 mb-4">Commented on: @comment.Created</p>
+                </div>
+            </div>
+        }
+
+        @if (loggedInUser == Model.UserName)
+        {
+            <form asp-action="UpdateProfilePicture" method="post" enctype="multipart/form-data" class="mt-4">
+                <label for="profilePicture" class="block text-sm font-medium text-gray-300">Upload new profile picture</label>
+                <input type="file" name="profilePicture" class="mt-2 p-2 rounded bg-gray-600 text-gray-100" />
+                <button type="submit" class="bg-green-500 text-white p-2 mt-2 rounded hover:bg-green-700 transition duration-300">Update profile picture</button>
+            </form>
         }
     </div>
 </div>
