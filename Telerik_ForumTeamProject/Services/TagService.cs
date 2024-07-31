@@ -40,7 +40,7 @@ namespace Telerik_ForumTeamProject.Services
 
             if (post.Tags.Any(tagPost => desc == tagPost.Description))
             {
-                post.Tags.Remove(tag);
+               
                 tag.Posts.Remove(post);
             }
             return this.tagRepository.RemoveTags(post, tag);
@@ -52,7 +52,7 @@ namespace Telerik_ForumTeamProject.Services
             {
                 throw new AuthorisationExcpetion("You can't edit tags of other users");
             }
-            if(post.Tags.Count > 2)
+            if(post.Tags.Count >= 2)
             {
                
                    throw new AuthorisationExcpetion("No more than two tags!");

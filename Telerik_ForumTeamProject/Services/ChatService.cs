@@ -52,7 +52,8 @@ namespace Telerik_ForumTeamProject.Services
             {
                 UserId = user.ID,
                 Name = name,
-                Messages = new List<ChatMessage>()
+                Messages = new List<ChatMessage>(),
+                Created = DateTime.UtcNow,
             };
 
             _chatRepository.AddChatRoom(chatRoom);
@@ -64,7 +65,7 @@ namespace Telerik_ForumTeamProject.Services
             {
                 if (chatRoom.UserId == user.ID || user.IsAdmin)
                 {
-                    if ((DateTime.UtcNow - chatRoom.Created).TotalHours > 24)
+                    if ((DateTime.UtcNow - chatRoom.Created).TotalHours <= 24)
                     {
                         _chatRepository.DeleteChatRoom(chatRoom);
                     }
