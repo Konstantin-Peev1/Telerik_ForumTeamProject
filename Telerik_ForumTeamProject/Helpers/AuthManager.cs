@@ -22,7 +22,7 @@ namespace Telerik_ForumTeamProject.Helpers
             this.userRepository = userRepository;
         }
 
-        public User Authenticate(string username, string password)
+        public virtual User Authenticate(string username, string password)
         {
             var user = userRepository.GetByInformationUsername(username);
 
@@ -35,7 +35,7 @@ namespace Telerik_ForumTeamProject.Helpers
             return user;
         }
 
-        public User TryGetUserByUserName(string userName)
+        public virtual User TryGetUserByUserName(string userName)
         {
             
             var user = userRepository.GetByInformationUsername(userName);
@@ -48,17 +48,17 @@ namespace Telerik_ForumTeamProject.Helpers
             return user;
         }
 
-        public bool VerifyPassword(string password, string hashedPassword)
+        public virtual bool VerifyPassword(string password, string hashedPassword)
         {
             return BCrypt.Net.BCrypt.Verify(password, hashedPassword);
         }
 
-        public string HashPassword(string password)
+        public virtual string HashPassword(string password)
         {
             return BCrypt.Net.BCrypt.HashPassword(password);
         }
 
-        public string Generate(User user)
+        public virtual string Generate(User user)
         {
             var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["Jwt:Key"]));
             var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
