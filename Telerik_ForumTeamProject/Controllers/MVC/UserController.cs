@@ -251,6 +251,76 @@ namespace Telerik_ForumTeamProject.Controllers.MVC
             }
         }
 
+        public IActionResult BlockUser(string username)
+        {
+            User user = userService.GetByInformationUsername(username);
+
+            var result = userService.BlockUser(user);
+
+            if (result != null)
+            {
+                TempData["Success"] = "User has been blocked successfully.";
+            }
+            else
+            {
+                TempData["Error"] = "Failed to block the user.";
+            }
+
+            return RedirectToAction("Details", new { username = user.UserName });
+        }
+        public IActionResult UnBlockUser(string username)
+        {
+            User user = userService.GetByInformationUsername(username);
+
+            var result = userService.UnBlockUser(user);
+
+            if (result != null)
+            {
+                TempData["Success"] = "User has been unblocked successfully.";
+            }
+            else
+            {
+                TempData["Error"] = "Failed to unblock the user.";
+            }
+
+            return RedirectToAction("Details", new { username = user.UserName });
+        } 
+        public IActionResult MakeAdmin(string username)
+        {
+            User user = userService.GetByInformationUsername(username);
+
+            var result = userService.MakeAdmin(user);
+
+            if (result != null)
+            {
+                TempData["Success"] = "User been promoted to admin successfully.";
+            }
+            else
+            {
+                TempData["Error"] = "Failed to promote the user.";
+            }
+
+            return RedirectToAction("Details", new { username = user.UserName });
+        }
+
+        public IActionResult DemoteAdmin(string username)
+        {
+            User user = userService.GetByInformationUsername(username);
+
+            var result = userService.MakeUser(user);
+
+            if (result != null)
+            {
+                TempData["Success"] = "Admin been demoted to user successfully.";
+            }
+            else
+            {
+                TempData["Error"] = "Failed to demote the admin.";
+            }
+
+            return RedirectToAction("Details", new { username = user.UserName });
+        }
+
         private string GenerateSessionId()
         {
             using (var rng = new RNGCryptoServiceProvider())

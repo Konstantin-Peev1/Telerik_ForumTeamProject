@@ -246,5 +246,16 @@ namespace Telerik_ForumTeamProject.Controllers
             //trycatch later -> think of where to put them 
         }
 
+        [HttpPost("makeUser")]
+        [Authorize(Policy = "AdminPolicy")]
+        public IActionResult MakeUser([FromQuery] string userName)
+        {
+            User user = GetCurrentUser();
+            var userInfo = this.userService.GetByInformation(userName);
+            var newUser = this.userService.MakeAdmin(userInfo);
+            var newUserToDisplay = modelMapper.Map(newUser);
+            return this.Ok(newUserToDisplay);
+        }
+
     }
 }

@@ -13,6 +13,7 @@ namespace Telerik_ForumTeamProject.Services.Contracts
         User BlockUser(User user);
         User UnBlockUser(User user);
         User MakeAdmin(User user);
+        User MakeUser(User user);
         bool UserExists(string username);
         bool UserExistsEmail(string username);
         IEnumerable<User> SearchUsers(string searchTerm);

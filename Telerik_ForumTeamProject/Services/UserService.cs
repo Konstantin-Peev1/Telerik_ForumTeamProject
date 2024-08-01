@@ -120,5 +120,9 @@ namespace Telerik_ForumTeamProject.Services
             return this.userRepository.MakeAdmin(user);
         }
 
+        public User MakeUser(User user)
+        {
+            return this.userRepository.MakeUser(user);
+        }
     }
 }

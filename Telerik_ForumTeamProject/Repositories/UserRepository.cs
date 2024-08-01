@@ -111,6 +111,14 @@ namespace Telerik_ForumTeamProject.Repositories
             return user;
         }
 
+        public User MakeUser(User user)
+        {
+            user.IsAdmin = false;
+            user.Role = "User";
+            this.applicationConetxt.SaveChanges();
+            return user;
+        }
+
         public User UnBlockUser(User user)
         {
             user.IsBlocked = false;
