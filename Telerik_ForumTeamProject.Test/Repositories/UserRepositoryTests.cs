@@ -56,6 +56,17 @@ namespace Telerik_ForumTeamProject.Tests.Repositories
         }
 
         [TestMethod]
+        public void GetByInformationUserName_ShouldReturnUser_WhenInformationIsValid()
+        {
+            // Act
+            var user = _userRepository.GetByInformationUsername("testuser1");
+
+            // Assert
+            Assert.IsNotNull(user);
+            Assert.AreEqual("testuser1", user.UserName);
+        }
+
+        [TestMethod]
         [ExpectedException(typeof(EntityNotFoundException))]
         public void GetByInformation_ShouldThrowException_WhenInformationIsInvalid()
         {
