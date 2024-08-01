@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Telerik_ForumTeamProject.Exceptions;
 using Telerik_ForumTeamProject.Helpers;
 using Telerik_ForumTeamProject.Models.Entities;
 using Telerik_ForumTeamProject.Models.ResponseDTO;
@@ -30,10 +31,23 @@ namespace Telerik_ForumTeamProject.Controllers
         [Authorize]
         public IActionResult AddRemoveLike(int id)
         {
-            User user = GetCurrentUser();
-            Like like = this.likeService.Create(id, user);
-            LikeResponseDTO likeToReturn = mapper.Map(like);
-            return Ok(likeToReturn);
+            try
+            {
+                User user = GetCurrentUser();
+                Like like = this.likeService.Create(id, user);
+                LikeResponseDTO likeToReturn = mapper.Map(like);
+                return Ok(likeToReturn);
+            }
+            catch (DuplicateEntityException ex) 
+            
+            {
+                return Conflict(ex);
+            }
+            catch(AuthorisationExcpetion ex)
+            {
+                return Unauthorized(ex);
+            }
+            
         }
        
     }

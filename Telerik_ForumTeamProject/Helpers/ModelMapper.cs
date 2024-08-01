@@ -10,7 +10,7 @@ namespace Telerik_ForumTeamProject.Helpers
 {
     public class ModelMapper
     {
-        public UserResponseDTO Map(User user)
+        public virtual UserResponseDTO Map(User user)
         {
             UserResponseDTO response = new UserResponseDTO()
             {
@@ -22,7 +22,7 @@ namespace Telerik_ForumTeamProject.Helpers
             return response;
         }
 
-        public User Map(UserRequestDTO userRequest)
+        public virtual User Map(UserRequestDTO userRequest)
         {
             User request = new User()
             {
@@ -36,7 +36,7 @@ namespace Telerik_ForumTeamProject.Helpers
             return request;
         }
 
-        public LikeResponseDTO Map(Like like)
+        public virtual LikeResponseDTO Map(Like like)
         {
             LikeResponseDTO response = new LikeResponseDTO()
             {
@@ -45,7 +45,7 @@ namespace Telerik_ForumTeamProject.Helpers
             return response;
         }
 
-        public Post Map(PostRequestDTO postRequestDTO)
+        public virtual Post Map(PostRequestDTO postRequestDTO)
         {
             Post request = new Post()
             {
@@ -56,7 +56,7 @@ namespace Telerik_ForumTeamProject.Helpers
             return request;
         }
 
-        public PostUploadResponseDTO Map(Post post)
+        public virtual PostUploadResponseDTO Map(Post post)
         {
             PostUploadResponseDTO postResponse = new PostUploadResponseDTO();
 
@@ -71,7 +71,7 @@ namespace Telerik_ForumTeamProject.Helpers
             return postResponse;
         }
 
-            public TagResponseDTO Map(Tag tag)
+            public virtual TagResponseDTO Map(Tag tag)
         {
             TagResponseDTO response = new TagResponseDTO()
             {
@@ -81,7 +81,7 @@ namespace Telerik_ForumTeamProject.Helpers
             return response;
         }
 
-        public List<CommentReplyResponseDTO> Map(ICollection<Comment> comments)
+        public virtual List<CommentReplyResponseDTO> Map(ICollection<Comment> comments)
         {
             return comments?.Where(c => c.ParentCommentID == null)
                             .Select(c => new CommentReplyResponseDTO
@@ -94,7 +94,7 @@ namespace Telerik_ForumTeamProject.Helpers
                             .ToList() ?? new List<CommentReplyResponseDTO>();
         }
 
-        public List<ReplyResponseDTO> MapReplyResponse(ICollection<Comment> reply)
+        public virtual List<ReplyResponseDTO> MapReplyResponse(ICollection<Comment> reply)
         {
             return reply?.Select(c => new ReplyResponseDTO 
             {
@@ -104,7 +104,7 @@ namespace Telerik_ForumTeamProject.Helpers
             }).ToList() ?? new List<ReplyResponseDTO>();
         }
 
-        public Comment Map(CommentRequestDTO comment, int postId = 0, int commentId = 0)
+        public virtual Comment Map(CommentRequestDTO comment, int postId = 0, int commentId = 0)
         {
             // Map for Creating a new comment
             if (postId != 0 && commentId == 0) 
@@ -137,7 +137,7 @@ namespace Telerik_ForumTeamProject.Helpers
             }
         }
 
-        public CommentReplyResponseDTO Map(Comment comment)
+        public virtual CommentReplyResponseDTO Map(Comment comment)
         {
             return new CommentReplyResponseDTO
             {
@@ -147,7 +147,7 @@ namespace Telerik_ForumTeamProject.Helpers
             };
         }
 
-        public List<PostResponseDTO> Map(ICollection<Post> posts)
+        public virtual List<PostResponseDTO> Map(ICollection<Post> posts)
         {
             List<PostResponseDTO> response;
             response = posts.Count != 0 ? posts

@@ -43,10 +43,18 @@ namespace Telerik_ForumTeamProject.Controllers
         [Authorize(Policy = "AdminPolicy")]
         public IActionResult Get([FromQuery] string information)
         {
-            User user = GetCurrentUser();
-            var userInfo = this.userService.GetByInformation(information);
-            var userToDisplay = modelMapper.Map(userInfo);
-            return this.Ok(userToDisplay);
+            try
+            {
+                User user = GetCurrentUser();
+                var userInfo = this.userService.GetByInformation(information);
+                var userToDisplay = modelMapper.Map(userInfo);
+                return this.Ok(userToDisplay);
+            }
+            catch(EntityNotFoundException ex)
+            {
+                return this.NotFound(ex);
+            }
+           
              //trycatch later -> think of where to put them 
         }
 
