@@ -71,7 +71,7 @@ namespace Telerik_ForumTeamProject.Helpers
             return postResponse;
         }
 
-            public TagResponseDTO Map(Tag tag)
+            public virtual TagResponseDTO Map(Tag tag)
         {
             TagResponseDTO response = new TagResponseDTO()
             {
