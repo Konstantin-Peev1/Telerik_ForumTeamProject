@@ -18,6 +18,13 @@
     <div class="bg-gray-800 p-6 rounded-lg shadow-md w-full max-w-md">
         <h2 class="text-3xl font-bold text-center text-green-500 mb-4">Login</h2>
 
+        @if (!ViewData.ModelState.IsValid)
+        {
+            <div class="bg-red-600 text-white p-4 rounded-lg mb-4">
+                @Html.ValidationSummary(true, "", new { @class = "text-white" })
+            </div>
+        }
+
         <form id="loginForm" method="post" class="space-y-4">
             @Html.AntiForgeryToken()
             <div class="form-group">

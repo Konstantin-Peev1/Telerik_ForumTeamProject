@@ -15,6 +15,7 @@ using Telerik_ForumTeamProject.Models.ViewModels;
 using System.Linq;
 using System.Security.Claims;
 using static System.Net.WebRequestMethods;
+using Telerik_ForumTeamProject.Models.Entities;
 
 namespace Telerik_ForumTeamProject.Controllers.MVC
 {
@@ -61,11 +62,11 @@ namespace Telerik_ForumTeamProject.Controllers.MVC
             try
             {
                 var user = authManager.Authenticate(loginRequest.UserName, loginRequest.Password);
-                if (user == null)
+/*                if (user == null)
                 {
                     ModelState.AddModelError(string.Empty, "Invalid login attempt.");
                     return View(loginRequest);
-                }
+                }*/
 
                 var token = authManager.Generate(user);
                 var sessionId = GenerateSessionId();
@@ -165,20 +166,39 @@ namespace Telerik_ForumTeamProject.Controllers.MVC
         [HttpGet]
         public IActionResult Search(string query)
         {
-            var users = userService.SearchUsers(query);
             var model = new UserSearchViewModel
             {
                 Query = query,
-                Users = users.ToList(),
+                Users = new List<User>() // Initialize with an empty list
             };
-            return PartialView(model);
+
+            try
+            {
+                var users = userService.SearchUsers(query);
+                model.Users = users.ToList();
+            }
+            catch (EntityNotFoundException ex)
+            {
+                TempData["ErrorMessage"] = ex.Message;
+            }
+
+            return View(model); // Ensure you return the View, not Redirect
         }
 
         [HttpGet]
         public IActionResult Details([FromQuery]string username)
         {
-            var user = userService.GetByInformationUsername(username);
-            return View(user);
+            try
+            {
+                var user = userService.GetByInformationUsername(username);
+                return View(user);
+            } 
+            catch (EntityNotFoundException ex)
+            {
+                Response.StatusCode = StatusCodes.Status404NotFound;
+                ViewData["ErrorMessage"] = ex.Message;
+                return View("Error");
+            }
         }
 
         [HttpPost]
@@ -203,8 +223,6 @@ namespace Telerik_ForumTeamProject.Controllers.MVC
             // Upload image to Cloudinary
             var uploadResult = await this.cloudinaryService.UploadImageAsync(profilePicture);
 
-            //var uploadResult = "https://res.cloudinary.com/dpfnd2zns/image/upload/v1722120515/qhpqteatf2vsx3ny6aze.jpg";
-
             if (uploadResult == null)
             {
                 TempData["Error"] = "Error uploading image.";
@@ -214,7 +232,6 @@ namespace Telerik_ForumTeamProject.Controllers.MVC
             try
             {
                 // Get the user ID from the authenticated user
-                //var user = userService.GetByInformationUsername(User.FindFirst(ClaimTypes.NameIdentifier).Value);
                 int userId = user.ID;
                 // Update user's profile picture URL uploadResult.Url
                 var updatedUser = this.userService.UpdateProfilePicture(userId, uploadResult.Url);

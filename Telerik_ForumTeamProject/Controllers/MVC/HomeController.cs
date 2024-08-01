@@ -51,5 +51,9 @@ namespace Telerik_ForumTeamProject.Controllers.MVC
 
             return View(model);
         }
+        public IActionResult Error()
+        {
+            return View();
+        }
     }
 }

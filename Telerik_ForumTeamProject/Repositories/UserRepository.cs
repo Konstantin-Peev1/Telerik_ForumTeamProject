@@ -84,9 +84,16 @@ namespace Telerik_ForumTeamProject.Repositories
         public IQueryable<User> SearchUsers(string searchTerm)
         {
 
-            return applicationConetxt.Users
+            var users = applicationConetxt.Users
                 .Where(u => u.UserName.Contains(searchTerm) || u.Email.Contains(searchTerm));
-                
+
+            if (!users.Any())
+            {
+                throw new EntityNotFoundException($"No user with '{searchTerm}' has been found!");
+            }
+
+            return users;
+
         }
 
         public User BlockUser(User user)
