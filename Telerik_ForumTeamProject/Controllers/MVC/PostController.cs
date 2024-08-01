@@ -113,7 +113,8 @@ namespace Telerik_ForumTeamProject.Controllers.MVC
                     Content = comment?.Content ?? "No content",
                     UserName = comment.User.UserName,
                     Created = DateTimeFormatter.FormatToStandard(comment.Created),
-                    Replies = new List<CommentReplyResponseDTO>()
+                    Replies = new List<CommentReplyResponseDTO>(),
+                    RepliesCount = comment.Replies?.Count ?? 0,
 
                 }).ToList() ?? new List<CommentReplyResponseDTO>(),
                 UserName = post.User.UserName,
@@ -289,6 +290,25 @@ namespace Telerik_ForumTeamProject.Controllers.MVC
             _commentService.CreateComment(comment, user);
 
             return RedirectToAction("GetPost", new { id = postId });
+        }
+
+        public IActionResult AddReply (int postId, int parentCommentId, CommentRequestDTO replyRequest)
+        {
+            var comment = _commentService.GetComment(parentCommentId);
+            if (replyRequest == null || string.IsNullOrWhiteSpace(replyRequest.Content))
+            {
+                TempData["ReplyError"] = "Reply cannot be empty";
+                return RedirectToAction("GetPost", new { id = comment.PostID });
+            }
+
+            User user = GetCurrentUser();
+            Comment reply = _modelMapper.Map(replyRequest);
+            Comment replyToCreate = _commentService.CreateReply(reply, parentCommentId, user);
+            CommentReplyResponseDTO response = _modelMapper.Map(replyToCreate);
+
+            TempData["ReplySuccess"] = "Reply added successfully";
+            return RedirectToAction("GetPost", new { id = comment.PostID });
+
         }
 
     }

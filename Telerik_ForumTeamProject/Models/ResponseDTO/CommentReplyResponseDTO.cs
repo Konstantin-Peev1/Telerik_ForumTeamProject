@@ -9,5 +9,6 @@ namespace Telerik_ForumTeamProject.Models.ResponseDTO
         public string UserName {  get; set; }
         public string Created { get; set; }
         public List<CommentReplyResponseDTO> Replies { get; set; }
+        public int? RepliesCount { get; set; }
         }
 }
