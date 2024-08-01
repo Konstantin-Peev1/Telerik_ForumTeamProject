@@ -18,12 +18,12 @@ namespace Telerik_ForumTeamProject.Controllers.MVC
     public class ChatController : BaseControllerMVC
     {
         private readonly IChatService _chatService;
-        private readonly AuthManager _authManager;
+        
 
         public ChatController(IChatService chatService, AuthManager auth) :base(auth)
         {
             _chatService = chatService;
-         //   _authManager = auth;
+         
         }
 
         public IActionResult Index()
@@ -40,7 +40,7 @@ namespace Telerik_ForumTeamProject.Controllers.MVC
                 return NotFound();
             }
 
-            // Retrieve current user
+            
             User currentUser = GetCurrentUser();
 
             var viewModel = new ChatRoomViewModel

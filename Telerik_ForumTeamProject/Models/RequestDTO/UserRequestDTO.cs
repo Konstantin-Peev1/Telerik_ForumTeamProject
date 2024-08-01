@@ -14,9 +14,12 @@ namespace Telerik_ForumTeamProject.Models.RequestDTO
         public string FirstName { get; set; }
 
         [Required(AllowEmptyStrings = false, ErrorMessage = "The {0} field is required and must not be an empty string.")]
+        
         [MaxLength(32, ErrorMessage = "The {0} field must be less than {1} characters.")]
         [MinLength(4, ErrorMessage = "The {0} field must be at least {1} character.")]
         public string LastName { get; set; }
+
+        [EmailAddress]
         public string Email { get; set; }
         public string Password { get; set; }
     }
