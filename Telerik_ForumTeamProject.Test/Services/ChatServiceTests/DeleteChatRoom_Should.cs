@@ -36,7 +36,8 @@ namespace Telerik_ForumTeamProject.Test.Services.ChatServiceTests
             var chatRoom = _mockRepository.Object.GetChatRoom(chatRoomId);
             chatRoom.Created = DateTime.UtcNow.AddDays(-2); // Older than 24 hours
 
-            _sut.DeleteChatRoom(chatRoomId, user);
+            _sut.DeleteChatRoomIFOld();
+            
 
 
             Assert.ThrowsException<EntityNotFoundException>(() => _mockRepository.Object.GetChatRoom(chatRoomId)); ;

@@ -69,10 +69,7 @@ namespace Telerik_ForumTeamProject.Services
                     {
                         _chatRepository.DeleteChatRoom(chatRoom);
                     }
-                    else
-                    {
-                        
-                    }
+                    
                 }
                 else
                 {
