@@ -42,14 +42,14 @@
         @if (isAdmin)
         {
             <div class="mt-4">
-                @if (Model.IsBlocked)
+                @if (Model.IsBlocked && Model.UserName != loggedInUser)
                 {
                     <form asp-action="UnblockUser" method="post" class="inline-block mr-2">
                         <input type="hidden" name="username" value="@Model.UserName" />
                         <button type="submit" class="bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-700 transition duration-300">Unblock</button>
                     </form>
                 }
-                else
+                else if (!Model.IsBlocked && Model.UserName != loggedInUser)
                 {
                     <form asp-action="BlockUser" method="post" class="inline-block mr-2">
                         <input type="hidden" name="username" value="@Model.UserName" />
@@ -57,51 +57,69 @@
                     </form>
                 }
 
-                @if (Model.Role == "Admin")
+                @if (Model.Role == "Admin" && Model.UserName != loggedInUser)
                 {
                     <form asp-action="DemoteAdmin" method="post" class="inline-block">
                         <input type="hidden" name="username" value="@Model.UserName" />
-                        <button type="submit" class="bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-700 transition duration-300">Demote</button>
+                        <button type="submit" class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-700 transition duration-300">Demote</button>
                     </form>
                 }
-                else
+                else if (Model.Role != "Admin" && Model.UserName != loggedInUser)
                 {
                     <form asp-action="MakeAdmin" method="post" class="inline-block">
                         <input type="hidden" name="username" value="@Model.UserName" />
-                        <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-700 transition duration-300">Make Admin</button>
+                        <button type="submit" class="bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-700 transition duration-300">Make Admin</button>
                     </form>
                 }
             </div>
         }
 
+        <button class="bg-green-500 text-white p-2 mt-4 rounded hover:bg-green-700 transition duration-300" onclick="toggleSection('postsSection')">Toggle Posts</button>
+        <button class="bg-green-500 text-white p-2 mt-4 rounded hover:bg-green-700 transition duration-300" onclick="toggleSection('commentsSection')">Toggle Comments</button>
 
-        <h3 class="text-2xl font-bold text-white mt-6">Posts (@Model.Posts.Count())</h3>
-        @foreach (var post in Model.Posts)
-        {
-            <div class="mt-4 bg-gray-700 p-6 rounded-lg shadow-md">
-                <div class="bg-gray-800 p-6 rounded-lg shadow-md">
-                    <h2 class="text-3xl font-bold text-white mb-4">
-                        <a href="@Url.Action("GetPost", "Post", new { id = post.Id })" class="text-gray-300 no-underline hover:underline">@post.Title</a>
-                    </h2>
-                    <p class="text-gray-300 mb-4">@post.Content</p>
-                    <p class="text-gray-500 mb-4">Posted on: @post.Created</p>
+        <div id="postsSection" class="hidden">
+            <h3 class="text-2xl font-bold text-white mt-6">Posts (@Model.Posts.Count())</h3>
+            @foreach (var post in Model.Posts)
+            {
+                <div class="mt-4 bg-gray-700 p-6 rounded-lg shadow-md">
+                    <div class="bg-gray-800 p-6 rounded-lg shadow-md">
+                        <h2 class="text-3xl font-bold text-white mb-4">
+                            <a href="@Url.Action("GetPost", "Post", new { id = post.Id })" class="text-gray-300 no-underline hover:underline">@post.Title</a>
+                        </h2>
+                        <p class="text-gray-300 mb-4">@post.Content</p>
+                        <p class="text-gray-500 mb-4">Posted on: @post.Created</p>
+                    </div>
                 </div>
-            </div>
-        }
+            }
+        </div>
 
-        <h3 class="text-2xl font-bold text-white mt-6">Comments (@Model.Comments.Count())</h3>
-        @foreach (var comment in Model.Comments)
-        {
-            <div class="mt-4 bg-gray-700 p-6 rounded-lg shadow-md">
-                <div class="bg-gray-800 p-6 rounded-lg shadow-md">
-                    <h2 class="text-3xl font-bold text-white mb-4">
-                        <a href="@Url.Action("GetPost", "Post", new { id = comment.PostID })" class="text-gray-300 no-underline hover:underline">@comment.Post.Title</a>
-                    </h2>
-                    <p class="text-gray-300 mb-4">@comment.Content</p>
-                    <p class="text-gray-500 mb-4">Commented on: @comment.Created</p>
+        <div id="commentsSection" class="hidden">
+            <h3 class="text-2xl font-bold text-white mt-6">Comments (@Model.Comments.Count())</h3>
+            @foreach (var comment in Model.Comments)
+            {
+                <div class="mt-4 bg-gray-700 p-6 rounded-lg shadow-md">
+                    <div class="bg-gray-800 p-6 rounded-lg shadow-md">
+                        <h2 class="text-3xl font-bold text-white mb-4">
+                            <a href="@Url.Action("GetPost", "Post", new { id = comment.PostID })" class="text-gray-300 no-underline hover:underline">@comment.Post.Title</a>
+                        </h2>
+                        <p class="text-gray-300 mb-4">@comment.Content</p>
+                        <p class="text-gray-500 mb-4">Commented on: @comment.Created</p>
+                    </div>
                 </div>
-            </div>
-        }
-
+            }
+        </div>
     </div>
 </div>
+
+@section Scripts {
+    <script>
+        function toggleSection(sectionId) {
+            var section = document.getElementById(sectionId);
+            if (section.classList.contains('hidden')) {
+                section.classList.remove('hidden');
+            } else {
+                section.classList.add('hidden');
+            }
+        }
+    </script>
+}

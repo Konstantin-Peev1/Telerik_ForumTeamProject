@@ -71,7 +71,7 @@ namespace Telerik_ForumTeamProject.Services
                     }
                     else
                     {
-                        _chatRepository.DeleteChatRoomIfOld(chatRoomId);
+                        
                     }
                 }
                 else
@@ -81,5 +81,21 @@ namespace Telerik_ForumTeamProject.Services
             }
             
         }
+        public void DeleteChatRoomIFOld()
+        {
+            foreach (var chatRoom in GetActiveChats())
+            {
+               
+                if (chatRoom != null && (DateTime.UtcNow - chatRoom.Created).TotalHours > 24)
+                {
+                    _chatRepository.DeleteChatRoomIfOld(chatRoom.Id);
+                }
+                else
+                {
+                    break;
+                }
+            }
+        }
+            
     }
 }

@@ -29,6 +29,7 @@ namespace Telerik_ForumTeamProject.Controllers.MVC
         public IActionResult Index()
         {
             var activeChats = _chatService.GetActiveChats();
+            _chatService.DeleteChatRoomIFOld();
             return View(activeChats);
         }
 

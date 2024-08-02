@@ -87,7 +87,7 @@
                     <img src="@post.userProfilePictureURL" alt="" class="h-10 w-10 rounded-full bg-gray-50">
                     <div class="text-sm leading-6">
                         <p class="font-semibold text-white">
-                            <a href="#">
+                            <a href="@Url.Action("Details", "User", new { username = post.UserName })" class="text-green-500 hover:underline">
                                 <span class="absolute inset-0"></span>
                                 @post.UserName
                             </a>

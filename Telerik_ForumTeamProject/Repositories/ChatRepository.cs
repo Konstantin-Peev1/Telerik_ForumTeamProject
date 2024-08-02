@@ -49,12 +49,11 @@ namespace Telerik_ForumTeamProject.Repositories
         public void DeleteChatRoomIfOld(int chatRoomId)
         {
             var chatRoom = GetChatRoom(chatRoomId);
-            if (chatRoom != null && (DateTime.UtcNow - chatRoom.Created).TotalHours > 24)
-            {
+           
                 chatRoom.Creator.ChatRooms.Remove(chatRoom);
                 applicationContext.ChatRooms.Remove(chatRoom);
                 applicationContext.SaveChanges();
-            }
+            
         }
     }
 }
