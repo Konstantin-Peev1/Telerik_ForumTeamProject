@@ -16,6 +16,7 @@ using System.Linq;
 using System.Security.Claims;
 using static System.Net.WebRequestMethods;
 using Telerik_ForumTeamProject.Models.Entities;
+using Microsoft.EntityFrameworkCore;
 
 namespace Telerik_ForumTeamProject.Controllers.MVC
 {
@@ -320,6 +321,107 @@ namespace Telerik_ForumTeamProject.Controllers.MVC
 
             return RedirectToAction("Details", new { username = user.UserName });
         }
+
+
+        [HttpPost]
+        [Authorize]
+        [ValidateAntiForgeryToken]
+        public IActionResult Edit(EditUserViewModel model)
+        {
+            var username = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var user = userService.GetByInformationUsername(username);
+
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            try
+            {
+                var updatedUser = new User
+                {
+                    ID = user.ID,
+                    UserName = user.UserName,
+                    Password = user.Password,
+                    Email = user.Email,
+                    IsAdmin = user.IsAdmin,
+                    Role = user.Role,
+                    FirstName = model.FirstName,
+                    LastName = model.LastName,
+                    ProfilePictureUrl = user.ProfilePictureUrl // Preserve existing profile picture
+                };
+
+                userService.UpdateUser(user, updatedUser, user.ID);
+
+                TempData["Success"] = "Profile updated successfully.";
+                return RedirectToAction("Details", new { username = user.UserName });
+            }
+            catch (Exception ex)
+            {
+                TempData["Error"] = "An error occurred while updating the profile. Please try again.";
+                return RedirectToAction("Details", new { username = user.UserName });
+            }
+        }
+
+        [HttpPost]
+        [Authorize]
+        [ValidateAntiForgeryToken]
+        public IActionResult ChangePassword(ChangePasswordViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                TempData["Error"] = "Please fill in all required fields.";
+                return RedirectToAction("Details", new { username = User.FindFirst(ClaimTypes.NameIdentifier)?.Value });
+            }
+
+            var username = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var user = userService.GetByInformationUsername(username);
+
+            if (user == null)
+            {
+                TempData["Error"] = "User not found.";
+                return RedirectToAction("Details", new { username = User.FindFirst(ClaimTypes.NameIdentifier)?.Value });
+            }
+
+            if(model.NewPassword != model.ConfirmNewPassword)
+            {
+                TempData["Error"] = "New password doesn't not match";
+                return RedirectToAction("Details", new { username = User.FindFirst(ClaimTypes.NameIdentifier)?.Value });
+            }
+
+            if (!authManager.VerifyPassword(model.CurrentPassword, user.Password))
+            {
+                TempData["Error"] = "Current password is incorrect.";
+                return RedirectToAction("Details", new { username = User.FindFirst(ClaimTypes.NameIdentifier)?.Value });
+            }
+
+            try
+            {
+                var updatedUser = new User
+                {
+                    ID = user.ID,
+                    UserName = user.UserName,
+                    Password = authManager.HashPassword(model.NewPassword),
+                    Email = user.Email,
+                    IsAdmin = user.IsAdmin,
+                    Role = user.Role,
+                    FirstName = user.FirstName,
+                    LastName = user.LastName,
+                    ProfilePictureUrl = user.ProfilePictureUrl
+                };
+
+                userService.UpdateUser(user, updatedUser, user.ID);
+
+                TempData["Success"] = "Password changed successfully.";
+                return RedirectToAction("Details", new { username = user.UserName });
+            }
+            catch (Exception ex)
+            {
+                TempData["Error"] = "An error occurred while changing the password. Please try again.";
+                return RedirectToAction("Details", new { username = user.UserName });
+            }
+        }
+
 
         private string GenerateSessionId()
         {

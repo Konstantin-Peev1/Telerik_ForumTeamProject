@@ -226,7 +226,12 @@ namespace Telerik_ForumTeamProject.Controllers.MVC
                 {
                     if(model.TagDescriptions[0] != null)
                     {
-                        var newTags = model.TagDescriptions?.First().Split(',').Select(t => t.Trim()).Where(t => !string.IsNullOrWhiteSpace(t)).ToList() ?? new List<string>();
+                        var newTags = model.TagDescriptions?
+                            .First()
+                            .Split(',')
+                            .Select(t => t.Trim())
+                            .Where(t => !string.IsNullOrWhiteSpace(t))
+                            .ToList() ?? new List<string>();
                         foreach (string tag in newTags)
                         {
                             _tagService.UpdateTags(user, _postService.GetPost(id), tag);

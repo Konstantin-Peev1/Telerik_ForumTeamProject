@@ -6,7 +6,7 @@ namespace Telerik_ForumTeamProject.Helpers
     {
         public static string FormatToStandard(DateTime dateTime)
         {
-            string parsedDate = dateTime.ToString("dd.MM.yyyy HH:mm:s");
+            string parsedDate = dateTime.ToString("dd.MM.yyyy HH:mm");
 
             return parsedDate;
         }

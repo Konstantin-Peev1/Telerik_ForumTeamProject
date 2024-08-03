@@ -9,39 +9,59 @@
     var isAdmin = bool.Parse(User.FindFirst("isAdmin")?.Value ?? "false");
 }
 
-<div class="container mx-auto p-6 mt-6 bg-gray-700 shadow-md rounded-lg">
-    <div class="bg-gray-800 p-6 rounded-lg shadow-md">
+<div class="container mx-auto p-6 mt-6 bg-gray-700 shadow-md rounded-lg relative">
+    <!-- Success and Error Messages -->
+    @if (TempData["Success"] != null)
+    {
+        <div class="bg-green-500 text-white p-4 rounded mb-4 top-0 right-0 z-20">
+            <p>@TempData["Success"]</p>
+        </div>
+    }
+    @if (TempData["Error"] != null)
+    {
+        <div class="bg-red-500 text-white p-4 rounded mb-4 top-16 right-0 z-20">
+            <p>@TempData["Error"]</p>
+        </div>
+    }
 
-        @if (TempData["Success"] != null)
-        {
-            <div class="bg-green-500 text-white p-4 rounded mb-4">
-                <p>@TempData["Success"]</p>
-            </div>
-        }
-        @if (TempData["Error"] != null)
-        {
-            <div class="bg-red-500 text-white p-4 rounded mb-4">
-                <p>@TempData["Error"]</p>
-            </div>
-        }
+    <div class="bg-gray-800 p-6 rounded-lg shadow-md relative">
+        <!-- Profile Picture with Hover Edit Option -->
+        <div class="relative w-32 h-32 mr-4">
+            <img src="@Model.ProfilePictureUrl" class="w-full h-full rounded-full shadow-md bg-white object-cover" alt="Profile Picture" id="profilePictureImage" />
+            @if (loggedInUser == Model.UserName)
+            {
+                <div class="rounded-full absolute inset-0 flex items-center justify-center opacity-0 hover:opacity-100 bg-black bg-opacity-50 transition-opacity duration-300">
+                    <button class="text-white p-2 rounded bg-blue-500 hover:bg-blue-700 transition duration-300" onclick="toggleSection('profilePictureSection')">Edit</button>
+                </div>
+            }
+        </div>
 
-        <img src="@Model.ProfilePictureUrl" class="w-32 h-32 rounded-full shadow-md bg-white" alt="Profile Picture" />
-        <h2 class="text-3xl font-bold text-white mb-4">@Model.UserName</h2>
-        <p class="text-gray-300 mb-4">First Name: @Model.FirstName</p>
-        <p class="text-gray-300 mb-4">Last Name: @Model.LastName</p>
-        <p class="text-gray-300 mb-4">Role: @Model.Role</p>
+        <!-- Profile Picture Upload Form -->
+        <div id="profilePictureSection" class="hidden mt-4 bg-gray-700 p-6 rounded-lg shadow-md">
+            <form asp-action="UpdateProfilePicture" method="post" enctype="multipart/form-data">
+                <div class="mb-4">
+                    <label for="profilePicture" class="block text-sm font-medium text-gray-300">Profile Picture</label>
+                    <input type="file" name="profilePicture" class="mt-2 p-2 rounded bg-gray-600 text-gray-100 w-full" />
+                </div>
+                <button type="submit" class="bg-green-500 text-white p-2 mt-2 rounded hover:bg-green-700 transition duration-300">Save Picture</button>
+            </form>
+        </div>
+
+
+        <h2 class="text-3xl font-bold text-white mb-4">@Model.UserName <span class="text-lg font-normal">(@Model.Role)</span></h2>
 
         @if (loggedInUser == Model.UserName)
         {
-            <form asp-action="UpdateProfilePicture" method="post" enctype="multipart/form-data" class="mt-4">
-                <label for="profilePicture" class="block text-sm font-medium text-gray-300">Upload new profile picture</label>
-                <input type="file" name="profilePicture" class="mt-2 p-2 rounded bg-gray-600 text-gray-100" />
-                <button type="submit" class="bg-green-500 text-white p-2 mt-2 rounded hover:bg-green-700 transition duration-300">Update profile picture</button>
-            </form>
+            <!-- Position container for buttons -->
+            <div class="absolute top-6 right-6 flex space-x-2 z-10">
+                <button class="bg-blue-500 text-white p-2 rounded hover:bg-blue-700 transition duration-300" onclick="toggleSection('editSection')">Edit</button>
+                <button class="bg-blue-500 text-white p-2 rounded hover:bg-blue-700 transition duration-300" onclick="toggleSection('changePasswordSection')">Change Password</button>
+            </div>
         }
+
         @if (isAdmin)
         {
-            <div class="mt-4">
+            <div class="absolute top-6 right-6 flex space-x-2 z-10">
                 @if (Model.IsBlocked && Model.UserName != loggedInUser)
                 {
                     <form asp-action="UnblockUser" method="post" class="inline-block mr-2">
@@ -74,8 +94,63 @@
             </div>
         }
 
-        <button class="bg-green-500 text-white p-2 mt-4 rounded hover:bg-green-700 transition duration-300" onclick="toggleSection('postsSection')">Toggle Posts</button>
-        <button class="bg-green-500 text-white p-2 mt-4 rounded hover:bg-green-700 transition duration-300" onclick="toggleSection('commentsSection')">Toggle Comments</button>
+
+        <div class="flex-1">
+            <p class="font-medium">First Name</p>
+            <p class="mt-1">@Model.FirstName</p>
+        </div>
+        <div class="flex-1">
+            <p class="font-medium">Last Name</p>
+            <p class="mt-1">@Model.LastName</p>
+        </div>
+
+
+
+        <div id="editSection" class="hidden mt-4 bg-gray-700 p-6 rounded-lg shadow-md">
+            <!-- Single Form for Changing Profile Picture, First Name, and Last Name -->
+            <form asp-action="Edit" method="post" enctype="multipart/form-data">
+                <!-- First Name -->
+                <div class="mb-4">
+                    <label for="firstName" class="block text-sm font-medium text-gray-300">First Name</label>
+                    <input type="text" name="firstName" value="@Model.FirstName" class="mt-2 p-2 rounded bg-gray-600 text-gray-100 w-full" />
+                </div>
+
+                <!-- Last Name -->
+                <div class="mb-4">
+                    <label for="lastName" class="block text-sm font-medium text-gray-300">Last Name</label>
+                    <input type="text" name="lastName" value="@Model.LastName" class="mt-2 p-2 rounded bg-gray-600 text-gray-100 w-full" />
+                </div>
+
+                <!-- Save Button -->
+                <button type="submit" class="bg-green-500 text-white p-2 mt-2 rounded hover:bg-green-700 transition duration-300">Save Changes</button>
+            </form>
+        </div>
+
+        <!-- Change Password Section -->
+        <div id="changePasswordSection" class="hidden mt-4 bg-gray-700 p-6 rounded-lg shadow-md">
+            <form asp-action="ChangePassword" method="post">
+                <div class="relative z-0 w-full mb-5 group">
+                    <label for="floating_current_password" class="block text-sm font-medium text-gray-300">Current Password</label>
+                    <input type="password" name="currentPassword" id="floating_current_password" class="mt-2 p-2 rounded bg-gray-600 text-gray-100" required />
+                </div>
+                <div class="relative z-0 w-full mb-5 group">
+                    <label for="floating_new_password" class="block text-sm font-medium text-gray-300">New Password</label>
+                    <input type="password" name="newPassword" id="floating_new_password" class="mt-2 p-2 rounded bg-gray-600 text-gray-100" required />
+                </div>
+                <div class="relative z-0 w-full mb-5 group">
+                    <label for="floating_confirm_new_password" class="block text-sm font-medium text-gray-300">Confirm New Password</label>
+                    <input type="password" name="confirmNewPassword" id="floating_confirm_new_password" class="mt-2 p-2 rounded bg-gray-600 text-gray-100" required />
+                </div>
+                <button type="submit" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Save Changes</button>
+            </form>
+        </div>
+
+
+
+        <div class="flex space-x-2 mt-4">
+            <button class="bg-green-500 text-white p-2 rounded hover:bg-green-700 transition duration-300" onclick="toggleSection('postsSection')">Toggle Posts</button>
+            <button class="bg-green-500 text-white p-2 rounded hover:bg-green-700 transition duration-300" onclick="toggleSection('commentsSection')">Toggle Comments</button>
+        </div>
 
         <div id="postsSection" class="hidden">
             <h3 class="text-2xl font-bold text-white mt-6">Posts (@Model.Posts.Count())</h3>
@@ -97,6 +172,7 @@
             <h3 class="text-2xl font-bold text-white mt-6">Comments (@Model.Comments.Count())</h3>
             @foreach (var comment in Model.Comments)
             {
+
                 <div class="mt-4 bg-gray-700 p-6 rounded-lg shadow-md">
                     <div class="bg-gray-800 p-6 rounded-lg shadow-md">
                         <h2 class="text-3xl font-bold text-white mb-4">
@@ -114,12 +190,8 @@
 @section Scripts {
     <script>
         function toggleSection(sectionId) {
-            var section = document.getElementById(sectionId);
-            if (section.classList.contains('hidden')) {
-                section.classList.remove('hidden');
-            } else {
-                section.classList.add('hidden');
-            }
+            const section = document.getElementById(sectionId);
+            section.classList.toggle('hidden');
         }
     </script>
 }
