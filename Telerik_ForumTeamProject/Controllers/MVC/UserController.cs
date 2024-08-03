@@ -26,17 +26,17 @@ namespace Telerik_ForumTeamProject.Controllers.MVC
         private readonly ICloudinaryService cloudinaryService;
         private readonly ModelMapper modelMapper;
         private readonly AuthManager authManager;
-        private readonly ILogger<UserController> logger;
+        
         private readonly List<string> allowedExtensions = new List<string> { ".jpg", ".jpeg", ".png" };
 
-        public UserController(IUserService userService, IPostService postService, ICloudinaryService cloudinaryService, ModelMapper modelMapper, AuthManager authManager, ILogger<UserController> logger)
+        public UserController(IUserService userService, IPostService postService, ICloudinaryService cloudinaryService, ModelMapper modelMapper, AuthManager authManager)
         {
             this.userService = userService;
             this.postService = postService;
             this.modelMapper = modelMapper;
             this.authManager = authManager;
             this.cloudinaryService = cloudinaryService;
-            this.logger = logger;
+            
         }
 
         [HttpGet]
@@ -57,7 +57,7 @@ namespace Telerik_ForumTeamProject.Controllers.MVC
                 return View(new LogInRequestDTO());
             }
 
-            logger.LogInformation("Received login request with UserName: {UserName}", loginRequest.UserName);
+            //logger.LogInformation("Received login request with UserName: {UserName}", loginRequest.UserName);
 
             try
             {
@@ -141,12 +141,12 @@ namespace Telerik_ForumTeamProject.Controllers.MVC
                     ModelState.AddModelError("Email", "Email is already taken.");
                 }
 
-                return View(registerRequest);
+                return Conflict(registerRequest);
             }
             catch (Exception ex)
             {
                 ModelState.AddModelError(string.Empty, "An error occurred while registering the user.");
-                return View(registerRequest);
+                return Conflict(registerRequest);
             }
         }
 
