@@ -60,37 +60,45 @@ namespace Telerik_ForumTeamProject.Controllers.MVC
             return Json(new { success = true, likeCount });
         }
 
+        [AllowAnonymous]
         public IActionResult Index(PostQueryParamteres filterParams, int page = 1, int pageSize = 10)
         {
-            User currentUser = GetCurrentUser();
-            PagedResult<Post> pagedPosts = _postService.GetPagedPosts(page, pageSize, filterParams);
-
-            var postViewModels = pagedPosts.Items.Select(post => new PostViewModel
+            try
             {
-                id = post.Id,
-                Title = post.Title,
-                Content = post.Content,
-                Likes = post.Likes?.Count ?? 0,
-                PostDate = DateTimeFormatter.FormatToStandard(post.Created),
-                Comments = post.Comments?.Select(comment => new CommentReplyResponseDTO
+                User currentUser = GetCurrentUser();
+                PagedResult<Post> pagedPosts = _postService.GetPagedPosts(page, pageSize, filterParams);
+
+                var postViewModels = pagedPosts.Items.Select(post => new PostViewModel
                 {
-                    Content = comment?.Content ?? "No content",
-                }).ToList() ?? new List<CommentReplyResponseDTO>(),
-                UserName = post.User.UserName,
-                userProfilePictureURL = post.User.ProfilePictureUrl,
-                Tags = post.Tags?.Select(tag => tag.Description).ToList() ?? new List<string>(),
-                IsCreator = post.UserID == currentUser.ID,
-                IsAdmin = currentUser.IsAdmin,
-                LastModified = post.LastModified,
-            }).ToList();
+                    id = post.Id,
+                    Title = post.Title,
+                    Content = post.Content,
+                    Likes = post.Likes?.Count ?? 0,
+                    PostDate = DateTimeFormatter.FormatToStandard(post.Created),
+                    Comments = post.Comments?.Select(comment => new CommentReplyResponseDTO
+                    {
+                        Content = comment?.Content ?? "No content",
+                    }).ToList() ?? new List<CommentReplyResponseDTO>(),
+                    UserName = post.User.UserName,
+                    userProfilePictureURL = post.User.ProfilePictureUrl,
+                    Tags = post.Tags?.Select(tag => tag.Description).ToList() ?? new List<string>(),
+                    IsCreator = post.UserID == currentUser.ID,
+                    IsAdmin = currentUser.IsAdmin,
+                    LastModified = post.LastModified,
+                }).ToList();
 
-            var pagedPostViewModel = new PagedPostViewModel
+                var pagedPostViewModel = new PagedPostViewModel
+                {
+                    Posts = postViewModels,
+                    PaginationMetadata = pagedPosts.Metadata
+                };
+
+                return View(pagedPostViewModel);
+            }
+            catch(EntityNotFoundException ex)
             {
-                Posts = postViewModels,
-                PaginationMetadata = pagedPosts.Metadata
-            };
-
-            return View(pagedPostViewModel);
+                return RedirectToAction("Login", "User");
+            }
         }
 
         [HttpGet]
@@ -171,7 +179,6 @@ namespace Telerik_ForumTeamProject.Controllers.MVC
                 {
                     var post = _modelMapper.Map(model);
                     _postService.CreatePost(post, user);
-
                     // Add tags if provided
                     if (model.TagDescriptions != null && model.TagDescriptions[0] != null)
                     {
@@ -183,15 +190,24 @@ namespace Telerik_ForumTeamProject.Controllers.MVC
                         }
                     }
 
+                    
                     return RedirectToAction("Index", "Post");
                 }
                 catch (AuthorisationExcpetion ex)
                 {
                     ModelState.AddModelError(string.Empty, ex.Message);
                 }
+                catch(ArgumentException)
+                {
+                    return RedirectToAction("Index", "Post");
+                }
+                
             }
+            
+                return View(model);
+            
 
-            return View(model);
+            
         }
 
 

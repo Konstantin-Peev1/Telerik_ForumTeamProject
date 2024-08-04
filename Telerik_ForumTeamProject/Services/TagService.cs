@@ -55,7 +55,7 @@ namespace Telerik_ForumTeamProject.Services
             if(post.Tags.Count >= 2)
             {
                
-                   throw new AuthorisationExcpetion("No more than two tags!");
+                   throw new ArgumentException("No more than two tags!");
                 
             }
             if(tagRepository.TagExists(desc) 

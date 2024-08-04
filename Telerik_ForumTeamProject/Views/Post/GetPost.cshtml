@@ -10,13 +10,27 @@
     var isAdmin = bool.Parse(User.FindFirst("isAdmin")?.Value ?? "false");
 }
 
+@functions {
+    public string Truncate(string value, int maxChars)
+    {
+        return value.Length <= maxChars ? value : value.Substring(0, maxChars) + "...";
+    }
+}
+
+<style>
+    .content-wrapper {
+        word-break: break-word;
+        overflow-wrap: break-word;
+    }
+</style>
+
 <div class="container mx-auto p-6 mt-6 bg-gray-700 shadow-md rounded-lg">
 
     <div class="bg-gray-800 p-6 rounded-lg shadow-md relative">
         <div class="flex justify-between items-start">
             <div>
                 <h2 class="text-3xl font-bold text-white mb-4">@Model.Title</h2>
-                <p class="text-gray-300 mb-4">@Model.Content</p>
+                <p class="text-gray-300 mb-4 content-wrapper">@Model.Content</p>
                 <p class="text-gray-500 mb-4">Posted on: @Model.PostDate</p>
                 <p class="text-gray-500 mb-4">Likes: @Model.Likes</p>
                 <p class="text-gray-500 mb-4">Creator: @Model.UserName</p>
@@ -41,7 +55,7 @@
         </div>
     </div>
 
-    <div class="mt-6">
+    <div class="mt-6 content-wrapper">
         @if (TempData["ReplyError"] != null)
         {
             <div class="bg-red-500 text-white p-4 rounded mb-4">
@@ -60,7 +74,7 @@
         @foreach (var comment in Model.Comments)
         {
 
-            <div class="bg-gray-800 p-4 mb-4 rounded-lg shadow-md relative">
+            <div class="bg-gray-800 p-4 mb-4 rounded-lg shadow-md relative content-wrapper">
                 <p class="text-gray-300">@comment.Content</p>
                 <p class="text-gray-500 mb-4">By: @comment.UserName on @comment.Created</p>
 
@@ -112,7 +126,7 @@
                         <h3 class="text-xl font-bold text-white mb-4">Replies:</h3>
                         @foreach (var reply in comment.Replies)
                         {
-                            <div class="bg-gray-700 p-4 mb-4 rounded-lg shadow-md">
+                            <div class="bg-gray-700 p-4 mb-4 rounded-lg shadow-md content-wrapper">
                                 <p class="text-gray-300">@reply.Content</p>
                                 <p class="text-gray-500 mb-4">By: @reply.UserName on @reply.Created</p>
                             </div>
@@ -183,6 +197,4 @@
         replyForm.classList.add('hidden');
         showRepliesButton.classList.remove('hidden');
     }
-
-
 </script>
