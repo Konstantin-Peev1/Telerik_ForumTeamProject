@@ -459,6 +459,83 @@ namespace Telerik_ForumTeamProject.Tests.Controllers.MVC
         }
 
         [TestMethod]
+        public void Edit_ShouldUpdateUser_WhenModelIsValid()
+        {
+            // Arrange
+            var model = new EditUserViewModel { FirstName = "NewFirstName", LastName = "NewLastName" };
+            var user = new User
+            {
+                ID = 1,
+                UserName = "testuser",
+                Password = "password",
+                Email = "email@example.com",
+                IsAdmin = false,
+                Role = "User",
+                FirstName = "FirstName",
+                LastName = "LastName",
+                ProfilePictureUrl = "http://example.com/pic.jpg"
+            };
+
+            _userServiceMock.Setup(x => x.GetByInformationUsername(It.IsAny<string>())).Returns(user);
+            _userServiceMock.Setup(x => x.UpdateUser(It.IsAny<User>(), It.IsAny<User>(), It.IsAny<int>())).Returns(user);
+
+            // Act
+            var result = _controller.Edit(model) as RedirectToActionResult;
+
+            // Assert
+            Assert.IsNotNull(result);
+            Assert.AreEqual("Details", result.ActionName);
+            Assert.AreEqual("testuser", result.RouteValues["username"]);
+            Assert.AreEqual("Profile updated successfully.", _controller.TempData["Success"]);
+        }
+
+        [TestMethod]
+        public void Edit_ShouldReturnNotFound_WhenUserNotFound()
+        {
+            // Arrange
+            var model = new EditUserViewModel { FirstName = "NewFirstName", LastName = "NewLastName" };
+
+            _userServiceMock.Setup(x => x.GetByInformationUsername(It.IsAny<string>())).Returns((User)null);
+
+            // Act
+            var result = _controller.Edit(model) as NotFoundResult;
+
+            // Assert
+            Assert.IsNotNull(result);
+        }
+
+        [TestMethod]
+        public void Edit_ShouldReturnError_WhenExceptionOccurs()
+        {
+            // Arrange
+            var model = new EditUserViewModel { FirstName = "NewFirstName", LastName = "NewLastName" };
+            var user = new User
+            {
+                ID = 1,
+                UserName = "testuser",
+                Password = "password",
+                Email = "email@example.com",
+                IsAdmin = false,
+                Role = "User",
+                FirstName = "FirstName",
+                LastName = "LastName",
+                ProfilePictureUrl = "http://example.com/pic.jpg"
+            };
+
+            _userServiceMock.Setup(x => x.GetByInformationUsername(It.IsAny<string>())).Returns(user);
+            _userServiceMock.Setup(x => x.UpdateUser(It.IsAny<User>(), It.IsAny<User>(), It.IsAny<int>())).Throws(new Exception());
+
+            // Act
+            var result = _controller.Edit(model) as RedirectToActionResult;
+
+            // Assert
+            Assert.IsNotNull(result);
+            Assert.AreEqual("Details", result.ActionName);
+            Assert.AreEqual("testuser", result.RouteValues["username"]);
+            Assert.AreEqual("An error occurred while updating the profile. Please try again.", _controller.TempData["Error"]);
+        }
+
+        [TestMethod]
         public async Task ReturnError_When_FileExtensionIsNotAllowed()
         {
             // Arrange
@@ -514,6 +591,121 @@ namespace Telerik_ForumTeamProject.Tests.Controllers.MVC
             Assert.AreEqual("Details", result.ActionName);
             Assert.AreEqual("User not found", _controller.TempData["Error"]);
         }
+
+        [TestMethod]
+        public void ChangePassword_ShouldReturnRedirectToDetails_WhenPasswordIsChanged()
+        {
+            // Arrange
+            var model = new ChangePasswordViewModel { CurrentPassword = "oldPassword", NewPassword = "newPassword", ConfirmNewPassword = "newPassword" };
+            var user = new User { ID = 1, UserName = "John", Password = "hashedPassword", Email = "john@example.com" };
+
+            _userServiceMock.Setup(x => x.GetByInformationUsername(It.IsAny<string>())).Returns(user);
+            _authManagerMock.Setup(x => x.VerifyPassword(It.IsAny<string>(), It.IsAny<string>())).Returns(true);
+            _authManagerMock.Setup(x => x.HashPassword(It.IsAny<string>())).Returns("hashedNewPassword");
+
+            // Act
+            var result = _controller.ChangePassword(model) as RedirectToActionResult;
+
+            // Assert
+            Assert.IsNotNull(result);
+            Assert.AreEqual("Details", result.ActionName);
+            Assert.AreEqual(user.UserName, result.RouteValues["username"]);
+            Assert.AreEqual("Password changed successfully.", _controller.TempData["Success"]);
+        }
+
+        [TestMethod]
+        public void ChangePassword_ShouldReturnRedirectToDetails_WhenUserNotFound()
+        {
+            // Arrange
+            var model = new ChangePasswordViewModel { CurrentPassword = "oldPassword", NewPassword = "newPassword", ConfirmNewPassword = "newPassword" };
+            _userServiceMock.Setup(x => x.GetByInformationUsername(It.IsAny<string>())).Returns((User)null);
+
+            // Act
+            var result = _controller.ChangePassword(model) as RedirectToActionResult;
+
+            // Assert
+            Assert.IsNotNull(result);
+            Assert.AreEqual("Details", result.ActionName);
+            Assert.AreEqual("John", result.RouteValues["username"]);
+            Assert.AreEqual("User not found.", _controller.TempData["Error"]);
+        }
+
+        [TestMethod]
+        public void ChangePassword_ShouldReturnRedirectToDetails_WhenCurrentPasswordIsIncorrect()
+        {
+            // Arrange
+            var model = new ChangePasswordViewModel { CurrentPassword = "incorrectPassword", NewPassword = "newPassword", ConfirmNewPassword = "newPassword" };
+            var user = new User { ID = 1, UserName = "John", Password = "hashedPassword", Email = "john@example.com" };
+
+            _userServiceMock.Setup(x => x.GetByInformationUsername(It.IsAny<string>())).Returns(user);
+            _authManagerMock.Setup(x => x.VerifyPassword(It.IsAny<string>(), It.IsAny<string>())).Returns(false);
+
+            // Act
+            var result = _controller.ChangePassword(model) as RedirectToActionResult;
+
+            // Assert
+            Assert.IsNotNull(result);
+            Assert.AreEqual("Details", result.ActionName);
+            Assert.AreEqual(user.UserName, result.RouteValues["username"]);
+            Assert.AreEqual("Current password is incorrect.", _controller.TempData["Error"]);
+        }
+
+        [TestMethod]
+        public void ChangePassword_ShouldReturnRedirectToDetails_WhenPasswordsDoNotMatch()
+        {
+            // Arrange
+            var model = new ChangePasswordViewModel { CurrentPassword = "oldPassword", NewPassword = "newPassword", ConfirmNewPassword = "differentNewPassword" };
+            var user = new User { ID = 1, UserName = "John", Password = "hashedPassword", Email = "john@example.com" };
+
+            _userServiceMock.Setup(x => x.GetByInformationUsername(It.IsAny<string>())).Returns(user);
+
+            // Act
+            var result = _controller.ChangePassword(model) as RedirectToActionResult;
+
+            // Assert
+            Assert.IsNotNull(result);
+            Assert.AreEqual("Details", result.ActionName);
+            Assert.AreEqual(user.UserName, result.RouteValues["username"]);
+            Assert.AreEqual("New password doesn't not match", _controller.TempData["Error"]);
+        }
+
+        [TestMethod]
+        public void ChangePassword_ShouldReturnError_WhenModelIsInvalid()
+        {
+            // Arrange
+            var model = new ChangePasswordViewModel { CurrentPassword = "currentpassword", NewPassword = "newpassword", ConfirmNewPassword = "differentpassword" };
+
+            // Act
+            var result = _controller.ChangePassword(model) as RedirectToActionResult;
+
+            // Assert
+            Assert.IsNotNull(result);
+            Assert.AreEqual("Details", result.ActionName);
+            
+            Assert.AreEqual("New password doesn't not match", _controller.TempData["Error"]);
+        }
+
+        
+        [TestMethod]
+        public void ChangePassword_ShouldReturnError_WhenUserNotFound()
+        {
+            // Arrange
+            var model = new ChangePasswordViewModel { CurrentPassword = "currentpassword", NewPassword = "newpassword", ConfirmNewPassword = "newpassword" };
+
+            _userServiceMock.Setup(x => x.GetByInformationUsername(It.IsAny<string>())).Returns((User)null);
+
+            // Act
+            var result = _controller.ChangePassword(model) as RedirectToActionResult;
+
+            // Assert
+            Assert.IsNotNull(result);
+            Assert.AreEqual("Details", result.ActionName);
+            
+            Assert.AreEqual("User not found.", _controller.TempData["Error"]);
+        }
+
+       
+
 
         [TestMethod]
         public async Task ReturnError_When_GeneralExceptionIsThrown()

@@ -13,6 +13,8 @@
     <None Remove="wwwroot\**" />
   </ItemGroup>
 
+	
+
   <ItemGroup>
     <Content Remove="Views\Post\Comments.cshtml" />
   </ItemGroup>
@@ -41,6 +43,8 @@
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
     <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="6.35.0" />
   </ItemGroup>
+    
+
 
   <ItemGroup>
     <UpToDateCheckInput Remove="Views\Post\Comments.cshtml" />
