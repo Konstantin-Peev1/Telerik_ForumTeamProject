@@ -245,6 +245,12 @@ namespace Telerik_ForumTeamProject.Controllers.MVC
                 TempData["Error"] = ex.Message;
                 return RedirectToAction("Details", new { username = user.UserName });
             }
+            catch (AuthorisationExcpetion ex)
+            {
+                Response.StatusCode = StatusCodes.Status403Forbidden;
+                ViewData["ErrorMessage"] = ex.Message;
+                return View("Error");
+            }
             catch (Exception ex)
             {
                 TempData["Error"] = "An error occurred while updating the profile picture. Please try again.";
@@ -356,6 +362,12 @@ namespace Telerik_ForumTeamProject.Controllers.MVC
                 TempData["Success"] = "Profile updated successfully.";
                 return RedirectToAction("Details", new { username = user.UserName });
             }
+            catch (AuthorisationExcpetion ex)
+            {
+                Response.StatusCode = StatusCodes.Status403Forbidden;
+                ViewData["ErrorMessage"] = ex.Message;
+                return View("Error");
+            }
             catch (Exception ex)
             {
                 TempData["Error"] = "An error occurred while updating the profile. Please try again.";
@@ -414,6 +426,12 @@ namespace Telerik_ForumTeamProject.Controllers.MVC
 
                 TempData["Success"] = "Password changed successfully.";
                 return RedirectToAction("Details", new { username = user.UserName });
+            }
+            catch (AuthorisationExcpetion ex)
+            {
+                Response.StatusCode = StatusCodes.Status403Forbidden;
+                ViewData["ErrorMessage"] = ex.Message;
+                return View("Error");
             }
             catch (Exception ex)
             {

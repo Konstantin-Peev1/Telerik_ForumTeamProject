@@ -99,6 +99,7 @@ namespace Telerik_ForumTeamProject.Repositories
         public User BlockUser(User user)
         {
             user.IsBlocked = true;
+            user.Role = "Blocked user";
             this.applicationConetxt.SaveChanges();
             return user;
         }
@@ -122,6 +123,7 @@ namespace Telerik_ForumTeamProject.Repositories
         public User UnBlockUser(User user)
         {
             user.IsBlocked = false;
+            user.Role = "User";
             this.applicationConetxt.SaveChanges();
             return user;
         }

@@ -56,11 +56,15 @@ namespace Telerik_ForumTeamProject.Services
         public User UpdateUser(User user, User userToUpdate, int id)
         {
             var validateUser = this.userRepository.GetUserByID(id);
+            if (user.IsBlocked)
+            {
+               throw new AuthorisationExcpetion("Blocked users cannot edit their profile information.");
+            }
             if(user.ID != validateUser.ID)
             {
                 throw new AuthorisationExcpetion("You can't edit other users!");
             }
-            if(user.UserName != userToUpdate.UserName && this.userRepository.UserExists(userToUpdate.UserName))
+            if (user.UserName != userToUpdate.UserName && this.userRepository.UserExists(userToUpdate.UserName))
             {
                 throw new DuplicateEntityException("User with such username exists");
             }
@@ -70,6 +74,10 @@ namespace Telerik_ForumTeamProject.Services
         public User UpdateProfilePicture(int userId, string profilePictureUrl)
         {
             User userToUpdate = this.userRepository.GetUserByID(userId);
+            if (userToUpdate.IsBlocked)
+            {
+                throw new AuthorisationExcpetion("Blocked user cannot update their profile picture.");
+            }
 
             if(userToUpdate == null)
             {

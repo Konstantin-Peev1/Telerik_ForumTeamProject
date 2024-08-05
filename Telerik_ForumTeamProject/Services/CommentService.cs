@@ -57,12 +57,20 @@ namespace Telerik_ForumTeamProject.Services
 
         public Comment CreateComment(Comment comment, User user)
         {
+            if (user.IsBlocked)
+            {
+                throw new AuthorisationExcpetion("Blocked users can't create comments");
+            }
             comment.UserID = user.ID;
             Comment result = this.commentRepository.CreateComment(comment);
             return result;
         }
         public Comment CreateReply(Comment reply, int parentCommentId, User user)
         {
+            if (user.IsBlocked)
+            {
+                throw new AuthorisationExcpetion("Blocked users can't reply to comments");
+            }
             reply.UserID = user.ID;
             Comment result = this.commentRepository.CreateReply(reply, parentCommentId);
             return result;

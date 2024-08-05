@@ -20,7 +20,7 @@ namespace Telerik_ForumTeamProject.Controllers.MVC
         private readonly IPostService _postService;
         private readonly ICommentService _commentService;
         private readonly ModelMapper _modelMapper;
-        
+
         private readonly ILikeService _likeService;
         private readonly ITagService _tagService;
 
@@ -95,7 +95,7 @@ namespace Telerik_ForumTeamProject.Controllers.MVC
 
                 return View(pagedPostViewModel);
             }
-            catch(EntityNotFoundException ex)
+            catch (EntityNotFoundException ex)
             {
                 return RedirectToAction("Login", "User");
             }
@@ -162,11 +162,24 @@ namespace Telerik_ForumTeamProject.Controllers.MVC
         [HttpGet]
         public IActionResult Create()
         {
-            var postModel = new PostRequestDTO();
-            return View(postModel);
+
+
+            try
+            {
+                var user = GetCurrentUser();
+                var postModel = new PostRequestDTO();
+                return View(postModel);
+            }
+            catch (AuthorisationExcpetion ex)
+            {
+                Response.StatusCode = StatusCodes.Status403Forbidden;
+                ViewData["ErrorMessage"] = ex.Message;
+                return View("Error");
+            }
+
         }
 
-       
+
 
         [HttpPost]
         public IActionResult Create(PostRequestDTO model)
@@ -183,52 +196,59 @@ namespace Telerik_ForumTeamProject.Controllers.MVC
                     if (model.TagDescriptions != null && model.TagDescriptions[0] != null)
                     {
                         var tags = model.TagDescriptions.First().Split(',').Select(t => t.Trim()).Where(t => !string.IsNullOrWhiteSpace(t)).ToList();
-                        
+
                         foreach (var tag in tags)
                         {
                             _tagService.UpdateTags(user, post, tag);
                         }
                     }
 
-                    
+
                     return RedirectToAction("Index", "Post");
                 }
                 catch (AuthorisationExcpetion ex)
                 {
-                    ModelState.AddModelError(string.Empty, ex.Message);
+                    Response.StatusCode = StatusCodes.Status403Forbidden;
+                    ViewData["ErrorMessage"] = ex.Message;
+                    return View("Error");
                 }
-                catch(ArgumentException)
+                catch (ArgumentException)
                 {
                     return RedirectToAction("Index", "Post");
                 }
-                
-            }
-            
-                return View(model);
-            
 
-            
+            }
+            return View(model);
         }
 
 
         [HttpGet]
         public IActionResult Edit(int id)
         {
-            var post = _postService.GetPost(id);
-            if (post == null)
+            try
             {
-                return NotFound();
+                var post = _postService.GetPost(id);
+                if (post == null)
+                {
+                    return NotFound();
+                }
+                var model = new PostRequestDTO
+                {
+                    Title = post.Title,
+                    Content = post.Content,
+                    TagDescriptions = post.Tags.Select(tag => tag.Description).ToList()
+                };
+
+
+                ViewData["PostId"] = id;
+                return View(model);
             }
-
-            var model = new PostRequestDTO
+            catch (AuthorisationExcpetion ex)
             {
-                Title = post.Title,
-                Content = post.Content,
-                TagDescriptions = post.Tags.Select(tag => tag.Description).ToList()
-            };
-
-            ViewData["PostId"] = id;
-            return View(model);
+                Response.StatusCode = StatusCodes.Status403Forbidden;
+                ViewData["ErrorMessage"] = ex.Message;
+                return View("Error");
+            }
         }
 
         [HttpPost]
@@ -240,7 +260,7 @@ namespace Telerik_ForumTeamProject.Controllers.MVC
                 var post = _modelMapper.Map(model);
                 try
                 {
-                    if(model.TagDescriptions[0] != null)
+                    if (model.TagDescriptions[0] != null)
                     {
                         var newTags = model.TagDescriptions?
                             .First()
@@ -253,13 +273,13 @@ namespace Telerik_ForumTeamProject.Controllers.MVC
                             _tagService.UpdateTags(user, _postService.GetPost(id), tag);
                         }
                     }
-                   
+
                 }
-                catch(AuthorisationExcpetion ex)
+                catch (AuthorisationExcpetion ex)
                 {
                     ModelState.AddModelError(string.Empty, ex.Message);
                 }
-               
+
 
                 _postService.UpdatePost(id, post, user);
 
@@ -273,9 +293,9 @@ namespace Telerik_ForumTeamProject.Controllers.MVC
         public IActionResult DeleteTag(int postId, string tagDescription)
         {
             var user = GetCurrentUser();
-            var post = _postService.GetPost(postId);      
+            var post = _postService.GetPost(postId);
             _tagService.RemoveTags(user, post, tagDescription);
-            
+
 
             return RedirectToAction("Edit", new { id = postId });
         }
@@ -299,36 +319,56 @@ namespace Telerik_ForumTeamProject.Controllers.MVC
         [ValidateAntiForgeryToken]
         public IActionResult AddComment(int postId, CommentRequestDTO commentRequest)
         {
-            if (commentRequest == null || string.IsNullOrWhiteSpace(commentRequest.Content))
+            try
             {
+                if (commentRequest == null || string.IsNullOrWhiteSpace(commentRequest.Content))
+                {
+                    return RedirectToAction("GetPost", new { id = postId });
+                }
+
+                var user = GetCurrentUser();
+                var comment = _modelMapper.Map(commentRequest, postId);
+
+
+                _commentService.CreateComment(comment, user);
+
                 return RedirectToAction("GetPost", new { id = postId });
             }
-
-            var user = GetCurrentUser();
-            var comment = _modelMapper.Map(commentRequest, postId);
-
-            
-            _commentService.CreateComment(comment, user);
-
-            return RedirectToAction("GetPost", new { id = postId });
-        }
-
-        public IActionResult AddReply (int postId, int parentCommentId, CommentRequestDTO replyRequest)
-        {
-            var comment = _commentService.GetComment(parentCommentId);
-            if (replyRequest == null || string.IsNullOrWhiteSpace(replyRequest.Content))
+            catch (AuthorisationExcpetion ex)
             {
-                TempData["ReplyError"] = "Reply cannot be empty";
-                return RedirectToAction("GetPost", new { id = comment.PostID });
+                Response.StatusCode = StatusCodes.Status403Forbidden;
+                ViewData["ErrorMessage"] = ex.Message;
+                return View("Error");
             }
 
-            User user = GetCurrentUser();
-            Comment reply = _modelMapper.Map(replyRequest);
-            Comment replyToCreate = _commentService.CreateReply(reply, parentCommentId, user);
-            CommentReplyResponseDTO response = _modelMapper.Map(replyToCreate);
+        }
 
-            TempData["ReplySuccess"] = "Reply added successfully";
-            return RedirectToAction("GetPost", new { id = comment.PostID });
+        public IActionResult AddReply(int postId, int parentCommentId, CommentRequestDTO replyRequest)
+        {
+            try
+            {
+                var comment = _commentService.GetComment(parentCommentId);
+                if (replyRequest == null || string.IsNullOrWhiteSpace(replyRequest.Content))
+                {
+                    TempData["ReplyError"] = "Reply cannot be empty";
+                    return RedirectToAction("GetPost", new { id = comment.PostID });
+                }
+
+                User user = GetCurrentUser();
+                Comment reply = _modelMapper.Map(replyRequest);
+                Comment replyToCreate = _commentService.CreateReply(reply, parentCommentId, user);
+                CommentReplyResponseDTO response = _modelMapper.Map(replyToCreate);
+
+                TempData["ReplySuccess"] = "Reply added successfully";
+                return RedirectToAction("GetPost", new { id = comment.PostID });
+            }
+            catch (AuthorisationExcpetion ex)
+            {
+                Response.StatusCode = StatusCodes.Status403Forbidden;
+                ViewData["ErrorMessage"] = ex.Message;
+                return View("Error");
+            }
+            
 
         }
 
