@@ -91,7 +91,7 @@ namespace Telerik_ForumTeamProject.Test.Services.TagServiceTests
             };
 
 
-            Assert.ThrowsException<AuthorisationExcpetion>(() => this._sut.UpdateTags(user, post, "Tag3"));
+            Assert.ThrowsException<ArgumentException>(() => this._sut.UpdateTags(user, post, "Tag3"));
         }
 
         [TestMethod]
